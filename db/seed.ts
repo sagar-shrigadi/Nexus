@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { db } from "@/db/index";
-import { users } from "@/db/schema";
+import { users, posts } from "@/db/schema";
 import bcrypt from "bcryptjs";
 
 interface User {
@@ -8,7 +8,7 @@ interface User {
   lastName: string;
   username: string;
   password: string;
-  bio: string;
+  bio: string | null;
 }
 
 async function createRandomUser(): Promise<User> {
@@ -25,23 +25,26 @@ async function createRandomUser(): Promise<User> {
   };
 }
 async function seedUsers() {
-  const users: User[] = [];
   for (let i = 0; i <= 20; i++) {
     const user = await createRandomUser();
-    users.push(user);
-  }
-  return users;
-}
-async function seed() {
-  const seededUsers = await seedUsers();
-
-  for (const user of seededUsers) {
     await db.insert(users).values({
       firstName: user.firstName,
       lastName: user.lastName,
       username: user.username,
       password: user.password,
       bio: user.bio,
+    });
+  }
+}
+async function seed() {
+  await seedUsers();
+  const seededUsers = await db.select().from(users);
+
+  for (const user of seededUsers) {
+    await db.insert(posts).values({
+      title: `from ${user.username}`,
+      content: `Hello, I am ${user.firstName} ${user.lastName}.\nBio: ${user.bio}`,
+      userId: user.id,
     });
   }
 }

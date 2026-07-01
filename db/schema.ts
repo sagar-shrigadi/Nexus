@@ -8,3 +8,12 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   bio: text("bio"),
 });
+
+export const posts = pgTable("posts", {
+  id: integer("id").notNull().primaryKey().generatedAlwaysAsIdentity(),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
+});
