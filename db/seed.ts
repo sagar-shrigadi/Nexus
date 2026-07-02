@@ -43,7 +43,7 @@ async function seed() {
   for (const user of seededUsers) {
     await db.insert(posts).values({
       title: `from ${user.username}`,
-      content: `Hello, I am ${user.firstName} ${user.lastName}.\nBio: ${user.bio}`,
+      content: `Hello, I am ${user.firstName} ${user.lastName}.`,
       userId: user.id,
     });
   }
