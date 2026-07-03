@@ -1,0 +1,95 @@
+import { getLatestPosts } from "@/app/services/posts";
+import Image from "next/image";
+import { getRandomUsers } from "@/app/services/users";
+
+export default async function Explore() {
+  const posts = await getLatestPosts();
+  const users = await getRandomUsers(3);
+  return (
+    <main className="flex flex-1 w-full mx-auto flex-col sm:flex-row bg-white dark:bg-black sm:items-start sm:justify-center sm:gap-8 md:gap-12 xl:gap-24">
+      <section className="grow w-full max-w-3xl flex flex-col gap-5 h-[85dvh] sm:h-dvh overflow-y-scroll border-x rounded">
+        <h1 className="text-2xl lg:text-3xl font-bold mt-2 mb-3 ml-4">
+          Explore Latest Tweets
+        </h1>
+        {posts.map((post) => (
+          <article
+            key={post.id}
+            className="flex flex-col pt-2 pb-4 px-4 border-y"
+          >
+            <div className="flex items-center gap-3.5 cursor-pointer py-1">
+              <Image
+                src="/images/defaultProfile.png"
+                width={180}
+                height={180}
+                alt="default image avatar for user"
+                className="rounded-full w-7.5 md:w-8.5 aspect-square block"
+              />
+              <h2 className="text-lg sm:text-xl">{post.users.username}</h2>
+            </div>
+            <div className="flex flex-col gap-1 pl-12.5 cursor-pointer">
+              <h3 className="sm:text-lg font-bold">{post.title}</h3>
+              <p>{post.content}</p>
+            </div>
+          </article>
+        ))}
+      </section>
+      <section className="hidden min-w-80 xl:w-100 justify-self-end md:flex flex-col gap-8 md:h-dvh">
+        <article className="flex flex-col gap-4 border-x border-b rounded">
+          <h2 className="text-xl lg:text-2xl font-bold my-2 ml-4">
+            Trending Users
+          </h2>
+          {users.map((user) => (
+            <div
+              key={user.id}
+              className="flex justify-between items-center gap-8 px-4 py-1.5 not-last:border-y last:border-t"
+            >
+              <div className="grow flex items-center gap-6">
+                <Image
+                  src="/images/defaultProfile.png"
+                  width={180}
+                  height={180}
+                  alt="default image avatar for user"
+                  className="rounded-full w-7.5 sm:w-9 aspect-square block"
+                />
+                <div className="cursor-pointer">
+                  <h3>{`${user.firstName} ${user.lastName}`}</h3>
+                  <p className="text-gray-600 text-sm">@{user.username}</p>
+                </div>
+              </div>
+              <button className="border px-6 py-1 rounded cursor-pointer text-center max-w-25">
+                Follow
+              </button>
+            </div>
+          ))}
+        </article>
+        <article className="flex flex-col gap-4 rounded border">
+          <h2 className="text-xl lg:text-2xl font-bold mt-3 mb-2 px-4">
+            Trends For You
+          </h2>
+          <div className="flex flex-col gap-6">
+            <div className="p-4 border-y">
+              <h3 className="text-lg cursor-pointer rounded">
+                Lorem ipsum dolor
+              </h3>
+            </div>
+            <div className="p-4 border-y">
+              <h3 className="text-lg cursor-pointer rounded">
+                Lorem ipsum dolor
+              </h3>
+            </div>
+            <div className="p-4 border-y">
+              <h3 className="text-lg cursor-pointer rounded">
+                Lorem ipsum dolor
+              </h3>
+            </div>
+            <div className="p-4 border-t">
+              <h3 className="text-lg cursor-pointer rounded">
+                Lorem ipsum dolor
+              </h3>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+  );
+}
