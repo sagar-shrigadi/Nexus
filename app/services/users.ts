@@ -1,10 +1,10 @@
 import { db } from "@/db";
 import { sql } from "drizzle-orm";
 
-export async function getRandomUsers() {
+export async function getRandomUsers(limit: number) {
   return db.query.users.findMany({
     orderBy: sql`RANDOM()`,
-    limit: 10,
+    limit,
     columns: { password: false, bio: false },
   });
 }

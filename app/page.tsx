@@ -4,7 +4,7 @@ import { getRandomUsers } from "@/app/services/users";
 
 export default async function Home() {
   const posts = await getAllPosts();
-  const users = await getRandomUsers();
+  const users = await getRandomUsers(10);
 
   return (
     <main className="flex flex-1 w-full mx-auto flex-col sm:flex-row bg-white dark:bg-black sm:items-start sm:justify-center sm:gap-8 md:gap-12 xl:gap-24">
