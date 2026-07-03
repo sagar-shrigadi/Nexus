@@ -1,5 +1,5 @@
 import { CircleUserRound, Heart, House, Search, Settings } from "lucide-react";
-import Navlink from "@/app/ui/Navlink";
+import Navlink from "@/app/ui/navlink";
 
 export default function Navbar() {
   return (
