@@ -1,6 +1,7 @@
 import { getAllPosts } from "@/app/services/posts";
 import Image from "next/image";
 import { getRandomUsers } from "@/app/services/users";
+import Link from "next/link";
 
 export default async function Home() {
   const posts = await getAllPosts();
@@ -14,7 +15,10 @@ export default async function Home() {
             key={post.id}
             className="flex flex-col pt-2 pb-4 px-4 border-y"
           >
-            <div className="flex items-center gap-3.5 cursor-pointer py-1">
+            <Link
+              href={`/${post.users.username}`}
+              className="flex items-center gap-3.5 cursor-pointer py-1 text-lg sm:text-xl hover:text-gray-400 transition-colors"
+            >
               <Image
                 src="/images/defaultProfile.png"
                 width={180}
@@ -22,8 +26,8 @@ export default async function Home() {
                 alt="default image avatar for user"
                 className="rounded-full w-7.5 md:w-8.5 aspect-square block"
               />
-              <h2 className="text-lg sm:text-xl">{post.users.username}</h2>
-            </div>
+              {`${post.users.firstName} ${post.users.lastName}`}
+            </Link>
             <div className="flex flex-col gap-1 pl-12.5 cursor-pointer">
               <h3 className="sm:text-lg font-bold">{post.title}</h3>
               <p>{post.content}</p>
@@ -40,7 +44,10 @@ export default async function Home() {
             key={user.id}
             className="flex justify-between items-center gap-4 px-4 py-1.5 not-last:border-y last:border-t"
           >
-            <div className="grow flex items-center gap-6">
+            <Link
+              href={`/${user.username}`}
+              className="grow flex items-center gap-6 hover:text-gray-400 transition-colors cursor-pointer"
+            >
               <Image
                 src="/images/defaultProfile.png"
                 width={180}
@@ -48,11 +55,11 @@ export default async function Home() {
                 alt="default image avatar for user"
                 className="rounded-full w-7.5 sm:w-9 aspect-square block"
               />
-              <div className="mr-6 cursor-pointer">
-                <h3>{`${user.firstName} ${user.lastName}`}</h3>
-                <p className="text-gray-600 text-sm">@{user.username}</p>
+              <div className="flex flex-col">
+                <span>{`${user.firstName} ${user.lastName}`}</span>
+                <span className="text-gray-600 text-sm">@{user.username}</span>
               </div>
-            </div>
+            </Link>
             <button className="border px-6 py-1 rounded cursor-pointer text-center max-w-25">
               Follow
             </button>
