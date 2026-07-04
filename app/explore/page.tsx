@@ -15,11 +15,11 @@ export default async function Explore() {
         {posts.map((post) => (
           <article
             key={post.id}
-            className="flex flex-col pt-2 pb-4 px-4 border-y"
+            className="flex flex-col gap-2 pt-2 pb-4 border-y"
           >
             <Link
               href={`/${post.users.username}`}
-              className="flex items-center gap-3.5 cursor-pointer py-1 text-lg sm:text-xl hover:text-gray-400 transition-colors"
+              className="flex items-center gap-3.5 cursor-pointer px-4 py-1 text-lg sm:text-xl hover:text-gray-400 transition-colors"
             >
               <Image
                 src="/images/defaultProfile.png"
@@ -30,10 +30,15 @@ export default async function Explore() {
               />
               {`${post.users.firstName} ${post.users.lastName}`}
             </Link>
-            <div className="flex flex-col gap-1 pl-12.5 cursor-pointer">
-              <h3 className="sm:text-lg font-bold">{post.title}</h3>
-              <p>{post.content}</p>
-            </div>
+            <Link
+              href={`/${post.users.username}/status/${post.id}`}
+              className="hover:bg-(--hover) transition-colors py-2"
+            >
+              <div className="flex flex-col gap-1 pl-12.5 cursor-pointer">
+                <h3 className="sm:text-lg font-bold">{post.title}</h3>
+                <p>{post.content}</p>
+              </div>
+            </Link>
           </article>
         ))}
       </section>
@@ -60,7 +65,7 @@ export default async function Explore() {
                 />
                 <div className="flex flex-col">
                   <span>{`${user.firstName} ${user.lastName}`}</span>
-                  <span className="text-gray-600 text-sm">
+                  <span className="text-(--lightText) text-sm">
                     @{user.username}
                   </span>
                 </div>
