@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getUserWithPostsByUsername } from "../services/users";
+import { getUserWithPostsByUsername } from "@/app/services/users";
 
 import Image from "next/image";
 import BackButton from "@/app/ui/backButtton";
