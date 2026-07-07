@@ -20,3 +20,13 @@ export async function getUser(username: string) {
     where: eq(users.username, username),
   });
 }
+export async function postUser(
+  firstname: string,
+  lastname: string,
+  username: string,
+  password: string,
+) {
+  return db
+    .insert(users)
+    .values({ firstName: firstname, lastName: lastname, username, password });
+}

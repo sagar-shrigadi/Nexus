@@ -2,6 +2,10 @@
 
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
+import { z } from "zod";
+import bcrypt from "bcryptjs";
+import { postUser } from "@/app/services/users";
+import { redirect } from "next/navigation";
 
 export async function authenticate(
   prevState: string | undefined,
@@ -20,4 +24,36 @@ export async function authenticate(
     }
     throw error;
   }
+}
+
+const SignUpSchema = z.object({
+  firstname: z.string().min(3, "First Name must be at least 3 characters."),
+  lastname: z.string().min(3, "Last Name must be at least 3 characters."),
+  username: z.string().min(3, "Username must be at least 3 characters."),
+  password: z.string().min(6, "Password must be at least 6 characters."),
+});
+export async function register(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  const validatedFields = SignUpSchema.safeParse(
+    Object.fromEntries(formData.entries()),
+  );
+
+  if (!validatedFields.success) {
+    return "Missing Fields. Failed to Register.";
+  }
+  const { password } = validatedFields.data;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  try {
+    await postUser(
+      validatedFields.data.firstname,
+      validatedFields.data.lastname,
+      validatedFields.data.username,
+      hashedPassword,
+    );
+  } catch (error) {
+    throw error;
+  }
+  redirect("/login");
 }
