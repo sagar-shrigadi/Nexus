@@ -15,3 +15,8 @@ export async function getUserWithPostsByUsername(username: string) {
     with: { posts: { orderBy: [desc(posts.id)] } },
   });
 }
+export async function getUser(username: string) {
+  return db.query.users.findFirst({
+    where: eq(users.username, username),
+  });
+}

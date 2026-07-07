@@ -1,5 +1,13 @@
-import { CircleUserRound, Heart, House, Search, Settings } from "lucide-react";
+import {
+  CircleUserRound,
+  Heart,
+  House,
+  LogOut,
+  Search,
+  Settings,
+} from "lucide-react";
 import Navlink from "@/app/ui/navlink";
+import { signOut } from "@/auth";
 
 export default function Navbar() {
   return (
@@ -29,6 +37,19 @@ export default function Navbar() {
           <Settings className="size-8" />
           <span className="hidden lg:block">Settings</span>
         </Navlink>
+
+        <form
+          action={async () => {
+            "use server";
+            await signOut({ redirectTo: "/login" });
+          }}
+          className="mt-auto py-2"
+        >
+          <button className="flex items-center gap-4 cursor-pointer ">
+            <LogOut className="size-8" />
+            <span className="hidden lg:block">Logout</span>
+          </button>
+        </form>
       </ul>
     </nav>
   );
