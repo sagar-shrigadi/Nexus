@@ -20,11 +20,32 @@ export const { auth, signIn, signOut } = NextAuth({
           if (!user) return null;
           const passwordMatch = await bcrypt.compare(password, user.password);
 
-          if (passwordMatch) return { ...user, id: String(user.id) };
+          if (passwordMatch) {
+            return {
+              id: String(user.id),
+              name: `${user.firstName} ${user.lastName}`,
+              email: `${user.username}`,
+            };
+          }
         }
         console.error("Invalid Credentials!");
         return null;
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.user = user;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token.user) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        session.user = token.user as any;
+      }
+      return session;
+    },
+  },
 });

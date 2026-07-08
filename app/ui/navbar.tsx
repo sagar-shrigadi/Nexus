@@ -7,9 +7,11 @@ import {
   Settings,
 } from "lucide-react";
 import Navlink from "@/app/ui/navlink";
-import { signOut } from "@/auth";
+import { signOut, auth } from "@/auth";
 
-export default function Navbar() {
+export default async function Navbar() {
+  const session = await auth();
+
   return (
     <nav>
       <ul className="flex justify-between gap-6 px-4 py-2 sm:flex-col sm:justify-stretch sm:text-xl sm:min-h-dvh">
@@ -28,7 +30,7 @@ export default function Navbar() {
           <span className="hidden lg:block">Likes</span>
         </Navlink>
 
-        <Navlink to="/profile">
+        <Navlink to={`/${session?.user?.email}`}>
           <CircleUserRound className="size-8" />
           <span className="hidden lg:block">Profile</span>
         </Navlink>
