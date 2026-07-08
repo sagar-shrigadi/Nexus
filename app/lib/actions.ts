@@ -43,15 +43,10 @@ export async function register(
   if (!validatedFields.success) {
     return "Missing Fields. Failed to Register.";
   }
-  const { password } = validatedFields.data;
+  const { firstname, lastname, username, password } = validatedFields.data;
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
-    await postUser(
-      validatedFields.data.firstname,
-      validatedFields.data.lastname,
-      validatedFields.data.username,
-      hashedPassword,
-    );
+    await postUser(firstname, lastname, username, hashedPassword);
   } catch (error) {
     throw error;
   }

@@ -1,3 +1,4 @@
+import GuestLoginForm from "@/app/ui/guest-login-form";
 import LoginForm from "@/app/ui/login-form";
 import { Suspense } from "react";
 
@@ -7,6 +8,7 @@ export default function Login() {
       <h1 className="text-4xl mr-auto">Welcome Back</h1>
       <Suspense>
         <LoginForm />
+        <GuestLoginForm />
       </Suspense>
     </section>
   );
