@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
-import { register } from "@/app/lib/actions";
+import { register } from "@/app/lib/actions/auth";
 import { CircleAlert } from "lucide-react";
 
 export default function SignUp() {

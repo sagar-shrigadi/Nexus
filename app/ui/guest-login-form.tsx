@@ -1,7 +1,7 @@
 "use client";
 
 import { CircleUserRound } from "lucide-react";
-import { authenticate } from "@/app/lib/actions";
+import { authenticate } from "@/app/lib/actions/auth";
 import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
 import AuthFormErrors from "./auth-form-errors";

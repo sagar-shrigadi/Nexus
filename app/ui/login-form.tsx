@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { authenticate } from "@/app/lib/actions";
+import { authenticate } from "@/app/lib/actions/auth";
 import { useSearchParams } from "next/navigation";
 import AuthFormErrors from "@/app/ui/auth-form-errors";
 
