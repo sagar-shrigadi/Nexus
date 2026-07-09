@@ -2,6 +2,7 @@ import { getAllPosts } from "@/app/services/posts";
 import Image from "next/image";
 import { getRandomUsers } from "@/app/services/users";
 import Link from "next/link";
+import CreatePost from "@/app/ui/create-post";
 
 export default async function Home() {
   const posts = await getAllPosts();
@@ -9,37 +10,40 @@ export default async function Home() {
 
   return (
     <main className="flex flex-1 w-full mx-auto flex-col sm:flex-row bg-white dark:bg-black sm:items-start sm:justify-center sm:gap-8 md:gap-12 xl:gap-24">
-      <section className="grow w-full max-w-3xl flex flex-col gap-5 h-[85dvh] sm:h-dvh overflow-y-scroll border-x rounded">
-        {posts.map((post) => (
-          <article
-            key={post.id}
-            className="flex flex-col gap-2 pt-2 pb-4 border-y"
-          >
-            <Link
-              href={`/${post.users.username}`}
-              className="flex items-center gap-3.5 cursor-pointer px-4 py-1 text-lg sm:text-xl hover:text-gray-400 transition-colors"
+      <div className="flex flex-col gap-4 w-full max-w-3xl h-[85dvh] sm:h-dvh">
+        <CreatePost />
+        <section className="grow flex flex-col gap-5 overflow-y-scroll border-x rounded">
+          {posts.map((post) => (
+            <article
+              key={post.id}
+              className="flex flex-col gap-2 pt-2 pb-4 border-y"
             >
-              <Image
-                src="/images/defaultProfile.png"
-                width={180}
-                height={180}
-                alt="default image avatar for user"
-                className="rounded-full w-7.5 md:w-8.5 aspect-square block"
-              />
-              {`${post.users.firstName} ${post.users.lastName}`}
-            </Link>
-            <Link
-              href={`/${post.users.username}/status/${post.id}`}
-              className="hover:bg-(--hover) transition-colors py-2"
-            >
-              <div className="flex flex-col gap-1 pl-12.5 cursor-pointer">
-                <h3 className="sm:text-lg font-bold">{post.title}</h3>
-                <p>{post.content}</p>
-              </div>
-            </Link>
-          </article>
-        ))}
-      </section>
+              <Link
+                href={`/${post.users.username}`}
+                className="flex items-center gap-3.5 cursor-pointer px-4 py-1 text-lg sm:text-xl hover:text-gray-400 transition-colors"
+              >
+                <Image
+                  src="/images/defaultProfile.png"
+                  width={180}
+                  height={180}
+                  alt="default image avatar for user"
+                  className="rounded-full w-7.5 md:w-8.5 aspect-square block"
+                />
+                {`${post.users.firstName} ${post.users.lastName}`}
+              </Link>
+              <Link
+                href={`/${post.users.username}/status/${post.id}`}
+                className="hover:bg-(--hover) transition-colors py-2"
+              >
+                <div className="flex flex-col gap-1 pl-12.5 cursor-pointer">
+                  <h3 className="sm:text-lg font-bold">{post.title}</h3>
+                  <p>{post.content}</p>
+                </div>
+              </Link>
+            </article>
+          ))}
+        </section>
+      </div>
       <section className="hidden min-w-80 max-w-100 sm:justify-self-end md:max-h-dvh md:flex md:overflow-y-scroll flex-col gap-4 border rounded">
         <h2 className="text-xl lg:text-2xl font-bold mt-2 mb-3 ml-4">
           Users to Follow
