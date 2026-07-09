@@ -28,3 +28,6 @@ export async function getPostById(id: number) {
 export async function newPost(userId: number, title: string, content: string) {
   return db.insert(posts).values({ title, content, userId });
 }
+export async function deletePostById(postId: number) {
+  return db.delete(posts).where(eq(posts.id, postId));
+}

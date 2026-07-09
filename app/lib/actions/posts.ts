@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { auth } from "@/auth";
-import { newPost } from "@/app/services/posts";
+import { deletePostById, newPost } from "@/app/services/posts";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { $ZodIssue } from "zod/v4/core";
@@ -34,4 +34,16 @@ export async function createPost(
   revalidatePath("/explore");
   revalidatePath(`/${session?.user?.email}`);
   redirect("/");
+}
+export async function deletePost(id: number) {
+  const session = await auth();
+
+  try {
+    await deletePostById(id);
+    revalidatePath("/");
+    revalidatePath("/explore");
+    revalidatePath(`/${session?.user?.email}`);
+  } catch (error) {
+    throw error;
+  }
 }

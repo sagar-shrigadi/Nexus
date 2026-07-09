@@ -2,8 +2,12 @@ import { getLatestPosts } from "@/app/services/posts";
 import Image from "next/image";
 import { getRandomUsers } from "@/app/services/users";
 import Link from "next/link";
+import { EllipsisIcon } from "lucide-react";
+import { auth } from "@/auth";
+import DeleteForm from "@/app/ui/delete-form";
 
 export default async function Explore() {
+  const session = await auth();
   const posts = await getLatestPosts();
   const users = await getRandomUsers(3);
   return (
@@ -17,19 +21,38 @@ export default async function Explore() {
             key={post.id}
             className="flex flex-col gap-2 pt-2 pb-4 border-y"
           >
-            <Link
-              href={`/${post.users.username}`}
-              className="flex items-center gap-3.5 cursor-pointer px-4 py-1 text-lg sm:text-xl hover:text-gray-400 transition-colors"
-            >
-              <Image
-                src="/images/defaultProfile.png"
-                width={180}
-                height={180}
-                alt="default image avatar for user"
-                className="rounded-full w-7.5 md:w-8.5 aspect-square block"
-              />
-              {`${post.users.firstName} ${post.users.lastName}`}
-            </Link>
+            <div className="flex justify-between px-4 py-1">
+              <Link
+                href={`/${post.users.username}`}
+                className="grow flex items-center gap-3.5 cursor-pointer text-lg sm:text-xl hover:text-gray-400 transition-colors"
+              >
+                <Image
+                  src="/images/defaultProfile.png"
+                  width={180}
+                  height={180}
+                  alt="default image avatar for user"
+                  className="rounded-full w-7.5 md:w-8.5 aspect-square block"
+                />
+                <span>{`${post.users.firstName} ${post.users.lastName}`}</span>
+              </Link>
+              {post.userId === Number(session?.user?.id) && (
+                <button
+                  popoverTarget={`${post.userId}PostActions`}
+                  style={{ anchorName: `${post.userId}Pos` }}
+                  className="cursor-pointer hover:bg-(--hover) px-1 rounded-full transition-colors"
+                >
+                  <EllipsisIcon className="size-6" />
+                </button>
+              )}
+              <div
+                id={`${post.userId}PostActions`}
+                popover="auto"
+                style={{ positionAnchor: `${post.userId}Pos` }}
+                className="absolute [position-area:top_left] m-0 bg-slate-200 border rounded shadow-md text-base"
+              >
+                <DeleteForm postId={post.id} />
+              </div>
+            </div>
             <Link
               href={`/${post.users.username}/status/${post.id}`}
               className="hover:bg-(--hover) transition-colors py-2"
