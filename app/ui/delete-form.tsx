@@ -16,7 +16,7 @@ export default function DeleteForm({ postId }: { postId: number }) {
         <button
           aria-disabled={isPending}
           disabled={isPending}
-          className="px-6 py-1.5 hover:bg-slate-50 cursor-pointer transition-colors"
+          className="px-6 py-1.5 hover:bg-gray-200 rounded cursor-pointer transition-colors"
         >
           {isPending ? "Deleting" : "Delete"}
         </button>

@@ -14,7 +14,7 @@ export default async function Navbar() {
 
   return (
     <nav>
-      <ul className="flex justify-between gap-6 px-4 py-2 sm:flex-col sm:justify-stretch sm:text-xl sm:min-h-dvh">
+      <ul className="flex justify-between gap-6 px-2 sm:px-4 py-2 sm:flex-col sm:justify-stretch sm:text-xl sm:min-h-dvh">
         <Navlink to="/">
           <House className="size-7.25" />
           <span className="hidden lg:block">Home</span>
