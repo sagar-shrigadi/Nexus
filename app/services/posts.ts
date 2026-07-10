@@ -31,3 +31,10 @@ export async function newPost(userId: number, title: string, content: string) {
 export async function deletePostById(postId: number) {
   return db.delete(posts).where(eq(posts.id, postId));
 }
+export async function editPostById(
+  postId: number,
+  title: string,
+  content: string,
+) {
+  return db.update(posts).set({ title, content }).where(eq(posts.id, postId));
+}

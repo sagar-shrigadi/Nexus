@@ -46,11 +46,20 @@ export default async function Explore() {
               )}
               <div
                 id={`${post.userId}PostActions`}
+                aria-atomic="true"
                 popover="auto"
                 style={{ positionAnchor: `${post.userId}Pos` }}
-                className="absolute [position-area:top_left] m-0 bg-slate-200 border rounded shadow-md text-base"
+                className="absolute [position-area:bottom_left] rounded shadow-md"
               >
-                <DeleteForm postId={post.id} />
+                <div className="flex flex-col gap-2 p-2">
+                  <DeleteForm postId={post.id} />
+                  <Link
+                    href={`/${session?.user?.email}/status/${post.id}/edit`}
+                    className="px-6 py-1.5 hover:bg-gray-200 rounded cursor-pointer transition-colors"
+                  >
+                    Edit
+                  </Link>
+                </div>
               </div>
             </div>
             <Link

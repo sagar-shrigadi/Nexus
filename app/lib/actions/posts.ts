@@ -2,7 +2,12 @@
 
 import { z } from "zod";
 import { auth } from "@/auth";
-import { deletePostById, newPost } from "@/app/services/posts";
+import {
+  deletePostById,
+  editPostById,
+  getPostById,
+  newPost,
+} from "@/app/services/posts";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { $ZodIssue } from "zod/v4/core";
@@ -46,4 +51,30 @@ export async function deletePost(id: number) {
   } catch (error) {
     throw error;
   }
+}
+export async function updatePost(
+  postId: number,
+  prevState: $ZodIssue[] | undefined,
+  formData: FormData,
+) {
+  const post = await getPostById(postId);
+  const validatedPost = PostSchema.safeParse(
+    Object.fromEntries(formData.entries()),
+  );
+
+  if (!validatedPost.success) {
+    return validatedPost.error.issues.map((issue) => issue);
+  }
+  const { title, content } = validatedPost.data;
+
+  try {
+    await editPostById(postId, title, content);
+    revalidatePath("/");
+    revalidatePath("/explore");
+    revalidatePath(`/${post?.users.username}/status/${post?.id}`);
+    revalidatePath(`/${post?.users.username}`);
+  } catch (error) {
+    throw error;
+  }
+  redirect(`/${post?.users.username}/status/${post?.id}`);
 }
