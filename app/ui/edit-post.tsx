@@ -51,7 +51,7 @@ export default function EditPostForm({
         </label>
         <button
           aria-disabled={isPending}
-          className="mt-4 self-center cursor-pointer rounded px-4 py-2 bg-mist-700 hover:bg-(--hover) transition-colors"
+          className="mt-4 self-center cursor-pointer rounded px-4 py-2 bg-(--hover) hover:bg-[hsl(210_7%_22%)] transition-colors"
         >
           Update
         </button>
