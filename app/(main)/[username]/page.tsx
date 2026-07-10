@@ -4,12 +4,16 @@ import { getUserWithPostsByUsername } from "@/app/services/users";
 import Image from "next/image";
 import BackButton from "@/app/ui/backButtton";
 import Link from "next/link";
+import { auth } from "@/auth";
+import PostOptions from "@/app/ui/post-options";
+import PostContentCard from "@/app/ui/post-content-card";
 
 export default async function UserPage({
   params,
 }: {
   params: Promise<{ username: string }>;
 }) {
+  const session = await auth();
   const { username } = await params;
   const user = await getUserWithPostsByUsername(username);
 
@@ -18,7 +22,7 @@ export default async function UserPage({
   }
 
   return (
-    <main className="flex flex-1 w-full max-w-3xl h-dvh mx-auto flex-col bg-white dark:bg-black">
+    <main className="flex flex-1 w-full max-w-3xl h-dvh mx-auto flex-col">
       <section className="border-x border-gray-500 flex flex-col py-2 pb-4">
         <div className="flex items-center gap-3 px-4 pb-2">
           <BackButton />
@@ -49,29 +53,31 @@ export default async function UserPage({
         {user.posts.map((post) => (
           <article
             key={post.id}
-            className="flex flex-col gap-2 pt-2 pb-4 border-y border-gray-500"
+            className="flex flex-col gap-2 pt-2 pb-4 border-y border-gray-500 "
           >
-            <Link
-              href={`/${user.username}`}
-              className="flex items-center gap-3.5 cursor-pointer px-4 py-1 text-lg sm:text-xl hover:underline transition-all"
-            >
-              <Image
-                src="/images/defaultProfile.png"
-                width={180}
-                height={180}
-                alt="default image avatar for user"
-                className="rounded-full w-7.5 md:w-8.5 aspect-square block"
-              />
-              <span>{`${user.firstName} ${user.lastName}`}</span>
-            </Link>
+            <div className="flex justify-between px-4 py-1">
+              <Link
+                href={`/${user.username}`}
+                className="grow flex items-center gap-3.5 cursor-pointer text-lg sm:text-xl hover:underline transition-all"
+              >
+                <Image
+                  src="/images/defaultProfile.png"
+                  width={180}
+                  height={180}
+                  alt="default image avatar for user"
+                  className="rounded-full w-7.5 md:w-8.5 aspect-square block"
+                />
+                <span>{`${user.firstName} ${user.lastName}`}</span>
+              </Link>
+              {post.userId === Number(session?.user?.id) && (
+                <PostOptions session={session} post={post} />
+              )}
+            </div>
             <Link
               href={`/${user.username}/status/${post.id}`}
               className="hover:bg-(--hover) transition-colors py-2"
             >
-              <div className="flex flex-col gap-1 pl-12.5 cursor-pointer">
-                <h3 className="sm:text-lg font-bold">{post.title}</h3>
-                <p>{post.content}</p>
-              </div>
+              <PostContentCard post={post} />
             </Link>
           </article>
         ))}

@@ -2,12 +2,10 @@ import { getLatestPosts } from "@/app/services/posts";
 import Image from "next/image";
 import { getRandomUsers } from "@/app/services/users";
 import Link from "next/link";
-import { EllipsisIcon } from "lucide-react";
-import { auth } from "@/auth";
-import DeleteForm from "@/app/ui/delete-form";
+import PostNameCard from "@/app/ui/post-name-card";
+import PostContentCard from "@/app/ui/post-content-card";
 
 export default async function Explore() {
-  const session = await auth();
   const posts = await getLatestPosts();
   const users = await getRandomUsers(3);
   return (
@@ -21,55 +19,12 @@ export default async function Explore() {
             key={post.id}
             className="flex flex-col gap-2 pt-2 pb-4 border-y"
           >
-            <div className="flex justify-between px-4 py-1">
-              <Link
-                href={`/${post.users.username}`}
-                className="grow flex items-center gap-3.5 cursor-pointer text-lg sm:text-xl hover:text-gray-400 transition-colors"
-              >
-                <Image
-                  src="/images/defaultProfile.png"
-                  width={180}
-                  height={180}
-                  alt="default image avatar for user"
-                  className="rounded-full w-7.5 md:w-8.5 aspect-square block"
-                />
-                <span>{`${post.users.firstName} ${post.users.lastName}`}</span>
-              </Link>
-              {post.userId === Number(session?.user?.id) && (
-                <button
-                  popoverTarget={`${post.userId}PostActions`}
-                  style={{ anchorName: `${post.userId}Pos` }}
-                  className="cursor-pointer hover:bg-(--hover) px-1 rounded-full transition-colors"
-                >
-                  <EllipsisIcon className="size-6" />
-                </button>
-              )}
-              <div
-                id={`${post.userId}PostActions`}
-                aria-atomic="true"
-                popover="auto"
-                style={{ positionAnchor: `${post.userId}Pos` }}
-                className="absolute [position-area:bottom_left] rounded shadow-md"
-              >
-                <div className="flex flex-col gap-2 p-2">
-                  <DeleteForm postId={post.id} />
-                  <Link
-                    href={`/${session?.user?.email}/status/${post.id}/edit`}
-                    className="px-6 py-1.5 hover:bg-gray-200 rounded cursor-pointer transition-colors"
-                  >
-                    Edit
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <PostNameCard post={post} />
             <Link
               href={`/${post.users.username}/status/${post.id}`}
               className="hover:bg-(--hover) transition-colors py-2"
             >
-              <div className="flex flex-col gap-1 pl-12.5 cursor-pointer">
-                <h3 className="sm:text-lg font-bold">{post.title}</h3>
-                <p>{post.content}</p>
-              </div>
+              <PostContentCard post={post} />
             </Link>
           </article>
         ))}

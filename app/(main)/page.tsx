@@ -3,6 +3,8 @@ import Image from "next/image";
 import { getRandomUsers } from "@/app/services/users";
 import Link from "next/link";
 import CreatePost from "@/app/ui/create-post";
+import PostNameCard from "@/app/ui/post-name-card";
+import PostContentCard from "@/app/ui/post-content-card";
 
 export default async function Home() {
   const posts = await getAllPosts();
@@ -18,27 +20,12 @@ export default async function Home() {
               key={post.id}
               className="flex flex-col gap-2 pt-2 pb-4 border-y"
             >
-              <Link
-                href={`/${post.users.username}`}
-                className="flex items-center gap-3.5 cursor-pointer px-4 py-1 text-lg sm:text-xl hover:text-gray-400 transition-colors"
-              >
-                <Image
-                  src="/images/defaultProfile.png"
-                  width={180}
-                  height={180}
-                  alt="default image avatar for user"
-                  className="rounded-full w-7.5 md:w-8.5 aspect-square block"
-                />
-                {`${post.users.firstName} ${post.users.lastName}`}
-              </Link>
+              <PostNameCard post={post} />
               <Link
                 href={`/${post.users.username}/status/${post.id}`}
                 className="hover:bg-(--hover) transition-colors py-2"
               >
-                <div className="flex flex-col gap-1 pl-12.5 cursor-pointer">
-                  <h3 className="sm:text-lg font-bold">{post.title}</h3>
-                  <p>{post.content}</p>
-                </div>
+                <PostContentCard post={post} />
               </Link>
             </article>
           ))}

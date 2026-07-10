@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { deletePost } from "@/app/lib/actions/posts";
 
-export default function DeleteForm({ postId }: { postId: number }) {
+export default function DeletePost({ postId }: { postId: number }) {
   const deletePostWithId = deletePost.bind(null, postId);
   const [errorMessage, formAction, isPending] = useActionState(
     deletePostWithId,
