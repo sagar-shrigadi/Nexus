@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { deletePost } from "@/app/lib/actions/posts";
+import DeleteForm from "@/app/ui/delete-form";
 
 export default function DeletePost({ postId }: { postId: number }) {
   const deletePostWithId = deletePost.bind(null, postId);
@@ -10,17 +11,5 @@ export default function DeletePost({ postId }: { postId: number }) {
     undefined,
   );
 
-  return (
-    <>
-      <form action={formAction}>
-        <button
-          aria-disabled={isPending}
-          disabled={isPending}
-          className="px-6 py-1.5 hover:bg-gray-200 rounded cursor-pointer transition-colors"
-        >
-          {isPending ? "Deleting" : "Delete"}
-        </button>
-      </form>
-    </>
-  );
+  return <DeleteForm action={formAction} isPending={isPending} />;
 }
