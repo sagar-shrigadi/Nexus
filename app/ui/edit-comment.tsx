@@ -1,20 +1,28 @@
 "use client";
-
+import { usePathname } from "next/navigation";
+import { updateComment } from "@/app/lib/actions/comments";
 import { useActionState } from "react";
-import { createComment } from "@/app/lib/actions/comments";
 import { CircleAlert } from "lucide-react";
 
-export default function CreateComment({ postId }: { postId: number }) {
-  const createCommentToPost = createComment.bind(null, postId);
+export default function EditCommentForm({
+  commentId,
+  content,
+}: {
+  commentId: number;
+  content: string;
+}) {
+  const pathname = usePathname();
+  const updateCommentById = updateComment.bind(null, commentId, pathname);
   const [errorMessage, formAction, isPending] = useActionState(
-    createCommentToPost,
+    updateCommentById,
     undefined,
   );
+
   return (
-    <section className="flex flex-col gap-4">
+    <>
       <form
         action={formAction}
-        className="flex justify-between items-center gap-8 px-6 py-4 border-y"
+        className="flex justify-between items-center gap-8 px-6 py-4"
       >
         <div className="grow">
           <label htmlFor="comment">
@@ -24,6 +32,7 @@ export default function CreateComment({ postId }: { postId: number }) {
               required
               rows={1}
               placeholder="Add a comment"
+              defaultValue={content}
               className="w-full rounded px-4 py-2 bg-dark-200 text-lg border"
             ></textarea>
           </label>
@@ -33,11 +42,11 @@ export default function CreateComment({ postId }: { postId: number }) {
           disabled={isPending}
           className="cursor-pointer rounded px-6 py-2 bg-(--hover) hover:bg-[hsl(210_7%_22%)] transition-colors"
         >
-          Post
+          Update
         </button>
       </form>
       <div
-        className={`${errorMessage ? "flex" : "hidden"} px-6 flex flex-col gap-2`}
+        className={`${errorMessage ? "flex" : "hidden"} flex flex-col gap-2`}
         aria-live="polite"
         aria-atomic="true"
       >
@@ -49,6 +58,6 @@ export default function CreateComment({ postId }: { postId: number }) {
             </div>
           ))}
       </div>
-    </section>
+    </>
   );
 }

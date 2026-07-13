@@ -1,5 +1,6 @@
 import { getPostByIdWithComments } from "@/app/services/posts";
 import BackButton from "@/app/ui/backButtton";
+import CommentCard from "@/app/ui/comment-card";
 import CreateComment from "@/app/ui/create-comment";
 import Image from "next/image";
 import Link from "next/link";
@@ -51,40 +52,12 @@ export default async function PostPage({
           <CreateComment postId={Number(id)} />
           <article className="flex flex-col gap-4 py-4">
             <h2 className="font-bold text-2xl px-6 mb-2">
-              {post.commentCount}{" "}
-              {post.commentCount >= 1 ? "Comment" : "Comments"}
+              {post.commentCount > 0 && post.commentCount} <span>Comments</span>
             </h2>
             <div>
               {post.comments.map((comment) => (
                 <div key={comment.id} className="w-full border">
-                  <div className="flex flex-col gap-6 px-4 py-2.5">
-                    <div className="flex justify-between">
-                      <Link
-                        href={`/${comment.users.username}`}
-                        className="grow flex items-center gap-3.5 cursor-pointer text-lg sm:text-xl hover:underline transition-all"
-                      >
-                        <Image
-                          src="/images/defaultProfile.png"
-                          width={180}
-                          height={180}
-                          alt="default image avatar for user"
-                          className="rounded-full w-7.5 md:w-8.5 aspect-square block"
-                        />
-                        <span>{`${comment.users.firstName} ${comment.users.lastName}`}</span>
-                      </Link>
-                      <span>
-                        {comment.createdAt.toLocaleDateString("en-US", {
-                          weekday: "long",
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
-                      </span>
-                    </div>
-                    <div className="text-lg max-w-[55ch]">
-                      {comment.content}
-                    </div>
-                  </div>
+                  <CommentCard comment={comment} />
                 </div>
               ))}
             </div>
