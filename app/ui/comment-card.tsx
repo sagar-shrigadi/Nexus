@@ -4,10 +4,13 @@ import Link from "next/link";
 import CommentOptions from "./comment-options";
 import { useState } from "react";
 import EditCommentForm from "./edit-comment";
+import { Session } from "next-auth";
 
 export default function CommentCard({
+  session,
   comment,
 }: {
+  session: Session | null;
   comment: {
     createdAt: Date;
     id: number;
@@ -47,7 +50,11 @@ export default function CommentCard({
             })}
           </span>
         </div>
-        <CommentOptions commentId={comment.id} setIsEditing={setIsEditing} />
+        {Number(session?.user?.id) === comment.userId ? (
+          <CommentOptions commentId={comment.id} setIsEditing={setIsEditing} />
+        ) : (
+          ""
+        )}
       </div>
       {isEditing ? (
         <EditCommentForm commentId={comment.id} content={comment.content} />

@@ -2,6 +2,7 @@ import { getPostByIdWithComments } from "@/app/services/posts";
 import BackButton from "@/app/ui/backButtton";
 import CommentCard from "@/app/ui/comment-card";
 import CreateComment from "@/app/ui/create-comment";
+import { auth } from "@/auth";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -11,6 +12,7 @@ export default async function PostPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const session = await auth();
   const { id } = await params;
   const post = await getPostByIdWithComments(Number(id));
 
@@ -57,7 +59,7 @@ export default async function PostPage({
             <div>
               {post.comments.map((comment) => (
                 <div key={comment.id} className="w-full border">
-                  <CommentCard comment={comment} />
+                  <CommentCard session={session} comment={comment} />
                 </div>
               ))}
             </div>

@@ -3,6 +3,7 @@
 import {
   deleteCommentById,
   editCommentById,
+  getCommentById,
   newComment,
 } from "@/app/services/comments";
 import { auth } from "@/auth";
@@ -42,7 +43,12 @@ export async function createComment(
   }
 }
 export async function deleteComment(commentId: number, pathname: string) {
+  const session = await auth();
   try {
+    const commentToDelete = await getCommentById(commentId);
+    if (Number(session?.user?.id) !== commentToDelete?.userId) {
+      return [{ message: "You are not authorized to perform this action!" }];
+    }
     await deleteCommentById(commentId);
     revalidatePath(`${pathname}`);
   } catch (error) {
@@ -53,9 +59,10 @@ export async function deleteComment(commentId: number, pathname: string) {
 export async function updateComment(
   commentId: number,
   pathname: string,
-  prevState: $ZodIssue[] | undefined,
+  prevState: $ZodIssue[] | { message: string }[] | undefined,
   formData: FormData,
 ) {
+  const session = await auth();
   const validatedComment = CommentSchema.safeParse(
     Object.fromEntries(formData.entries()),
   );
@@ -66,6 +73,14 @@ export async function updateComment(
 
   const { comment } = validatedComment.data;
   try {
+    const commentToUpdate = await getCommentById(commentId);
+
+    if (
+      !commentToUpdate ||
+      commentToUpdate.userId !== Number(session?.user?.id)
+    ) {
+      return [{ message: "You are not authorized to perform this action!" }];
+    }
     await editCommentById(commentId, comment);
     revalidatePath(`${pathname}`);
   } catch (error) {

@@ -15,3 +15,8 @@ export async function deleteCommentById(commentId: number) {
 export async function editCommentById(commentId: number, content: string) {
   return db.update(comments).set({ content }).where(eq(comments.id, commentId));
 }
+export async function getCommentById(commentId: number) {
+  return db.query.comments.findFirst({
+    where: eq(comments.id, commentId),
+  });
+}
