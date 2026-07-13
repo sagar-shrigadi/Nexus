@@ -28,7 +28,7 @@ export const posts = pgTable("posts", {
 export const comments = pgTable("comments", {
   id: integer("id").notNull().primaryKey().generatedAlwaysAsIdentity(),
   content: text("content").notNull(),
-  createdBy: timestamp().defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
   userId: integer("user_id")
     .notNull()
     .references(() => users.id),

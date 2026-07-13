@@ -1,5 +1,6 @@
-import { getPostById } from "@/app/services/posts";
+import { getPostByIdWithComments } from "@/app/services/posts";
 import BackButton from "@/app/ui/backButtton";
+import CreateComment from "@/app/ui/create-comment";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -10,14 +11,14 @@ export default async function PostPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const post = await getPostById(Number(id));
+  const post = await getPostByIdWithComments(Number(id));
 
   if (!post) {
     notFound();
   }
 
   return (
-    <main className="flex flex-1 w-full max-w-3xl h-dvh mx-auto flex-col bg-white dark:bg-black">
+    <main className=" mx-auto flex flex-1 flex-col h-dvh w-full max-w-3xl">
       <section className="grow w-full max-w-3xl flex flex-col gap-5 border-x rounded">
         <div className="flex items-center gap-4 px-4 py-2 sticky border">
           <BackButton />
@@ -32,6 +33,7 @@ export default async function PostPage({
               src="/images/defaultProfile.png"
               width={180}
               height={180}
+              loading="eager"
               alt="default image avatar for user"
               className="rounded-full w-7.5 sm:w-9 aspect-square block"
             />
@@ -45,6 +47,49 @@ export default async function PostPage({
           <h2 className="text-2xl font-bold">{post.title}</h2>
           <div className="text-lg">{post.content}</div>
         </article>
+        <div>
+          <CreateComment postId={Number(id)} />
+          <article className="flex flex-col gap-4 py-4">
+            <h2 className="font-bold text-2xl px-6 mb-2">
+              {post.commentCount}{" "}
+              {post.commentCount >= 1 ? "Comment" : "Comments"}
+            </h2>
+            <div>
+              {post.comments.map((comment) => (
+                <div key={comment.id} className="w-full border">
+                  <div className="flex flex-col gap-6 px-4 py-2.5">
+                    <div className="flex justify-between">
+                      <Link
+                        href={`/${comment.users.username}`}
+                        className="grow flex items-center gap-3.5 cursor-pointer text-lg sm:text-xl hover:underline transition-all"
+                      >
+                        <Image
+                          src="/images/defaultProfile.png"
+                          width={180}
+                          height={180}
+                          alt="default image avatar for user"
+                          className="rounded-full w-7.5 md:w-8.5 aspect-square block"
+                        />
+                        <span>{`${comment.users.firstName} ${comment.users.lastName}`}</span>
+                      </Link>
+                      <span>
+                        {comment.createdAt.toLocaleDateString("en-US", {
+                          weekday: "long",
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    <div className="text-lg max-w-[55ch]">
+                      {comment.content}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </article>
+        </div>
       </section>
     </main>
   );

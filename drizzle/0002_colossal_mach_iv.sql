@@ -1,0 +1,1 @@
+ALTER TABLE "comments" RENAME COLUMN "createdAt" TO "created_at";
