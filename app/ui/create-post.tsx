@@ -10,11 +10,11 @@ export default function CreatePost() {
     undefined,
   );
   return (
-    <section className="mt-2 pl-4 flex flex-col gap-2">
+    <section className="mt-2 sm:pl-4 flex flex-col gap-2">
       <form action={formAction} className="flex flex-col gap-4">
         <button
           aria-disabled={isPending}
-          className="self-end cursor-pointer border rounded px-4 py-1"
+          className="self-end cursor-pointer rounded px-6 py-2 bg-(--hover) hover:bg-[hsl(210_7%_22%)] transition-colors"
         >
           Post
         </button>

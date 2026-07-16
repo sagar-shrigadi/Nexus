@@ -11,15 +11,12 @@ export default async function Home() {
   const users = await getRandomUsers(10);
 
   return (
-    <main className="flex flex-1 w-full mx-auto flex-col sm:flex-row bg-white dark:bg-black sm:items-start sm:justify-center sm:gap-8 md:gap-12 xl:gap-24">
-      <div className="flex flex-col gap-4 w-full max-w-3xl h-[85dvh] sm:h-dvh">
+    <main className="flex flex-1 w-full mx-auto flex-col px-2 sm:flex-row bg-white dark:bg-black sm:items-start sm:justify-center sm:gap-8 md:gap-12 xl:gap-24">
+      <div className="grow flex flex-col gap-4 w-full max-w-3xl h-[85dvh] sm:h-dvh">
         <CreatePost />
         <section className="grow flex flex-col gap-5 overflow-y-scroll border-x rounded">
           {posts.map((post) => (
-            <article
-              key={post.id}
-              className="flex flex-col gap-2 pt-2 pb-4 border-y"
-            >
+            <article key={post.id} className="flex flex-col gap-2 p-2 border-y">
               <PostNameCard post={post} />
               <Link
                 href={`/${post.users.username}/status/${post.id}`}
