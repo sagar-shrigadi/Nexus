@@ -7,14 +7,16 @@ export default async function PostNameCard({
   post,
 }: {
   post: {
-    userId: number;
     id: number;
     title: string;
     content: string;
+    userId: number;
+    likes: number;
+    commentCount: number;
     users: {
-      username: string;
       firstName: string;
       lastName: string;
+      username: string;
     };
   };
 }) {

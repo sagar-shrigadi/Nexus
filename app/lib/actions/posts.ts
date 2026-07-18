@@ -6,6 +6,7 @@ import {
   deletePostById,
   editPostById,
   getPostById,
+  likePostTransaction,
   newPost,
 } from "@/app/services/posts";
 import { revalidatePath } from "next/cache";
@@ -77,4 +78,17 @@ export async function updatePost(
     throw error;
   }
   redirect(`/${post?.users.username}/status/${post?.id}`);
+}
+export async function likePost(
+  userId: number,
+  postId: number,
+  pathname: string,
+) {
+  try {
+    await likePostTransaction(userId, postId);
+    revalidatePath(`${pathname}`);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }

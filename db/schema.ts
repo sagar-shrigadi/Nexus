@@ -24,7 +24,22 @@ export const posts = pgTable("posts", {
   userId: integer("user_id")
     .notNull()
     .references(() => users.id),
+  likes: integer("likes").notNull().default(0),
 });
+
+export const postLikes = pgTable(
+  "posts_likes",
+  {
+    id: integer("id").notNull().primaryKey().generatedAlwaysAsIdentity(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id),
+    postId: integer("post_id")
+      .notNull()
+      .references(() => posts.id),
+  },
+  (table) => [unique("unique_user_post_like").on(table.userId, table.postId)],
+);
 
 export const comments = pgTable("comments", {
   id: integer("id").notNull().primaryKey().generatedAlwaysAsIdentity(),

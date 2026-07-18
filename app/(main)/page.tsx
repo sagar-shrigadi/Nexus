@@ -3,8 +3,7 @@ import Image from "next/image";
 import { getRandomUsers } from "@/app/services/users";
 import Link from "next/link";
 import CreatePost from "@/app/ui/create-post";
-import PostNameCard from "@/app/ui/post-name-card";
-import PostContentCard from "@/app/ui/post-content-card";
+import PostCard from "@/app/ui/post-card";
 
 export default async function Home() {
   const posts = await getAllPosts();
@@ -16,15 +15,7 @@ export default async function Home() {
         <CreatePost />
         <section className="grow flex flex-col gap-5 overflow-y-scroll border-x rounded">
           {posts.map((post) => (
-            <article key={post.id} className="flex flex-col gap-2 p-2 border-y">
-              <PostNameCard post={post} />
-              <Link
-                href={`/${post.users.username}/status/${post.id}`}
-                className="hover:bg-(--hover) transition-colors py-2"
-              >
-                <PostContentCard post={post} />
-              </Link>
-            </article>
+            <PostCard key={post.id} post={post} />
           ))}
         </section>
       </div>

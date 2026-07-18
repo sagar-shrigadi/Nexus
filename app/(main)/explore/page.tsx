@@ -2,8 +2,7 @@ import { getLatestPosts } from "@/app/services/posts";
 import Image from "next/image";
 import { getRandomUsers } from "@/app/services/users";
 import Link from "next/link";
-import PostNameCard from "@/app/ui/post-name-card";
-import PostContentCard from "@/app/ui/post-content-card";
+import PostCard from "@/app/ui/post-card";
 
 export default async function Explore() {
   const posts = await getLatestPosts();
@@ -15,18 +14,7 @@ export default async function Explore() {
           Explore Latest Tweets
         </h1>
         {posts.map((post) => (
-          <article
-            key={post.id}
-            className="flex flex-col gap-2 pt-2 pb-4 border-y"
-          >
-            <PostNameCard post={post} />
-            <Link
-              href={`/${post.users.username}/status/${post.id}`}
-              className="hover:bg-(--hover) transition-colors py-2"
-            >
-              <PostContentCard post={post} />
-            </Link>
-          </article>
+          <PostCard key={post.id} post={post} />
         ))}
       </section>
       <section className="hidden min-w-80 xl:w-100 justify-self-end md:flex flex-col gap-8 md:h-dvh">
