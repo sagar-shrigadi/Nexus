@@ -2,32 +2,54 @@
 import Image from "next/image";
 import Link from "next/link";
 import CommentOptions from "./comment-options";
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import EditCommentForm from "./edit-comment";
 import { Session } from "next-auth";
+import { Heart } from "lucide-react";
+import { likeComment } from "../lib/actions/comments";
+import { usePathname } from "next/navigation";
 
 export default function CommentCard({
   session,
   comment,
+  postId,
+  likedComments,
 }: {
   session: Session | null;
   comment: {
-    createdAt: Date;
     id: number;
     content: string;
     userId: number;
+    createdAt: Date;
     postId: number;
+    likes: number;
     users: {
-      username: string;
       firstName: string;
       lastName: string;
+      username: string;
     };
   };
+  postId: number;
+  likedComments: {
+    commentId: number;
+  }[];
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const pathname = usePathname();
+  const likeCommentWithId = likeComment.bind(
+    null,
+    Number(session?.user?.id),
+    comment.id,
+    postId,
+    pathname,
+  );
+  const [errorMessage, formAction, isPending] = useActionState(
+    likeCommentWithId,
+    undefined,
+  );
   return (
-    <div className="flex flex-col gap-6 py-2.5">
-      <div className="flex justify-between px-4">
+    <div className="flex flex-col gap-8 py-4 px-4">
+      <div className="flex justify-between">
         <div className="flex gap-3 items-center">
           <Link
             href={`/${comment.users.username}`}
@@ -59,8 +81,20 @@ export default function CommentCard({
       {isEditing ? (
         <EditCommentForm commentId={comment.id} content={comment.content} />
       ) : (
-        <div className="px-4 text-lg max-w-[55ch]">{comment.content}</div>
+        <div className="px-2 text-lg max-w-[55ch]">{comment.content}</div>
       )}
+      <div className="flex items-center gap-2.5 hover:text-pink-500 transition-colors">
+        <form action={formAction} className="flex items-center">
+          <button aria-disabled={isPending} disabled={isPending}>
+            <Heart
+              className={`size-6.5 ${likedComments.some((item) => item.commentId === comment.id) ? "fill-pink-500 stroke-pink-500" : ""} transition-colors cursor-pointer`}
+            />
+          </button>
+        </form>
+        <span className="transition-all">
+          {comment.likes > 0 ? `${comment.likes}` : ""}
+        </span>
+      </div>
     </div>
   );
 }

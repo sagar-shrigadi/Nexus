@@ -5,6 +5,7 @@ import {
   varchar,
   text,
   timestamp,
+  unique,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -35,7 +36,27 @@ export const comments = pgTable("comments", {
   postId: integer("post_id")
     .notNull()
     .references(() => posts.id),
+  likes: integer("likes").notNull().default(0),
 });
+
+export const commentLikes = pgTable(
+  "comment_likes",
+  {
+    id: integer("id").notNull().primaryKey().generatedAlwaysAsIdentity(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id),
+    commentId: integer("comment_id")
+      .notNull()
+      .references(() => comments.id),
+    postId: integer("post_id")
+      .notNull()
+      .references(() => posts.id),
+  },
+  (table) => [
+    unique("unique_user_comment_like").on(table.userId, table.commentId),
+  ],
+);
 
 export const usersRelations = relations(users, ({ many }) => ({
   posts: many(posts),

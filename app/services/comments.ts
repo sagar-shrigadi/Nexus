@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { comments } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { commentLikes, comments } from "@/db/schema";
+import { and, eq, sql } from "drizzle-orm";
 
 export async function newComment(
   userId: number,
@@ -18,5 +18,54 @@ export async function editCommentById(commentId: number, content: string) {
 export async function getCommentById(commentId: number) {
   return db.query.comments.findFirst({
     where: eq(comments.id, commentId),
+  });
+}
+export async function likeCommentTransaction(
+  userId: number,
+  commentId: number,
+  postId: number,
+) {
+  return db.transaction(async (tx) => {
+    const existingLike = await tx.query.commentLikes.findFirst({
+      where: and(
+        eq(commentLikes.commentId, commentId),
+        eq(commentLikes.userId, userId),
+      ),
+    });
+
+    if (existingLike) {
+      // already liked, hence unlike now
+      await tx
+        .delete(commentLikes)
+        .where(
+          and(
+            eq(commentLikes.commentId, commentId),
+            eq(commentLikes.userId, userId),
+          ),
+        );
+      await tx
+        .update(comments)
+        .set({ likes: sql`${comments.likes} - 1` })
+        .where(eq(comments.id, commentId));
+    } else {
+      // not liked, hence like now
+      await tx.insert(commentLikes).values({ userId, commentId, postId });
+      await tx
+        .update(comments)
+        .set({ likes: sql`${comments.likes} + 1` })
+        .where(eq(comments.id, commentId));
+    }
+  });
+}
+export async function getAllLikedCommentsByUserOnPost(
+  userId: number,
+  postId: number,
+) {
+  return db.query.commentLikes.findMany({
+    where: and(
+      eq(commentLikes.postId, postId),
+      eq(commentLikes.userId, userId),
+    ),
+    columns: { commentId: true },
   });
 }

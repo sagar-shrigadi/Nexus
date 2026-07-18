@@ -4,6 +4,7 @@ import {
   deleteCommentById,
   editCommentById,
   getCommentById,
+  likeCommentTransaction,
   newComment,
 } from "@/app/services/comments";
 import { auth } from "@/auth";
@@ -88,4 +89,18 @@ export async function updateComment(
     throw error;
   }
   redirect(`${pathname}`);
+}
+export async function likeComment(
+  userId: number,
+  commentId: number,
+  postId: number,
+  pathname: string,
+) {
+  try {
+    await likeCommentTransaction(userId, commentId, postId);
+    revalidatePath(`${pathname}`);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }

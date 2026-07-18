@@ -1,3 +1,4 @@
+import { getAllLikedCommentsByUserOnPost } from "@/app/services/comments";
 import { getPostByIdWithComments } from "@/app/services/posts";
 import BackButton from "@/app/ui/backButtton";
 import CommentCard from "@/app/ui/comment-card";
@@ -15,6 +16,10 @@ export default async function PostPage({
   const session = await auth();
   const { id } = await params;
   const post = await getPostByIdWithComments(Number(id));
+  const likedComments = await getAllLikedCommentsByUserOnPost(
+    Number(session?.user?.id),
+    Number(id),
+  );
 
   if (!post) {
     notFound();
@@ -53,13 +58,18 @@ export default async function PostPage({
         <div>
           <CreateComment postId={Number(id)} />
           <article className="flex flex-col gap-4 py-4">
-            <h2 className="font-bold text-2xl px-6 mb-2">
+            <h2 className="font-bold text-2xl px-6">
               {post.commentCount > 0 && post.commentCount} <span>Comments</span>
             </h2>
             <div>
               {post.comments.map((comment) => (
-                <div key={comment.id} className="w-full border">
-                  <CommentCard session={session} comment={comment} />
+                <div key={comment.id} className="w-full border-y">
+                  <CommentCard
+                    session={session}
+                    comment={comment}
+                    postId={post.id}
+                    likedComments={likedComments}
+                  />
                 </div>
               ))}
             </div>

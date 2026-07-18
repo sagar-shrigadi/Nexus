@@ -22,6 +22,34 @@
       "when": 1783759172193,
       "tag": "0002_colossal_mach_iv",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1784272386797,
+      "tag": "0003_milky_blue_shield",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1784276008679,
+      "tag": "0004_medical_callisto",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1784277398203,
+      "tag": "0005_giant_sleepwalker",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1784359046965,
+      "tag": "0006_lethal_toad",
+      "breakpoints": true
     }
   ]
 }
