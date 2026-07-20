@@ -1,13 +1,17 @@
 import { getAllPosts } from "@/app/services/posts";
 import Image from "next/image";
-import { getRandomUsers } from "@/app/services/users";
+import { allUsersFollowedByUser, getRandomUsers } from "@/app/services/users";
 import Link from "next/link";
 import CreatePost from "@/app/ui/create-post";
 import PostCard from "@/app/ui/post-card";
+import { auth } from "@/auth";
+import FollowUserForm from "../ui/follow-user-form";
 
 export default async function Home() {
+  const session = await auth();
   const posts = await getAllPosts();
   const users = await getRandomUsers(10);
+  const usersFollowed = await allUsersFollowedByUser(Number(session?.user?.id));
 
   return (
     <main className="flex flex-1 w-full mx-auto flex-col px-2 sm:flex-row bg-white dark:bg-black sm:items-start sm:justify-center sm:gap-8 md:gap-12 xl:gap-24">
@@ -46,9 +50,11 @@ export default async function Home() {
                 </span>
               </div>
             </Link>
-            <button className="border px-6 py-1 rounded cursor-pointer text-center max-w-25">
-              Follow
-            </button>
+            <FollowUserForm
+              session={session!}
+              userToFollow={user}
+              usersFollowed={usersFollowed}
+            />
           </article>
         ))}
       </section>

@@ -1,12 +1,16 @@
 import { getLatestPosts } from "@/app/services/posts";
 import Image from "next/image";
-import { getRandomUsers } from "@/app/services/users";
+import { allUsersFollowedByUser, getRandomUsers } from "@/app/services/users";
 import Link from "next/link";
 import PostCard from "@/app/ui/post-card";
+import { auth } from "@/auth";
+import FollowUserForm from "@/app/ui/follow-user-form";
 
 export default async function Explore() {
+  const session = await auth();
   const posts = await getLatestPosts();
   const users = await getRandomUsers(3);
+  const usersFollowed = await allUsersFollowedByUser(Number(session?.user?.id));
   return (
     <main className="flex flex-1 w-full mx-auto flex-col sm:flex-row bg-white dark:bg-black sm:items-start sm:justify-center sm:gap-8 md:gap-12 xl:gap-24">
       <section className="grow w-full max-w-3xl flex flex-col gap-5 h-[85dvh] sm:h-dvh overflow-y-scroll border-x rounded">
@@ -45,9 +49,11 @@ export default async function Explore() {
                   </span>
                 </div>
               </Link>
-              <button className="border px-6 py-1 rounded cursor-pointer text-center max-w-25">
-                Follow
-              </button>
+              <FollowUserForm
+                session={session!}
+                userToFollow={user}
+                usersFollowed={usersFollowed}
+              />
             </div>
           ))}
         </article>

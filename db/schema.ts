@@ -15,6 +15,8 @@ export const users = pgTable("users", {
   username: varchar("username", { length: 255 }).notNull().unique(),
   password: text("password").notNull(),
   bio: text("bio"),
+  followers: integer("followers").notNull().default(0),
+  following: integer("following").notNull().default(0),
 });
 
 export const posts = pgTable("posts", {
@@ -71,6 +73,20 @@ export const commentLikes = pgTable(
   (table) => [
     unique("unique_user_comment_like").on(table.userId, table.commentId),
   ],
+);
+
+export const userFollows = pgTable(
+  "user_follows",
+  {
+    id: integer("id").notNull().primaryKey().generatedAlwaysAsIdentity(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id),
+    follows: integer("follows")
+      .notNull()
+      .references(() => users.id),
+  },
+  (table) => [unique("unique_user_follows").on(table.userId, table.follows)],
 );
 
 export const usersRelations = relations(users, ({ many }) => ({
