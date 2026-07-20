@@ -1,12 +1,12 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import CommentOptions from "./comment-options";
+import CommentOptions from "@/app/ui/comment-options";
 import { useActionState, useState } from "react";
-import EditCommentForm from "./edit-comment";
+import EditCommentForm from "@/app/ui/edit-comment";
 import { Session } from "next-auth";
 import { Heart } from "lucide-react";
-import { likeComment } from "../lib/actions/comments";
+import { likeComment } from "@/app/lib/actions/comments";
 import { usePathname } from "next/navigation";
 
 export default function CommentCard({

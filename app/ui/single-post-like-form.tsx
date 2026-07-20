@@ -1,7 +1,7 @@
 "use client";
 import { Heart } from "lucide-react";
 import { useActionState } from "react";
-import { likePost } from "../lib/actions/posts";
+import { likePost } from "@/app/lib/actions/posts";
 import { Session } from "next-auth";
 import { usePathname } from "next/navigation";
 

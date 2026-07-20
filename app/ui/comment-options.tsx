@@ -1,5 +1,5 @@
 import { EllipsisIcon } from "lucide-react";
-import DeleteComment from "./delete-comment";
+import DeleteComment from "@/app/ui/delete-comment";
 import { Dispatch, SetStateAction } from "react";
 
 export default function CommentOptions({
