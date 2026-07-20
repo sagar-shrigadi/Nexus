@@ -111,3 +111,8 @@ export async function getAllLikedPostsByUser(userId: number) {
     where: eq(postLikes.userId, userId),
   });
 }
+export async function isPostLikedByUser(userId: number, postId: number) {
+  return db.query.postLikes.findFirst({
+    where: and(eq(postLikes.userId, userId), eq(postLikes.postId, postId)),
+  });
+}

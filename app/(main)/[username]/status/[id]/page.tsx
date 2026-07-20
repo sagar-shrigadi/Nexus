@@ -1,9 +1,14 @@
 import { getAllLikedCommentsByUserOnPost } from "@/app/services/comments";
-import { getPostByIdWithComments } from "@/app/services/posts";
+import {
+  getPostByIdWithComments,
+  isPostLikedByUser,
+} from "@/app/services/posts";
 import BackButton from "@/app/ui/backButtton";
 import CommentCard from "@/app/ui/comment-card";
 import CreateComment from "@/app/ui/create-comment";
+import SinglePostLikeForm from "@/app/ui/single-post-like-form";
 import { auth } from "@/auth";
+import { MessageSquare } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -17,6 +22,10 @@ export default async function PostPage({
   const { id } = await params;
   const post = await getPostByIdWithComments(Number(id));
   const likedComments = await getAllLikedCommentsByUserOnPost(
+    Number(session?.user?.id),
+    Number(id),
+  );
+  const isLiked = await isPostLikedByUser(
     Number(session?.user?.id),
     Number(id),
   );
@@ -55,11 +64,18 @@ export default async function PostPage({
           <h2 className="text-2xl font-bold">{post.title}</h2>
           <div className="text-lg">{post.content}</div>
         </article>
+        <div className="px-6 flex items-center gap-6">
+          <div className="flex items-center gap-2">
+            <MessageSquare className="size-5.5" />
+            <span>{post.commentCount > 0 ? `${post.commentCount}` : ""}</span>
+          </div>
+          <SinglePostLikeForm session={session} post={post} isLiked={isLiked} />
+        </div>
         <div>
           <CreateComment postId={Number(id)} />
           <article className="flex flex-col gap-4 py-4">
             <h2 className="font-bold text-2xl px-6">
-              {post.commentCount > 0 && post.commentCount} <span>Comments</span>
+              <span>Comments</span>
             </h2>
             <div>
               {post.comments.map((comment) => (
