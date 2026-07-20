@@ -62,12 +62,12 @@ export default async function Navbar() {
             aria-atomic="true"
             popover="auto"
             style={{ positionAnchor: `userPos` }}
-            className="absolute [position-area:top_center] lg:[position-area:top_left] rounded shadow-md mb-4 mr-2 sm:mr-[unset] sm:ml-1"
+            className="absolute [position-area:top_left] sm:[position-area:top_center] sm:ml-px lg:[position-area:top_left] rounded shadow-md mb-2 md:mb-4 md:ml-[unset]"
           >
-            <div className="flex flex-col items-start gap-4 py-2 mx-auto">
+            <div className="text-base flex flex-col items-start gap-2 p-2">
               <Link
                 href={`/${session?.user?.email}/likes`}
-                className="w-full flex items-center gap-4 px-4 py-2 cursor-pointer hover:bg-gray-200 transition-colors"
+                className="w-full flex items-center gap-4 p-2 cursor-pointer hover:bg-gray-200 transition-colors"
               >
                 <Heart className="size-6" />
                 <span className="hidden lg:block">Likes</span>
@@ -79,7 +79,7 @@ export default async function Navbar() {
                 }}
                 className="mt-auto"
               >
-                <button className="flex items-center gap-4 px-4 py-2 cursor-pointer hover:bg-gray-200 transition-colors">
+                <button className="flex items-center gap-4 p-2 cursor-pointer hover:bg-gray-200 transition-colors">
                   <LogOut className="size-6" />
                   <span className="hidden lg:block">Logout</span>
                 </button>
