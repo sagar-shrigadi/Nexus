@@ -1,6 +1,7 @@
 import { EllipsisIcon } from "lucide-react";
 import DeleteComment from "@/app/ui/delete-comment";
 import { Dispatch, SetStateAction } from "react";
+import PopoverButton from "@/app/ui/button/popover-button";
 
 export default function CommentOptions({
   commentId,
@@ -11,13 +12,12 @@ export default function CommentOptions({
 }) {
   return (
     <>
-      <button
+      <PopoverButton
         popoverTarget={`${commentId}'sAction`}
         style={{ anchorName: `${commentId}Pos` }}
-        className="cursor-pointer hover:bg-(--hover) px-1 rounded-full transition-colors"
       >
         <EllipsisIcon className="size-6" />
-      </button>
+      </PopoverButton>
       <div
         id={`${commentId}'sAction`}
         aria-atomic="true"

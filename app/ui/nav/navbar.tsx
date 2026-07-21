@@ -1,8 +1,10 @@
 import { EllipsisIcon, Heart, House, LogOut, Search } from "lucide-react";
-import Navlink from "@/app/ui/navlink";
+import Navlink from "@/app/ui/nav/navlink";
 import { signOut, auth } from "@/auth";
 import Link from "next/link";
 import Image from "next/image";
+import UserNameCard from "@/app/ui/user/name-card";
+import PopoverButton from "@/app/ui/button/popover-button";
 
 export default async function Navbar() {
   const session = await auth();
@@ -36,27 +38,19 @@ export default async function Navbar() {
               />
               <span className="hidden lg:block">{`${session?.user?.name}`}</span>
             </button>
-            <Link
-              href={`/${session?.user?.email}`}
-              className="grow hidden lg:flex items-center gap-3.5 cursor-pointer text-lg sm:text-xl hover:underline transition-all"
+            <UserNameCard
+              className="hidden lg:flex"
+              to={`/${session?.user?.email}`}
+              username={`${session?.user?.name}`}
+            />
+            <PopoverButton
+              className="hidden lg:block"
+              popoverTarget="userAction"
+              style={{ anchorName: `userPos` }}
             >
-              <Image
-                src="/images/defaultProfile.png"
-                width={180}
-                height={180}
-                alt="default image avatar for user"
-                className="rounded-full w-7.5 md:w-8.5 aspect-square block"
-              />
-              <span className="hidden lg:block">{`${session?.user?.name}`}</span>
-            </Link>
+              <EllipsisIcon className="size-6" />
+            </PopoverButton>
           </div>
-          <button
-            popoverTarget="userAction"
-            style={{ anchorName: `userPos` }}
-            className="hidden lg:block cursor-pointer hover:bg-(--hover) px-1 rounded-full transition-colors"
-          >
-            <EllipsisIcon className="size-6" />
-          </button>
           <div
             id="userAction"
             aria-atomic="true"

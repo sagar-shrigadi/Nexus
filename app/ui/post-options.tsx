@@ -2,6 +2,7 @@ import { EllipsisIcon } from "lucide-react";
 import DeletePost from "@/app/ui/delete-post";
 import Link from "next/link";
 import { Session } from "next-auth";
+import PopoverButton from "@/app/ui/button/popover-button";
 
 export default function PostOptions({
   session,
@@ -22,13 +23,12 @@ export default function PostOptions({
 }) {
   return (
     <>
-      <button
+      <PopoverButton
         popoverTarget={`${post.userId}PostActions`}
         style={{ anchorName: `${post.userId}Pos` }}
-        className="cursor-pointer hover:bg-(--hover) px-1 rounded-full transition-colors"
       >
         <EllipsisIcon className="size-6" />
-      </button>
+      </PopoverButton>
       <div
         id={`${post.userId}PostActions`}
         aria-atomic="true"

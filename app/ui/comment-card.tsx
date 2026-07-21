@@ -1,6 +1,4 @@
 "use client";
-import Image from "next/image";
-import Link from "next/link";
 import CommentOptions from "@/app/ui/comment-options";
 import { useActionState, useState } from "react";
 import EditCommentForm from "@/app/ui/edit-comment";
@@ -8,6 +6,7 @@ import { Session } from "next-auth";
 import { Heart } from "lucide-react";
 import { likeComment } from "@/app/lib/actions/comments";
 import { usePathname } from "next/navigation";
+import UserNameCard from "@/app/ui/user/name-card";
 
 export default function CommentCard({
   session,
@@ -51,19 +50,11 @@ export default function CommentCard({
     <div className="flex flex-col gap-8 py-4 px-4">
       <div className="flex justify-between">
         <div className="flex gap-3 items-center">
-          <Link
-            href={`/${comment.users.username}`}
-            className="grow flex items-center gap-3.5 cursor-pointer text-lg sm:text-xl hover:underline transition-all"
-          >
-            <Image
-              src="/images/defaultProfile.png"
-              width={180}
-              height={180}
-              alt="default image avatar for user"
-              className="rounded-full w-7.5 md:w-8.5 aspect-square block"
-            />
-            <span>{`${comment.users.firstName} ${comment.users.lastName}`}</span>
-          </Link>
+          <UserNameCard
+            className="flex"
+            to={`/${comment.users.username}`}
+            username={`${comment.users.firstName} ${comment.users.lastName}`}
+          />
           <span className="text-gray-300">
             {comment.createdAt.toLocaleDateString("en-US", {
               year: "numeric",

@@ -7,9 +7,9 @@ export default function BackButton() {
   return (
     <button
       onClick={() => router.back()}
-      className="hover:bg-(--hover) transition-colors rounded-full p-2"
+      className="hover:bg-(--hover) transition-colors rounded-full p-1.25"
     >
-      <ArrowLeft className="size-8 cursor-pointer" />
+      <ArrowLeft className="size-7 cursor-pointer" />
     </button>
   );
 }
