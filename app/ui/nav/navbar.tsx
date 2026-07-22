@@ -41,7 +41,7 @@ export default async function Navbar() {
             <UserNameCard
               className="hidden lg:flex"
               to={`/${session?.user?.email}`}
-              username={`${session?.user?.name}`}
+              fullname={`${session?.user?.name}`}
             />
             <PopoverButton
               className="hidden lg:block"

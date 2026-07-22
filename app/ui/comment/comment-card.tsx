@@ -51,7 +51,7 @@ export default function CommentCard({
           <UserNameCard
             className="flex"
             to={`/${comment.users.username}`}
-            username={`${comment.users.firstName} ${comment.users.lastName}`}
+            fullname={`${comment.users.firstName} ${comment.users.lastName}`}
           />
           <span className="text-gray-300">
             {comment.createdAt.toLocaleDateString("en-US", {

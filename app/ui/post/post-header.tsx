@@ -21,7 +21,7 @@ export default async function PostHeader({
       <UserNameCard
         className="flex"
         to={`/${post.user.username}`}
-        username={`${post.user.firstName} ${post.user.lastName}`}
+        fullname={`${post.user.firstName} ${post.user.lastName}`}
       />
       {post.userId === Number(session?.user?.id) && (
         <PostOptions
