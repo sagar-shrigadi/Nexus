@@ -3,7 +3,7 @@ import {
   getPostByIdWithComments,
   isPostLikedByUser,
 } from "@/app/services/posts";
-import BackButton from "@/app/ui/backButtton";
+import BackButton from "@/app/ui/button/back-button";
 import CommentCard from "@/app/ui/comment/comment-card";
 import CreateComment from "@/app/ui/comment/create-comment";
 import SinglePostLikeForm from "@/app/ui/post/single-post-like-form";

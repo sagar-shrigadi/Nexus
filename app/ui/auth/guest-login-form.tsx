@@ -4,7 +4,7 @@ import { CircleUserRound } from "lucide-react";
 import { authenticate } from "@/app/lib/actions/auth";
 import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
-import AuthFormErrors from "@/app/ui/auth-form-errors";
+import AuthFormErrors from "@/app/ui/auth/form-errors";
 
 export default function GuestLoginForm() {
   const searchParams = useSearchParams();

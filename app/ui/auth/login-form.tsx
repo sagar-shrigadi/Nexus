@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { authenticate } from "@/app/lib/actions/auth";
 import { useSearchParams } from "next/navigation";
-import AuthFormErrors from "@/app/ui/auth-form-errors";
+import AuthFormErrors from "@/app/ui/auth/form-errors";
 
 export default function LoginForm() {
   const searchParams = useSearchParams();

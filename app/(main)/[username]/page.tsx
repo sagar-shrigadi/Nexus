@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getUserWithPostsByUsername } from "@/app/services/users";
 import Image from "next/image";
-import BackButton from "@/app/ui/backButtton";
+import BackButton from "@/app/ui/button/back-button";
 import PostCard from "@/app/ui/post/post-card";
 
 export default async function UserPage({

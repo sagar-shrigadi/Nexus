@@ -1,5 +1,5 @@
-import GuestLoginForm from "@/app/ui/guest-login-form";
-import LoginForm from "@/app/ui/login-form";
+import GuestLoginForm from "@/app/ui/auth/guest-login-form";
+import LoginForm from "@/app/ui/auth/login-form";
 import { Suspense } from "react";
 
 export default function Login() {
