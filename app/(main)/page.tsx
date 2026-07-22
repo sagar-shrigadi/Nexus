@@ -5,7 +5,7 @@ import Link from "next/link";
 import CreatePost from "@/app/ui/post/create-post";
 import PostCard from "@/app/ui/post/post-card";
 import { auth } from "@/auth";
-import FollowUserForm from "@/app/ui/follow-user-form";
+import FollowUserForm from "@/app/ui/user/follow-user-form";
 
 export default async function Home() {
   const session = await auth();
@@ -65,8 +65,8 @@ export default async function Home() {
               </div>
             </Link>
             <FollowUserForm
-              session={session!}
-              userToFollow={user}
+              session={session}
+              userToFollow={{ id: user.id, username: user.username }}
               usersFollowed={usersFollowed}
             />
           </article>

@@ -1,6 +1,6 @@
 "use client";
 import { Session } from "next-auth";
-import { userFollows } from "../lib/actions/users";
+import { userFollows } from "../../lib/actions/users";
 import { useActionState } from "react";
 import { usePathname } from "next/navigation";
 
@@ -9,14 +9,10 @@ export default function FollowUserForm({
   userToFollow,
   usersFollowed,
 }: {
-  session: Session;
+  session: Session | null;
   userToFollow: {
     id: number;
-    firstName: string;
-    lastName: string;
     username: string;
-    followers: number;
-    following: number;
   };
   usersFollowed: {
     follows: number;
@@ -25,7 +21,7 @@ export default function FollowUserForm({
   const pathaname = usePathname();
   const userFollowsWithId = userFollows.bind(
     null,
-    { id: Number(session?.user?.id), username: session.user!.email! },
+    { id: Number(session?.user?.id), username: session!.user!.email! },
     {
       id: userToFollow.id,
       username: userToFollow.username,
