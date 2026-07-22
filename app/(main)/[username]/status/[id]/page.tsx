@@ -4,8 +4,8 @@ import {
   isPostLikedByUser,
 } from "@/app/services/posts";
 import BackButton from "@/app/ui/backButtton";
-import CommentCard from "@/app/ui/comment-card";
-import CreateComment from "@/app/ui/create-comment";
+import CommentCard from "@/app/ui/comment/comment-card";
+import CreateComment from "@/app/ui/comment/create-comment";
 import SinglePostLikeForm from "@/app/ui/post/single-post-like-form";
 import { auth } from "@/auth";
 import { MessageSquare } from "lucide-react";
@@ -90,7 +90,6 @@ export default async function PostPage({
                   <CommentCard
                     session={session}
                     comment={comment}
-                    postId={post.id}
                     likedComments={likedComments}
                   />
                 </div>

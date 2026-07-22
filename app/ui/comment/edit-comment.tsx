@@ -5,14 +5,15 @@ import { useActionState } from "react";
 import { CircleAlert } from "lucide-react";
 
 export default function EditCommentForm({
-  commentId,
-  content,
+  comment,
 }: {
-  commentId: number;
-  content: string;
+  comment: {
+    id: number;
+    content: string;
+  };
 }) {
   const pathname = usePathname();
-  const updateCommentById = updateComment.bind(null, commentId, pathname);
+  const updateCommentById = updateComment.bind(null, comment.id, pathname);
   const [errorMessage, formAction, isPending] = useActionState(
     updateCommentById,
     undefined,
@@ -32,7 +33,7 @@ export default function EditCommentForm({
               required
               rows={1}
               placeholder="Add a comment"
-              defaultValue={content}
+              defaultValue={comment.content}
               className="w-full rounded px-4 py-2 bg-dark-200 text-lg border"
             ></textarea>
           </label>

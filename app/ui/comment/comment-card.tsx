@@ -1,7 +1,7 @@
 "use client";
-import CommentOptions from "@/app/ui/comment-options";
+import CommentOptions from "@/app/ui/comment/comment-options";
 import { useActionState, useState } from "react";
-import EditCommentForm from "@/app/ui/edit-comment";
+import EditCommentForm from "@/app/ui/comment/edit-comment";
 import { Session } from "next-auth";
 import { Heart } from "lucide-react";
 import { likeComment } from "@/app/lib/actions/comments";
@@ -11,7 +11,6 @@ import UserNameCard from "@/app/ui/user/name-card";
 export default function CommentCard({
   session,
   comment,
-  postId,
   likedComments,
 }: {
   session: Session | null;
@@ -28,7 +27,6 @@ export default function CommentCard({
       username: string;
     };
   };
-  postId: number;
   likedComments: {
     commentId: number;
   }[];
@@ -39,7 +37,7 @@ export default function CommentCard({
     null,
     Number(session?.user?.id),
     comment.id,
-    postId,
+    comment.postId,
     pathname,
   );
   const [errorMessage, formAction, isPending] = useActionState(
@@ -70,7 +68,9 @@ export default function CommentCard({
         )}
       </div>
       {isEditing ? (
-        <EditCommentForm commentId={comment.id} content={comment.content} />
+        <EditCommentForm
+          comment={{ id: comment.id, content: comment.content }}
+        />
       ) : (
         <div className="px-2 text-lg max-w-[55ch]">{comment.content}</div>
       )}

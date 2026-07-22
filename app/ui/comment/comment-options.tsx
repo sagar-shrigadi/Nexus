@@ -1,5 +1,5 @@
 import { EllipsisIcon } from "lucide-react";
-import DeleteComment from "@/app/ui/delete-comment";
+import DeleteComment from "@/app/ui/comment/delete-comment";
 import { Dispatch, SetStateAction } from "react";
 import PopoverButton from "@/app/ui/button/popover-button";
 
