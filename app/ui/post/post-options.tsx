@@ -1,4 +1,3 @@
-import { EllipsisIcon } from "lucide-react";
 import DeletePost from "@/app/ui/post/delete-post";
 import Link from "next/link";
 import { Session } from "next-auth";
@@ -10,8 +9,8 @@ export default function PostOptions({
 }: {
   session: Session | null;
   post: {
-    userId: number;
     id: number;
+    userId: number;
   };
 }) {
   return (
@@ -19,9 +18,7 @@ export default function PostOptions({
       <PopoverButton
         popoverTarget={`${post.userId}PostActions`}
         style={{ anchorName: `${post.userId}Pos` }}
-      >
-        <EllipsisIcon className="size-6" />
-      </PopoverButton>
+      />
       <div
         id={`${post.userId}PostActions`}
         aria-atomic="true"

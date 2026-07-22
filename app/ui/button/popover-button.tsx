@@ -1,14 +1,10 @@
 import { cn } from "@/app/lib/utils";
+import { EllipsisIcon } from "lucide-react";
 
 interface PopoverButton extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
   className?: string;
 }
-export default function PopoverButton({
-  children,
-  className,
-  ...rest
-}: PopoverButton) {
+export default function PopoverButton({ className, ...rest }: PopoverButton) {
   return (
     <button
       {...rest}
@@ -17,7 +13,7 @@ export default function PopoverButton({
         className,
       )}
     >
-      {children}
+      <EllipsisIcon className="size-6" />
     </button>
   );
 }

@@ -6,6 +6,7 @@ import {
 import BackButton from "@/app/ui/button/back-button";
 import CommentCard from "@/app/ui/comment/comment-card";
 import CreateComment from "@/app/ui/comment/create-comment";
+import PostOptions from "@/app/ui/post/post-options";
 import SinglePostLikeForm from "@/app/ui/post/single-post-like-form";
 import { auth } from "@/auth";
 import { MessageSquare } from "lucide-react";
@@ -35,13 +36,13 @@ export default async function PostPage({
   }
 
   return (
-    <main className=" mx-auto flex flex-1 flex-col h-dvh w-full max-w-3xl">
+    <main className="mx-auto flex flex-1 flex-col h-dvh w-full max-w-3xl">
       <section className="grow w-full max-w-3xl flex flex-col gap-5 border-x rounded">
         <div className="flex items-center gap-4 px-4 py-2 sticky border">
           <BackButton />
           <h2 className="text-2xl">Post</h2>
         </div>
-        <div className="px-6">
+        <div className="px-6 flex justify-between items-center">
           <Link
             href={`/${post.users.username}`}
             className="grow flex items-center gap-4 cursor-pointer"
@@ -59,6 +60,14 @@ export default async function PostPage({
               <span className="text-(--lightText)">@{post.users.username}</span>
             </div>
           </Link>
+          {Number(session?.user?.id) === post.userId ? (
+            <PostOptions
+              session={session}
+              post={{ id: post.id, userId: post.userId }}
+            />
+          ) : (
+            ""
+          )}
         </div>
         <article className="px-6 flex flex-col gap-4">
           <h2 className="text-2xl font-bold">{post.title}</h2>

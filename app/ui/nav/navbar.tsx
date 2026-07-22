@@ -1,4 +1,4 @@
-import { EllipsisIcon, Heart, House, LogOut, Search } from "lucide-react";
+import { Heart, House, LogOut, Search } from "lucide-react";
 import Navlink from "@/app/ui/nav/navlink";
 import { signOut, auth } from "@/auth";
 import Link from "next/link";
@@ -47,9 +47,7 @@ export default async function Navbar() {
               className="hidden lg:block"
               popoverTarget="userAction"
               style={{ anchorName: `userPos` }}
-            >
-              <EllipsisIcon className="size-6" />
-            </PopoverButton>
+            />
           </div>
           <div
             id="userAction"
