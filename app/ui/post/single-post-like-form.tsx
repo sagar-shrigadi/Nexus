@@ -13,24 +13,11 @@ export default function SinglePostLikeForm({
   session: Session | null;
   post: {
     id: number;
-    title: string;
-    content: string;
-    userId: number;
     likes: number;
-    commentCount: number;
-    users: {
-      firstName: string;
-      lastName: string;
-      username: string;
-    };
   };
-  isLiked:
-    | {
-        id: number;
-        userId: number;
-        postId: number;
-      }
-    | undefined;
+  isLiked: {
+    postId: number | undefined;
+  };
 }) {
   const pathname = usePathname();
   const likePostWithId = likePost.bind(

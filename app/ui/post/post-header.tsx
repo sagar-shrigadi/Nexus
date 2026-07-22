@@ -1,18 +1,14 @@
 import { auth } from "@/auth";
-import PostOptions from "@/app/ui/post-options";
+import PostOptions from "@/app/ui/post/post-options";
 import UserNameCard from "@/app/ui/user/name-card";
 
-export default async function PostNameCard({
+export default async function PostHeader({
   post,
 }: {
   post: {
     id: number;
-    title: string;
-    content: string;
     userId: number;
-    likes: number;
-    commentCount: number;
-    users: {
+    user: {
       firstName: string;
       lastName: string;
       username: string;
@@ -24,11 +20,14 @@ export default async function PostNameCard({
     <div className="flex justify-between px-4 py-1">
       <UserNameCard
         className="flex"
-        to={`/${post.users.username}`}
-        username={`${post.users.firstName} ${post.users.lastName}`}
+        to={`/${post.user.username}`}
+        username={`${post.user.firstName} ${post.user.lastName}`}
       />
       {post.userId === Number(session?.user?.id) && (
-        <PostOptions session={session} post={post} />
+        <PostOptions
+          session={session}
+          post={{ userId: post.userId, id: post.id }}
+        />
       )}
     </div>
   );

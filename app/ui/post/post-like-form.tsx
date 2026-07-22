@@ -13,16 +13,7 @@ export default function PostLikeForm({
   session: Session | null;
   post: {
     id: number;
-    title: string;
-    content: string;
-    userId: number;
     likes: number;
-    commentCount: number;
-    users: {
-      firstName: string;
-      lastName: string;
-      username: string;
-    };
   };
   likedPosts: {
     id: number;

@@ -1,5 +1,5 @@
 import { getPostById } from "@/app/services/posts";
-import EditPostForm from "@/app/ui/edit-post";
+import EditPostForm from "@/app/ui/post/edit-post";
 import { auth } from "@/auth";
 import { notFound } from "next/navigation";
 
@@ -22,7 +22,13 @@ export default async function EditPost({
 
   return (
     <main className="grow w-full max-w-3xl mx-auto px-4 md:px-6 py-2">
-      <EditPostForm post={post} />
+      <EditPostForm
+        post={{
+          id: post.id,
+          title: post.title,
+          content: post.content,
+        }}
+      />
     </main>
   );
 }

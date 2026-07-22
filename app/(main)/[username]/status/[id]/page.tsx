@@ -6,7 +6,7 @@ import {
 import BackButton from "@/app/ui/backButtton";
 import CommentCard from "@/app/ui/comment-card";
 import CreateComment from "@/app/ui/create-comment";
-import SinglePostLikeForm from "@/app/ui/single-post-like-form";
+import SinglePostLikeForm from "@/app/ui/post/single-post-like-form";
 import { auth } from "@/auth";
 import { MessageSquare } from "lucide-react";
 import Image from "next/image";
@@ -69,7 +69,14 @@ export default async function PostPage({
             <MessageSquare className="size-5.5" />
             <span>{post.commentCount > 0 ? `${post.commentCount}` : ""}</span>
           </div>
-          <SinglePostLikeForm session={session} post={post} isLiked={isLiked} />
+          <SinglePostLikeForm
+            session={session}
+            post={{
+              id: post.id,
+              likes: post.likes,
+            }}
+            isLiked={{ postId: isLiked?.postId }}
+          />
         </div>
         <div>
           <CreateComment postId={Number(id)} />

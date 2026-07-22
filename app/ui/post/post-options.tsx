@@ -1,5 +1,5 @@
 import { EllipsisIcon } from "lucide-react";
-import DeletePost from "@/app/ui/delete-post";
+import DeletePost from "@/app/ui/post/delete-post";
 import Link from "next/link";
 import { Session } from "next-auth";
 import PopoverButton from "@/app/ui/button/popover-button";
@@ -12,13 +12,6 @@ export default function PostOptions({
   post: {
     userId: number;
     id: number;
-    title: string;
-    content: string;
-    users?: {
-      firstName: string;
-      lastName: string;
-      username: string;
-    };
   };
 }) {
   return (

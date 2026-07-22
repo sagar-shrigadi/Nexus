@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { posts, userFollows, users } from "@/db/schema";
+import { comments, posts, userFollows, users } from "@/db/schema";
 import { and, desc, eq, sql } from "drizzle-orm";
 
 export async function getRandomUsers(limit: number) {
@@ -12,7 +12,20 @@ export async function getRandomUsers(limit: number) {
 export async function getUserWithPostsByUsername(username: string) {
   return db.query.users.findFirst({
     where: eq(users.username, username),
-    with: { posts: { orderBy: [desc(posts.id)] } },
+    with: {
+      posts: {
+        orderBy: [desc(posts.id)],
+        extras: {
+          commentsCount: sql<number>`(
+            SELECT COUNT(*) 
+            FROM ${comments} 
+            WHERE ${comments}.post_id = ${posts.id}
+          )`
+            .mapWith(Number)
+            .as("comment_count"),
+        },
+      },
+    },
   });
 }
 export async function getUser(username: string) {

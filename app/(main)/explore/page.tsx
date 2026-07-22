@@ -2,7 +2,7 @@ import { getLatestPosts } from "@/app/services/posts";
 import Image from "next/image";
 import { allUsersFollowedByUser, getRandomUsers } from "@/app/services/users";
 import Link from "next/link";
-import PostCard from "@/app/ui/post-card";
+import PostCard from "@/app/ui/post/post-card";
 import { auth } from "@/auth";
 import FollowUserForm from "@/app/ui/follow-user-form";
 
@@ -18,7 +18,20 @@ export default async function Explore() {
           Explore Latest Tweets
         </h1>
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <PostCard
+            key={post.id}
+            post={{
+              id: post.id,
+              title: post.title,
+              content: post.content,
+              userId: post.userId,
+              likes: post.likes,
+              commentCount: post.commentsCount,
+              user: {
+                ...post.users,
+              },
+            }}
+          />
         ))}
       </section>
       <section className="hidden min-w-80 xl:w-100 justify-self-end md:flex flex-col gap-8 md:h-dvh">

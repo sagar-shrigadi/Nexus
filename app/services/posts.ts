@@ -1,22 +1,32 @@
-import { db } from "@/db/index";
-import { comments, postLikes, posts } from "@/db/schema";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { db } from "@/db";
+import { comments, postLikes, posts, userFollows, users } from "@/db/schema";
+import { and, desc, eq, or, sql } from "drizzle-orm";
 
-export async function getAllPosts() {
-  return db.query.posts.findMany({
-    with: {
-      users: { columns: { firstName: true, lastName: true, username: true } },
-    },
-    extras: {
-      commentCount: sql<number>`(
-        SELECT COUNT(*) 
-        FROM ${comments} 
-        WHERE ${comments}.post_id = ${posts.id}
-      )`
-        .mapWith(Number)
-        .as("comment_count"),
-    },
-  });
+export async function getAllPostsByUserAndUsersFollowedByUser(userId: number) {
+  return db
+    .select({
+      id: posts.id,
+      title: posts.title,
+      content: posts.content,
+      createdAt: posts.createdAt,
+      userId: posts.userId,
+      likes: posts.likes,
+      commentsCount: sql<number>`(SELECT COUNT(*) FROM ${comments} WHERE ${comments.postId} = ${posts.id})`,
+      users: {
+        username: users.username,
+        firstName: users.firstName,
+        lastName: users.lastName,
+      },
+    })
+    .from(posts)
+    .innerJoin(users, eq(posts.userId, users.id))
+    .where(
+      or(
+        eq(posts.userId, userId),
+        sql`${posts.userId} in (SELECT ${userFollows.follows} FROM ${userFollows} WHERE ${userFollows.userId} = ${userId})`,
+      ),
+    )
+    .orderBy(desc(posts.createdAt));
 }
 export async function getLatestPosts() {
   return db.query.posts.findMany({
@@ -25,7 +35,7 @@ export async function getLatestPosts() {
       users: { columns: { firstName: true, lastName: true, username: true } },
     },
     extras: {
-      commentCount: sql<number>`(
+      commentsCount: sql<number>`(
         SELECT COUNT(*) 
         FROM ${comments} 
         WHERE ${comments}.post_id = ${posts.id}

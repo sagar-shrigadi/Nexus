@@ -1,22 +1,19 @@
 import { MessageSquare } from "lucide-react";
 import Link from "next/link";
-import PostLikeForm from "./post-like-form";
+import PostLikeForm from "@/app/ui/post/post-like-form";
 import { auth } from "@/auth";
-import { getAllLikedPostsByUser } from "../services/posts";
+import { getAllLikedPostsByUser } from "@/app/services/posts";
 
-export default async function PostContentCard({
+export default async function PostContent({
   post,
 }: {
   post: {
     id: number;
     title: string;
     content: string;
-    userId: number;
     likes: number;
     commentCount: number;
-    users: {
-      firstName: string;
-      lastName: string;
+    user: {
       username: string;
     };
   };
@@ -26,7 +23,7 @@ export default async function PostContentCard({
   return (
     <div className="flex flex-col gap-6 px-6">
       <Link
-        href={`/${post.users.username}/status/${post.id}`}
+        href={`/${post.user.username}/status/${post.id}`}
         className="flex flex-col gap-1 cursor-pointer max-w-[65ch] hover:underline transition-all"
       >
         <h3 className="sm:text-lg font-bold">{post.title}</h3>
@@ -37,7 +34,11 @@ export default async function PostContentCard({
           <MessageSquare className="size-5.5" />
           <span>{post.commentCount > 0 ? `${post.commentCount}` : ""}</span>
         </div>
-        <PostLikeForm session={session} post={post} likedPosts={likedPosts} />
+        <PostLikeForm
+          session={session}
+          post={{ id: post.id, likes: post.likes }}
+          likedPosts={likedPosts}
+        />
       </div>
     </div>
   );

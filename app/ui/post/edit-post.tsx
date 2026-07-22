@@ -10,12 +10,6 @@ export default function EditPostForm({
     id: number;
     title: string;
     content: string;
-    userId: number;
-    users: {
-      firstName: string;
-      lastName: string;
-      username: string;
-    };
   };
 }) {
   const updatePostWithId = updatePost.bind(null, post.id);
