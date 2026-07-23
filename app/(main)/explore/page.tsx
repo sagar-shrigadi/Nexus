@@ -1,18 +1,12 @@
 import { getLatestPosts } from "@/app/services/posts";
-import Image from "next/image";
-import { allUsersFollowedByUser, getRandomUsers } from "@/app/services/users";
-import Link from "next/link";
 import PostCard from "@/app/ui/post/post-card";
-import { auth } from "@/auth";
-import FollowUserForm from "@/app/ui/user/follow-user-form";
+import { Suspense } from "react";
+import ExploreSidebar from "@/app/ui/sidebar/explore-sidebar";
 
 export default async function Explore() {
-  const session = await auth();
   const posts = await getLatestPosts();
-  const users = await getRandomUsers(3);
-  const usersFollowed = await allUsersFollowedByUser(Number(session?.user?.id));
   return (
-    <main className="flex flex-1 w-full mx-auto flex-col sm:flex-row bg-white dark:bg-black sm:items-start sm:justify-center sm:gap-8 md:gap-12 xl:gap-24">
+    <main className="flex flex-1 w-full mx-auto flex-col sm:flex-row sm:items-start sm:justify-center sm:gap-8 md:gap-12 xl:gap-24">
       <section className="grow w-full max-w-3xl flex flex-col gap-5 h-[85dvh] sm:h-dvh overflow-y-scroll border-x rounded">
         <h1 className="text-2xl lg:text-3xl font-bold mt-2 mb-3 ml-4">
           Explore Latest Tweets
@@ -34,70 +28,9 @@ export default async function Explore() {
           />
         ))}
       </section>
-      <section className="hidden min-w-80 xl:w-100 justify-self-end md:flex flex-col gap-8 md:h-dvh">
-        <article className="flex flex-col gap-4 border-x border-b rounded">
-          <h2 className="text-xl lg:text-2xl font-bold my-2 ml-4">
-            Trending Users
-          </h2>
-          {users.map((user) => (
-            <div
-              key={user.id}
-              className="flex justify-between items-center gap-8 px-4 py-1.5 not-last:border-y last:border-t"
-            >
-              <Link
-                href={`/${user.username}`}
-                className="grow flex items-center gap-6 cursor-pointer hover:text-gray-400 transition-colors"
-              >
-                <Image
-                  src="/images/defaultProfile.png"
-                  width={180}
-                  height={180}
-                  alt="default image avatar for user"
-                  className="rounded-full w-7.5 sm:w-9 aspect-square block"
-                />
-                <div className="flex flex-col">
-                  <span>{`${user.firstName} ${user.lastName}`}</span>
-                  <span className="text-(--lightText) text-sm">
-                    @{user.username}
-                  </span>
-                </div>
-              </Link>
-              <FollowUserForm
-                session={session}
-                userToFollow={{ id: user.id, username: user.username }}
-                usersFollowed={usersFollowed}
-              />
-            </div>
-          ))}
-        </article>
-        <article className="flex flex-col gap-4 rounded border">
-          <h2 className="text-xl lg:text-2xl font-bold mt-3 mb-2 px-4">
-            Trends For You
-          </h2>
-          <div className="flex flex-col gap-6">
-            <div className="p-4 border-y">
-              <h3 className="text-lg cursor-pointer rounded">
-                Lorem ipsum dolor
-              </h3>
-            </div>
-            <div className="p-4 border-y">
-              <h3 className="text-lg cursor-pointer rounded">
-                Lorem ipsum dolor
-              </h3>
-            </div>
-            <div className="p-4 border-y">
-              <h3 className="text-lg cursor-pointer rounded">
-                Lorem ipsum dolor
-              </h3>
-            </div>
-            <div className="p-4 border-t">
-              <h3 className="text-lg cursor-pointer rounded">
-                Lorem ipsum dolor
-              </h3>
-            </div>
-          </div>
-        </article>
-      </section>
+      <Suspense>
+        <ExploreSidebar />
+      </Suspense>
     </main>
   );
 }

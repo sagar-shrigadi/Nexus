@@ -1,11 +1,12 @@
 import { db } from "@/db";
 import { comments, posts, userFollows, users } from "@/db/schema";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, not, sql } from "drizzle-orm";
 
-export async function getRandomUsers(limit: number) {
+export async function getRandomUsersExcludingUser(userId: number) {
   return db.query.users.findMany({
+    where: not(eq(users.id, userId)),
     orderBy: sql`RANDOM()`,
-    limit,
+    limit: 10,
     columns: { password: false, bio: false },
   });
 }
@@ -99,5 +100,13 @@ export async function allUsersFollowedByUser(userId: number) {
   return db.query.userFollows.findMany({
     where: eq(userFollows.userId, userId),
     columns: { follows: true },
+  });
+}
+export async function getMostFollowedUsersExcludingUser(userId: number) {
+  return db.query.users.findMany({
+    columns: { id: true, username: true, firstName: true, lastName: true },
+    where: not(eq(users.id, userId)),
+    orderBy: [desc(users.followers)],
+    limit: 3,
   });
 }
