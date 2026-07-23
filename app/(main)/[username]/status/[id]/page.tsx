@@ -8,10 +8,9 @@ import CommentCard from "@/app/ui/comment/comment-card";
 import CreateComment from "@/app/ui/comment/create-comment";
 import PostOptions from "@/app/ui/post/post-options";
 import SinglePostLikeForm from "@/app/ui/post/single-post-like-form";
+import UserNameCard from "@/app/ui/user/name-card";
 import { auth } from "@/auth";
 import { MessageSquare } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export default async function PostPage({
@@ -43,23 +42,12 @@ export default async function PostPage({
           <h2 className="text-2xl">Post</h2>
         </div>
         <div className="px-6 flex justify-between items-center">
-          <Link
-            href={`/${post.users.username}`}
-            className="grow flex items-center gap-4 cursor-pointer"
-          >
-            <Image
-              src="/images/defaultProfile.png"
-              width={180}
-              height={180}
-              loading="eager"
-              alt="default image avatar for user"
-              className="rounded-full w-7.5 sm:w-9 aspect-square block"
-            />
-            <div className="flex flex-col">
-              <span className="hover:underline transition-all text-lg font-bold">{`${post.users.firstName} ${post.users.lastName}`}</span>
-              <span className="text-(--lightText)">@{post.users.username}</span>
-            </div>
-          </Link>
+          <UserNameCard
+            className="flex gap-4"
+            to={`/${post.users.username}`}
+            fullname={`${post.users.firstName} ${post.users.lastName}`}
+            username={post.users.username}
+          />
           {Number(session?.user?.id) === post.userId ? (
             <PostOptions
               session={session}

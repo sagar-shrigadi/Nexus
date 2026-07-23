@@ -54,7 +54,7 @@ export default async function Navbar() {
             aria-atomic="true"
             popover="auto"
             style={{ positionAnchor: `userPos` }}
-            className="absolute [position-area:top_left] sm:[position-area:top_center] sm:ml-px lg:[position-area:top_left] rounded shadow-md mb-2 md:mb-4 md:ml-[unset]"
+            className="absolute [position-area:top_left] sm:[position-area:top_center] sm:ml-px lg:[position-area:top_left] rounded shadow-md mb-2 sm:mb-4 md:ml-[unset]"
           >
             <div className="text-base flex flex-col items-start gap-2 p-2">
               <Link

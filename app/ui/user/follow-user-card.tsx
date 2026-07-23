@@ -1,7 +1,6 @@
-import Image from "next/image";
 import FollowUserForm from "@/app/ui/user/follow-user-form";
-import Link from "next/link";
 import { auth } from "@/auth";
+import UserNameCard from "@/app/ui/user/name-card";
 
 export default async function FollowUserCard({
   user,
@@ -19,22 +18,12 @@ export default async function FollowUserCard({
   const session = await auth();
   return (
     <li className="flex justify-between items-center px-4 py-1.5">
-      <Link
-        href={`/${user.username}`}
-        className="grow flex items-center gap-6 hover:text-gray-400 transition-colors cursor-pointer"
-      >
-        <Image
-          src="/images/defaultProfile.png"
-          width={180}
-          height={180}
-          alt="default image avatar for user"
-          className="rounded-full w-7.5 sm:w-9 aspect-square block"
-        />
-        <div className="flex flex-col">
-          <span>{user.fullname}</span>
-          <span className="text-(--lightText) text-sm">@{user.username}</span>
-        </div>
-      </Link>
+      <UserNameCard
+        className="flex gap-6"
+        to={`/${user.username}`}
+        fullname={user.fullname}
+        username={user.username}
+      />
       <FollowUserForm
         session={session}
         userToFollow={{ id: user.id, username: user.username }}
