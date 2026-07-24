@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { createComment } from "@/app/lib/actions/comments";
+import { createComment } from "@/lib/actions/comments";
 import { CircleAlert } from "lucide-react";
 
 export default function CreateComment({ postId }: { postId: number }) {

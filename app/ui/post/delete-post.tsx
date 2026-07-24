@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { deletePost } from "@/app/lib/actions/posts";
+import { deletePost } from "@/lib/actions/posts";
 import DeleteForm from "@/app/ui/delete-form";
 
 export default function DeletePost({ postId }: { postId: number }) {

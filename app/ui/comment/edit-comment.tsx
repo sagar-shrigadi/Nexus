@@ -1,6 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { updateComment } from "@/app/lib/actions/comments";
+import { updateComment } from "@/lib/actions/comments";
 import { useActionState } from "react";
 import { CircleAlert } from "lucide-react";
 

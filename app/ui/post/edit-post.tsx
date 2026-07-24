@@ -1,5 +1,5 @@
 "use client";
-import { updatePost } from "@/app/lib/actions/posts";
+import { updatePost } from "@/lib/actions/posts";
 import { CircleAlert } from "lucide-react";
 import { useActionState } from "react";
 

@@ -1,6 +1,6 @@
 "use client";
 import { Session } from "next-auth";
-import { userFollows } from "../../lib/actions/users";
+import { userFollows } from "@/lib/actions/users";
 import { useActionState } from "react";
 import { usePathname } from "next/navigation";
 

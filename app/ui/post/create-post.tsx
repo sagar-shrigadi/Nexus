@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useActionState } from "react";
-import { createPost } from "@/app/lib/actions/posts";
+import { createPost } from "@/lib/actions/posts";
 import { CircleAlert } from "lucide-react";
 
 export default function CreatePost() {

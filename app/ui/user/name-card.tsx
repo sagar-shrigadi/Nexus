@@ -1,4 +1,4 @@
-import { cn } from "@/app/lib/utils";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link, { type LinkProps } from "next/link";
 

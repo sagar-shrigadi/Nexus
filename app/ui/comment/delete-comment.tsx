@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { deleteComment } from "@/app/lib/actions/comments";
+import { deleteComment } from "@/lib/actions/comments";
 import { useActionState } from "react";
 import DeleteForm from "@/app/ui/delete-form";
 

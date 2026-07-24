@@ -4,7 +4,7 @@ import { useActionState, useState } from "react";
 import EditCommentForm from "@/app/ui/comment/edit-comment";
 import { Session } from "next-auth";
 import { Heart } from "lucide-react";
-import { likeComment } from "@/app/lib/actions/comments";
+import { likeComment } from "@/lib/actions/comments";
 import { usePathname } from "next/navigation";
 import UserNameCard from "@/app/ui/user/name-card";
 
