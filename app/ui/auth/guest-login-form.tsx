@@ -1,10 +1,13 @@
 "use client";
 
 import { CircleUserRound } from "lucide-react";
-import { authenticate } from "@/app/lib/actions/auth";
+import { authenticate } from "@/lib/actions/auth";
 import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
 import AuthFormErrors from "@/app/ui/auth/form-errors";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { Field } from "@/components/ui/field";
 
 export default function GuestLoginForm() {
   const searchParams = useSearchParams();
@@ -28,14 +31,18 @@ export default function GuestLoginForm() {
           value={process.env.GUEST_PASSWORD}
         />
         <input type="hidden" name="redirectTo" value={callbackUrl} />
-
-        <button
-          aria-disabled={isPending}
-          className="grow cursor-pointer border border-slate-50 hover:bg-slate-50 hover:text-black px-4 py-2 rounded transition-colors flex items-center justify-center gap-6"
-        >
-          <CircleUserRound className="size-6" />
-          Try a Guest Account
-        </button>
+        <Field>
+          <Button
+            type="submit"
+            variant="outline"
+            disabled={isPending}
+            aria-disabled={isPending}
+          >
+            <CircleUserRound className="size-6" />
+            <span>Try a Guest Account</span>
+            {isPending ? <Spinner data-icon="inline-end" /> : ""}
+          </Button>
+        </Field>
       </form>
     </>
   );

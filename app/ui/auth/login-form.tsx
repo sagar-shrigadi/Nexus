@@ -2,9 +2,18 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { authenticate } from "@/app/lib/actions/auth";
+import { authenticate } from "@/lib/actions/auth";
 import { useSearchParams } from "next/navigation";
 import AuthFormErrors from "@/app/ui/auth/form-errors";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 
 export default function LoginForm() {
   const searchParams = useSearchParams();
@@ -14,43 +23,52 @@ export default function LoginForm() {
     undefined,
   );
   return (
-    <form action={formAction} className="w-full mt-5 flex flex-col gap-5">
-      <div className="flex-1 flex flex-col ">
-        <label htmlFor="username">Username</label>
-        <input
-          type="text"
-          name="username"
-          id="username"
-          required
-          autoComplete="username"
-          className="rounded-sm p-1 px-2 bg-dark-200 text-lg border"
-        />
-      </div>
-      <div className="flex-1 flex flex-col ">
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          name="password"
-          id="password"
-          required
-          autoComplete="current-password"
-          className="rounded-sm p-1 px-2 bg-dark-200 text-lg border"
-        />
-      </div>
-      <p className="text-sm">
-        Don&apos;t have an account?{" "}
-        <Link href="/signup" className="underline">
-          Sign Up
-        </Link>
-      </p>
-      <input type="hidden" name="redirectTo" value={callbackUrl} />
-      <button
-        aria-disabled={isPending}
-        className="cursor-pointer py-2 px-6 rounded text-black bg-slate-200 hover:bg-slate-50 transition-colors"
-      >
-        Log in
-      </button>
+    <>
+      <form action={formAction}>
+        <FieldGroup>
+          <Field>
+            <FieldLabel htmlFor="username">Username</FieldLabel>
+            <Input
+              type="text"
+              name="username"
+              id="username"
+              required
+              autoComplete="username"
+            />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <Input
+              type="password"
+              name="password"
+              id="password"
+              required
+              autoComplete="current-password"
+            />
+          </Field>
+          <input type="hidden" name="redirectTo" value={callbackUrl} />
+          <Field className="flex flex-col gap-4">
+            <FieldDescription>
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/signup"
+                className="underline underline-offset-4 hover:text-primary text-muted-foreground transition-colors"
+              >
+                Sign Up
+              </Link>
+            </FieldDescription>
+            <Button
+              type="submit"
+              disabled={isPending}
+              aria-disabled={isPending}
+            >
+              <span>Login</span>
+              {isPending ? <Spinner data-icon="inline-end" /> : ""}
+            </Button>
+          </Field>
+        </FieldGroup>
+      </form>
       <AuthFormErrors errorMessage={errorMessage} />
-    </form>
+    </>
   );
 }
