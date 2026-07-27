@@ -1,84 +1,117 @@
-import { Heart, House, LogOut, Search } from "lucide-react";
+import { BadgeCheck, Ellipsis, House, LogOut, Search } from "lucide-react";
 import Navlink from "@/app/ui/nav/navlink";
 import { signOut, auth } from "@/auth";
 import Link from "next/link";
-import Image from "next/image";
 import UserNameCard from "@/app/ui/user/name-card";
-import PopoverButton from "@/app/ui/button/popover-button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { buttonVariants } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 export default async function Navbar() {
   const session = await auth();
 
   return (
     <nav>
-      <ul className="flex justify-between gap-6 px-2 py-2 sm:flex-col sm:justify-stretch sm:text-xl sm:min-h-dvh lg:min-w-60">
+      <ul className="flex justify-between gap-6 p-2 sm:p-4 sm:flex-col sm:justify-stretch sm:text-xl sm:h-dvh lg:min-w-60">
         <Navlink to="/">
-          <House className="size-7.25" />
+          <House className="size-7" />
           <span className="hidden lg:block">Home</span>
         </Navlink>
 
         <Navlink to="/explore">
-          <Search className="size-8" />
+          <Search className="size-7" />
           <span className="hidden lg:block">Explore</span>
         </Navlink>
 
-        <div className="flex justify-between items-center sm:mx-auto lg:mx-[unset] sm:mt-auto p-2">
-          <div className="flex gap-5 items-center">
-            <button
-              popoverTarget="userAction"
-              style={{ anchorName: `userPos` }}
-              className="grow flex lg:hidden items-center gap-3.5 cursor-pointer text-lg sm:text-xl hover:underline transition-all"
-            >
-              <Image
-                src="/images/defaultProfile.png"
-                width={180}
-                height={180}
-                alt="default image avatar for user"
-                className="rounded-full w-7.5 md:w-8.5 aspect-square block"
-              />
-              <span className="hidden lg:block">{`${session?.user?.name}`}</span>
-            </button>
-            <UserNameCard
-              className="hidden lg:flex"
-              to={`/${session?.user?.email}`}
-              fullname={`${session?.user?.name}`}
-            />
-            <PopoverButton
-              className="hidden lg:block"
-              popoverTarget="userAction"
-              style={{ anchorName: `userPos` }}
-            />
-          </div>
-          <div
-            id="userAction"
-            aria-atomic="true"
-            popover="auto"
-            style={{ positionAnchor: `userPos` }}
-            className="absolute [position-area:top_left] sm:[position-area:top_center] sm:ml-px lg:[position-area:top_left] rounded shadow-md mb-2 sm:mb-4 md:ml-[unset]"
-          >
-            <div className="text-base flex flex-col items-start gap-2 p-2">
-              <Link
-                href={`/${session?.user?.email}/likes`}
-                className="w-full flex items-center gap-4 p-2 cursor-pointer hover:bg-gray-200 transition-colors"
-              >
-                <Heart className="size-6" />
-                <span className="hidden lg:block">Likes</span>
-              </Link>
-              <form
-                action={async () => {
-                  "use server";
-                  await signOut({ redirectTo: "/login" });
-                }}
-                className="mt-auto"
-              >
-                <button className="flex items-center gap-4 p-2 cursor-pointer hover:bg-gray-200 transition-colors">
-                  <LogOut className="size-6" />
-                  <span className="hidden lg:block">Logout</span>
+        <li className="my-auto sm:my-[unset] sm:mt-auto flex justify-center px-4 py-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className="flex lg:hidden"
+              render={
+                <button
+                  className={cn(
+                    buttonVariants({
+                      variant: "ghost",
+                      size: "icon",
+                    }),
+                  )}
+                >
+                  <Avatar>
+                    <AvatarImage
+                      src={session?.user?.image ?? "/images/defaultProfile.png"}
+                      alt={
+                        session?.user?.image
+                          ? "User Avatar"
+                          : "Default User Avatar"
+                      }
+                    />
+                    <AvatarFallback>
+                      {session?.user?.name?.charAt(0).toUpperCase() ?? "U"}
+                    </AvatarFallback>
+                  </Avatar>
                 </button>
-              </form>
+              }
+            />
+            <div className="grow hidden lg:flex items-center gap-4">
+              <UserNameCard
+                className="flex"
+                to={`/${session?.user?.email}`}
+                fullname={`${session?.user?.name}`}
+              />
+              <DropdownMenuTrigger
+                render={
+                  <button
+                    className={cn(
+                      buttonVariants({
+                        variant: "outline",
+                        size: "icon",
+                      }),
+                    )}
+                  >
+                    <Ellipsis />
+                  </button>
+                }
+              />
             </div>
-          </div>
-        </div>
+            <DropdownMenuContent>
+              <DropdownMenuGroup>
+                <DropdownMenuItem className="cursor-pointer">
+                  <Link
+                    href={`/${session?.user?.email}`}
+                    className="flex items-center gap-1.5"
+                  >
+                    <BadgeCheck />
+                    Account
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem variant="destructive">
+                  <form
+                    action={async () => {
+                      "use server";
+                      await signOut({ redirectTo: "/login" });
+                    }}
+                  >
+                    <button className="flex items-center gap-1.5">
+                      <LogOut />
+                      Sign Out
+                    </button>
+                  </form>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </li>
       </ul>
     </nav>
   );
