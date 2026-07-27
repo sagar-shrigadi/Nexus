@@ -1,13 +1,26 @@
-import SignUpForm from "@/app/ui/auth/signup-form";
-import { Suspense } from "react";
+import SignupForm from "@/app/ui/auth/signup-form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
-export default function SignUp() {
+export default function Page() {
   return (
-    <section className="flex flex-col gap-4 items-center justify-center m-auto p-4 w-dvw max-w-136">
-      <h1 className="text-4xl mr-auto">Please Sign Up</h1>
-      <Suspense>
-        <SignUpForm />
-      </Suspense>
-    </section>
+    <article className="m-auto w-dvw max-w-sm">
+      <Card>
+        <CardHeader>
+          <CardTitle>Create an account</CardTitle>
+          <CardDescription>
+            Enter your information below to create your account
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-2.5">
+          <SignupForm />
+        </CardContent>
+      </Card>
+    </article>
   );
 }

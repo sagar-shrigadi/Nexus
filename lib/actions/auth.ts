@@ -27,13 +27,38 @@ export async function authenticate(
 }
 
 const SignUpSchema = z.object({
-  firstname: z.string().min(3, "First Name must be at least 3 characters."),
-  lastname: z.string().min(3, "Last Name must be at least 3 characters."),
-  username: z.string().min(3, "Username must be at least 3 characters."),
-  password: z.string().min(6, "Password must be at least 6 characters."),
+  firstname: z
+    .string()
+    .trim()
+    .min(1, "First name is required.")
+    .max(50, "First name is too long."),
+  lastname: z
+    .string()
+    .trim()
+    .min(1, "Last name is required.")
+    .max(50, "Last name is too long."),
+  username: z
+    .string()
+    .trim()
+    .min(3, "Username must be at least 3 characters long.")
+    .max(30, "Username must not exceed 30 characters."),
+  password: z
+    .string()
+    .trim()
+    .min(8, "Password must be at least 8 characters long.")
+    .max(72, "Password is too long."),
 });
+export type RegisterState = {
+  errors?: {
+    firstname?: string[];
+    lastname?: string[];
+    username?: string[];
+    password?: string[];
+  };
+  message?: string | null;
+};
 export async function register(
-  prevState: string | undefined,
+  prevState: RegisterState | undefined,
   formData: FormData,
 ) {
   const validatedFields = SignUpSchema.safeParse(
@@ -41,14 +66,20 @@ export async function register(
   );
 
   if (!validatedFields.success) {
-    return "Missing Fields. Failed to Register.";
+    return {
+      errors: z.flattenError(validatedFields.error).fieldErrors,
+      message: "Missing or invalid fields. Failed to register.",
+    };
   }
   const { firstname, lastname, username, password } = validatedFields.data;
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
     await postUser(firstname, lastname, username, hashedPassword);
   } catch (error) {
-    throw error;
+    return {
+      message:
+        "Database error: Failed to create your account. Please Try again!",
+    };
   }
   redirect("/login");
 }
