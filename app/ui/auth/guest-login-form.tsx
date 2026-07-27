@@ -1,24 +1,19 @@
 "use client";
 
 import { CircleUserRound } from "lucide-react";
-import { authenticate } from "@/lib/actions/auth";
-import { useActionState } from "react";
-import { useSearchParams } from "next/navigation";
-import AuthFormErrors from "@/app/ui/auth/form-errors";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Field } from "@/components/ui/field";
 
-export default function GuestLoginForm() {
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
-  const [errorMessage, formAction, isPending] = useActionState(
-    authenticate,
-    undefined,
-  );
+export default function GuestLoginForm({
+  formAction,
+  isPending,
+}: {
+  formAction: (payload: FormData) => void;
+  isPending: boolean;
+}) {
   return (
     <>
-      <AuthFormErrors errorMessage={errorMessage} />
       <form action={formAction} className="w-full flex">
         <input
           type="hidden"
@@ -30,7 +25,6 @@ export default function GuestLoginForm() {
           name="password"
           value={process.env.GUEST_PASSWORD}
         />
-        <input type="hidden" name="redirectTo" value={callbackUrl} />
         <Field>
           <Button
             type="submit"

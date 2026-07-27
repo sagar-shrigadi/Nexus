@@ -1,4 +1,3 @@
-import GuestLoginForm from "@/app/ui/auth/guest-login-form";
 import LoginForm from "@/app/ui/auth/login-form";
 import {
   Card,
@@ -7,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Suspense } from "react";
 
 export default function Page() {
   return (
@@ -20,10 +18,7 @@ export default function Page() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-2.5">
-          <Suspense>
-            <LoginForm />
-            <GuestLoginForm />
-          </Suspense>
+          <LoginForm />
         </CardContent>
       </Card>
     </article>

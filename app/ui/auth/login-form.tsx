@@ -4,27 +4,30 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { authenticate } from "@/lib/actions/auth";
 import { useSearchParams } from "next/navigation";
-import AuthFormErrors from "@/app/ui/auth/form-errors";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import GuestLoginForm from "@/app/ui/auth/guest-login-form";
 
 export default function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
-  const [errorMessage, formAction, isPending] = useActionState(
+  const [loginError, loginFormAction, loginPending] = useActionState(
     authenticate,
     undefined,
   );
+  const [guestLoginError, guestLoginFormAction, guestLoginPending] =
+    useActionState(authenticate, undefined);
   return (
     <>
-      <form action={formAction}>
+      <form action={loginFormAction}>
         <FieldGroup>
           <Field>
             <FieldLabel htmlFor="username">Username</FieldLabel>
@@ -47,28 +50,27 @@ export default function LoginForm() {
             />
           </Field>
           <input type="hidden" name="redirectTo" value={callbackUrl} />
-          <Field className="flex flex-col gap-4">
+          <Field>
             <FieldDescription>
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/signup"
-                className="underline underline-offset-4 hover:text-primary text-muted-foreground transition-colors"
-              >
-                Sign Up
-              </Link>
+              Don&apos;t have an account? <Link href="/signup">Sign Up</Link>
             </FieldDescription>
+            {loginError ? <FieldError>{loginError}</FieldError> : ""}
+            {guestLoginError ? <FieldError>{guestLoginError}</FieldError> : ""}
             <Button
               type="submit"
-              disabled={isPending}
-              aria-disabled={isPending}
+              disabled={loginPending}
+              aria-disabled={loginPending}
             >
               <span>Login</span>
-              {isPending ? <Spinner data-icon="inline-end" /> : ""}
+              {loginPending ? <Spinner data-icon="inline-end" /> : ""}
             </Button>
           </Field>
         </FieldGroup>
       </form>
-      <AuthFormErrors errorMessage={errorMessage} />
+      <GuestLoginForm
+        formAction={guestLoginFormAction}
+        isPending={guestLoginPending}
+      />
     </>
   );
 }
