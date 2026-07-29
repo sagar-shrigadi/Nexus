@@ -21,15 +21,15 @@ export default async function PostContent({
   const session = await auth();
   const likedPosts = await getAllLikedPostsByUser(Number(session?.user?.id));
   return (
-    <div className="flex flex-col gap-6 px-6">
+    <div className="flex flex-col gap-4">
       <Link
         href={`/${post.user.username}/status/${post.id}`}
-        className="flex flex-col gap-1 cursor-pointer max-w-[65ch] hover:underline transition-all"
+        className="flex justify-center flex-col gap-1 px-6 py-2 cursor-pointer hover:bg-sidebar-accent rounded transition-colors"
       >
         <h3 className="sm:text-lg font-bold">{post.title}</h3>
-        <p className="line-clamp-4">{post.content}</p>
+        <p className="line-clamp-4 max-w-[65ch]">{post.content}</p>
       </Link>
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-6 px-6">
         <div className="flex items-center gap-2">
           <MessageSquare className="size-5.5" />
           <span>{post.commentCount > 0 ? `${post.commentCount}` : ""}</span>

@@ -1,8 +1,11 @@
 "use client";
 import { Session } from "next-auth";
 import { userFollows } from "@/lib/actions/users";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { Field } from "@/components/ui/field";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
 
 export default function FollowUserForm({
   session,
@@ -28,29 +31,45 @@ export default function FollowUserForm({
     },
     pathaname,
   );
-  const [errorMessage, formAction, isPending] = useActionState(
+  const [result, formAction, isPending] = useActionState(
     userFollowsWithId,
     undefined,
   );
+
+  useEffect(() => {
+    if (!result) return;
+    if (result.status === "error") {
+      toast.add({
+        type: "error",
+        description: result.message,
+      });
+    }
+  }, [result]);
   return (
     <form action={formAction}>
-      {usersFollowed.some((item) => item.follows === userToFollow.id) ? (
-        <button
-          aria-disabled={isPending}
-          disabled={isPending}
-          className="px-4 py-1 rounded cursor-pointer text-center max-w-25 bg-gray-200 hover:bg-gray-300 text-black transition-colors"
-        >
-          Unfollow
-        </button>
-      ) : (
-        <button
-          aria-disabled={isPending}
-          disabled={isPending}
-          className="px-4 py-1 rounded cursor-pointer text-center max-w-25 bg-(--hover) hover:bg-[hsl(210_7%_22%)] transition-colors"
-        >
-          Follow
-        </button>
-      )}
+      <Field>
+        {usersFollowed.some((item) => item.follows === userToFollow.id) ? (
+          <Button
+            type="submit"
+            variant="secondary"
+            aria-disabled={isPending}
+            disabled={isPending}
+            className="px-4"
+          >
+            Unfollow
+          </Button>
+        ) : (
+          <Button
+            type="submit"
+            variant="default"
+            aria-disabled={isPending}
+            disabled={isPending}
+            className="px-4"
+          >
+            Follow
+          </Button>
+        )}
+      </Field>
     </form>
   );
 }

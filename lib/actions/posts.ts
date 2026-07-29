@@ -14,11 +14,17 @@ import { redirect } from "next/navigation";
 import { $ZodIssue } from "zod/v4/core";
 
 const PostSchema = z.object({
-  title: z.string().nonempty("Post Title must not be empty!"),
-  content: z.string().nonempty("Post Content must not be empty!"),
+  title: z.string().trim().min(1, "Post Title is required."),
+  content: z.string().trim().min(1, "Post Content is required."),
 });
+interface PostState {
+  errors?: {
+    title?: string[];
+    content?: string[];
+  };
+}
 export async function createPost(
-  prevState: $ZodIssue[] | undefined,
+  prevState: PostState | undefined,
   formData: FormData,
 ) {
   const session = await auth();
@@ -27,7 +33,9 @@ export async function createPost(
   );
 
   if (!validatedPost.success) {
-    return validatedPost.error.issues.map((issue) => issue);
+    return {
+      errors: z.flattenError(validatedPost.error).fieldErrors,
+    };
   }
   const { title, content } = validatedPost.data;
 
@@ -40,18 +48,6 @@ export async function createPost(
   revalidatePath("/explore");
   revalidatePath(`/${session?.user?.email}`);
   redirect("/");
-}
-export async function deletePost(id: number) {
-  const session = await auth();
-
-  try {
-    await deletePostById(id);
-    revalidatePath("/");
-    revalidatePath("/explore");
-    revalidatePath(`/${session?.user?.email}`);
-  } catch (error) {
-    throw error;
-  }
 }
 export async function updatePost(
   postId: number,
@@ -79,16 +75,50 @@ export async function updatePost(
   }
   redirect(`/${post?.users.username}/status/${post?.id}`);
 }
+
+interface ActionResult {
+  status: "error";
+  message: string;
+}
+
+export async function deletePost(post: {
+  id: number;
+  userId: number;
+}): Promise<ActionResult | undefined> {
+  const session = await auth();
+
+  if (Number(session?.user?.id) !== post.userId) {
+    return {
+      status: "error",
+      message: "You are not authorized to delete this post!",
+    };
+  }
+  try {
+    await deletePostById(post.id);
+    revalidatePath("/");
+    revalidatePath("/explore");
+    revalidatePath(`/${session?.user?.email}`);
+  } catch (error) {
+    console.error(error);
+    return {
+      status: "error",
+      message: "Post could not be deleted! Please try again!",
+    };
+  }
+}
 export async function likePost(
   userId: number,
   postId: number,
   pathname: string,
-) {
+): Promise<ActionResult | undefined> {
   try {
     await likePostTransaction(userId, postId);
     revalidatePath(`${pathname}`);
   } catch (error) {
     console.error(error);
-    throw error;
+    return {
+      status: "error",
+      message: "Error liking the post! Please try again!",
+    };
   }
 }

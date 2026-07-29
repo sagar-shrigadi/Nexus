@@ -1,9 +1,12 @@
 "use client";
 import { Heart } from "lucide-react";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { likePost } from "@/lib/actions/posts";
 import { Session } from "next-auth";
 import { usePathname } from "next/navigation";
+import { Field } from "@/components/ui/field";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
 
 export default function PostLikeForm({
   session,
@@ -28,18 +31,35 @@ export default function PostLikeForm({
     post.id,
     pathname,
   );
-  const [errorMessage, formAction, isPending] = useActionState(
+  const [result, formAction, isPending] = useActionState(
     likePostWithId,
     undefined,
   );
+
+  useEffect(() => {
+    if (!result) return;
+    if (result.status === "error") {
+      toast.add({
+        type: "error",
+        description: result.message,
+      });
+    }
+  }, [result]);
   return (
-    <div className="flex items-center gap-2.5 hover:text-pink-500 transition-colors">
+    <div className="flex items-center">
       <form action={formAction} className="flex items-center">
-        <button aria-disabled={isPending} disabled={isPending}>
-          <Heart
-            className={`size-6.5 ${likedPosts.some((item) => item.postId === post.id) ? "fill-pink-500 stroke-pink-500" : ""} transition-colors cursor-pointer`}
-          />
-        </button>
+        <Field>
+          <Button
+            type="submit"
+            variant="ghost"
+            aria-disabled={isPending}
+            disabled={isPending}
+          >
+            <Heart
+              className={`size-6.5 ${likedPosts.some((item) => item.postId === post.id) ? "fill-pink-500 stroke-pink-500" : ""} transition-colors`}
+            />
+          </Button>
+        </Field>
       </form>
       <span className="transition-all">
         {post.likes > 0 ? `${post.likes}` : ""}

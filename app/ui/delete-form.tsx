@@ -1,3 +1,7 @@
+import { Button } from "@/components/ui/button";
+import { Field } from "@/components/ui/field";
+import { Trash } from "lucide-react";
+
 export default function DeleteForm({
   action,
   isPending,
@@ -7,13 +11,18 @@ export default function DeleteForm({
 }) {
   return (
     <form action={action}>
-      <button
-        aria-disabled={isPending}
-        disabled={isPending}
-        className="px-6 py-1.5 hover:bg-gray-200 rounded cursor-pointer transition-colors"
-      >
-        {isPending ? "Deleting" : "Delete"}
-      </button>
+      <Field>
+        <Button
+          type="submit"
+          variant="destructive"
+          aria-disabled={isPending}
+          disabled={isPending}
+          className="flex justify-start"
+        >
+          <Trash />
+          Delete
+        </Button>
+      </Field>
     </form>
   );
 }

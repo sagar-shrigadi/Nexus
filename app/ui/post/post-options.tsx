@@ -1,7 +1,17 @@
 import DeletePost from "@/app/ui/post/delete-post";
 import Link from "next/link";
 import { Session } from "next-auth";
-import PopoverButton from "@/app/ui/button/popover-button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { buttonVariants } from "@/components/ui/button";
+import { Ellipsis, Pencil } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function PostOptions({
   session,
@@ -14,28 +24,38 @@ export default function PostOptions({
   };
 }) {
   return (
-    <>
-      <PopoverButton
-        popoverTarget={`${post.userId}PostActions`}
-        style={{ anchorName: `${post.userId}Pos` }}
-      />
-      <div
-        id={`${post.userId}PostActions`}
-        aria-atomic="true"
-        popover="auto"
-        style={{ positionAnchor: `${post.userId}Pos` }}
-        className="absolute [position-area:bottom_left] rounded shadow-md"
-      >
-        <div className="flex flex-col gap-2 p-2">
-          <DeletePost postId={post.id} />
-          <Link
-            href={`/${session?.user?.email}/status/${post.id}/edit`}
-            className="px-6 py-1.5 hover:bg-gray-200 rounded cursor-pointer transition-colors"
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <button
+            className={cn(
+              buttonVariants({
+                variant: "outline",
+                size: "icon",
+              }),
+            )}
           >
-            Edit
-          </Link>
-        </div>
-      </div>
-    </>
+            <Ellipsis />
+          </button>
+        }
+      />
+      <DropdownMenuContent>
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <Link
+              href={`/${session?.user?.email}/status/${post.id}/edit`}
+              className="flex items-center gap-1.5"
+            >
+              <Pencil />
+              Edit
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem render={<DeletePost post={post} />} />
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

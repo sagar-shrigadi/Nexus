@@ -19,7 +19,7 @@ export default function PostCard({
   };
 }) {
   return (
-    <article className="flex flex-col gap-4 py-4 border-y">
+    <div className="flex flex-col gap-1 py-2.5">
       <PostHeader
         post={{
           id: post.id,
@@ -41,6 +41,6 @@ export default function PostCard({
           },
         }}
       />
-    </article>
+    </div>
   );
 }
