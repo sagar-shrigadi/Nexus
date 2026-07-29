@@ -19,7 +19,7 @@ export default function CreatePost({ session }: { session: Session | null }) {
     undefined,
   );
   return (
-    <section className="mt-4">
+    <section className="mt-4 px-2">
       <form action={formAction}>
         <div className="flex gap-4">
           <Avatar>

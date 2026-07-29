@@ -7,7 +7,7 @@ export default function MainLayout({
 }>) {
   return (
     <>
-      <main className="flex flex-1 w-full h-dvh mx-auto flex-col px-2 sm:flex-row sm:items-start sm:justify-center sm:gap-8 md:gap-12 xl:gap-24">
+      <main className="flex flex-1 w-full h-dvh mx-auto flex-col sm:flex-row sm:items-start sm:justify-center sm:gap-8 md:gap-12 xl:gap-24">
         {children}
       </main>
       <Navbar />

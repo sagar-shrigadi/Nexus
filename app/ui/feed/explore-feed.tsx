@@ -11,7 +11,7 @@ export default async function ExploreFeed() {
       <h1 className="text-2xl lg:text-3xl font-bold px-4 py-2">
         Explore Latest Tweets
       </h1>
-      <section className="grow min-h-0 my-2">
+      <section className="grow min-h-0">
         <ScrollArea className="h-full border rounded">
           {posts.map((post, i) => (
             <article key={post.id}>

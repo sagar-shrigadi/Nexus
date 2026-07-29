@@ -11,9 +11,9 @@ export default async function MainFeed() {
     Number(session?.user?.id),
   );
   return (
-    <div className="grow flex flex-col gap-4 w-full max-w-3xl h-[85dvh] sm:h-dvh">
+    <article className="grow flex flex-col gap-4 w-full max-w-3xl h-[85dvh] sm:h-dvh">
       <CreatePost session={session} />
-      <section className="grow min-h-0 my-2">
+      <section className="grow min-h-0">
         <ScrollArea className="h-full border rounded">
           {posts.map((post, i) => (
             <article key={post.id}>
@@ -35,6 +35,6 @@ export default async function MainFeed() {
           ))}
         </ScrollArea>
       </section>
-    </div>
+    </article>
   );
 }
