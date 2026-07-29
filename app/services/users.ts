@@ -110,3 +110,14 @@ export async function getMostFollowedUsersExcludingUser(userId: number) {
     limit: 3,
   });
 }
+export async function isUserFollowedByUserWithId(
+  userId: number,
+  userToCheck: number,
+) {
+  return db.query.userFollows.findFirst({
+    where: and(
+      eq(userFollows.userId, userId),
+      eq(userFollows.follows, userToCheck),
+    ),
+  });
+}

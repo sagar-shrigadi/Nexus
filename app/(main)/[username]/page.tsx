@@ -1,69 +1,99 @@
 import { notFound } from "next/navigation";
-import { getUserWithPostsByUsername } from "@/app/services/users";
-import Image from "next/image";
+import {
+  getUserWithPostsByUsername,
+  isUserFollowedByUserWithId,
+} from "@/app/services/users";
 import BackButton from "@/app/ui/button/back-button";
 import PostCard from "@/app/ui/post/post-card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { auth } from "@/auth";
+import FollowUserForm from "@/app/ui/user/follow-user-form";
 
 export default async function UserPage({
   params,
 }: {
   params: Promise<{ username: string }>;
 }) {
+  const session = await auth();
   const { username } = await params;
   const user = await getUserWithPostsByUsername(username);
-
   if (!user) {
     notFound();
   }
+  const isFollowed = await isUserFollowedByUserWithId(
+    Number(session?.user?.id),
+    user?.id,
+  );
 
   return (
-    <main className="flex flex-1 w-full max-w-3xl h-dvh mx-auto flex-col">
-      <section className="border-x border-gray-500 flex flex-col py-2 pb-4">
-        <div className="flex items-center gap-3 px-4 pb-2">
+    <ScrollArea className="mr-auto w-full h-[91dvh] sm:h-full max-w-3xl">
+      <section className="flex flex-col pb-4">
+        <div className="flex items-center gap-4 px-2 py-4">
           <BackButton />
-          <h2 className="text-2xl lg:text-[28px]">{`${user.firstName} ${user.lastName}`}</h2>
+          <h2 className="text-2xl">{`${user.firstName} ${user.lastName}`}</h2>
         </div>
-        <div className="relative">
+        <div className="relative mb-15">
+          {/* keep the margin-bottom here exactly half of the Avatar size from below */}
           <div className="w-full h-55 md:h-60 bg-gray-800"></div>
-          <div className="px-4 absolute z-2 top-38.5 md:top-40 lg:top-36.5">
-            <Image
-              src="/images/defaultProfile.png"
-              width={180}
-              height={180}
-              alt="default image avatar for user"
-              className="rounded-[4%] size-30 md:size-36.5 lg:size-42.5 block border-4 border-gray-400"
-              loading="eager"
-            />
+          <div className="px-4 absolute z-2 bottom-0 translate-y-1/2 flex justify-between w-full">
+            <Avatar className="size-30">
+              <AvatarImage
+                src="/images/defaultProfile.png"
+                alt="Default User Avatar"
+                className="object-cover rounded-[4%]"
+              />
+              <AvatarFallback className="rounded-[4%]">{"U"}</AvatarFallback>
+            </Avatar>
+            {session?.user?.email === username || (
+              <FollowUserForm
+                session={session}
+                user={{ id: user.id, username: user.username }}
+                isFollowed={isFollowed ? true : false}
+                className="self-end"
+              />
+            )}
           </div>
         </div>
-        <div className="px-4 mt-15 md:mt-18 lg:mt-20.5 flex flex-col gap-3">
+        <div className="px-4 pt-2 flex flex-col gap-3">
           <div className="flex flex-col">
-            <h2 className="text-xl md:text-2xl lg:text-[28px]">{`${user.firstName} ${user.lastName}`}</h2>
-            <p className="text-gray-500 text-lg md:text-xl">@{user.username}</p>
+            <h2 className="text-xl md:text-2xl font-bold">{`${user.firstName} ${user.lastName}`}</h2>
+            <p className="text-lg md:text-xl text-sidebar-ring">
+              @{user.username}
+            </p>
           </div>
-          <article className="text-lg md:text-xl">{user.bio}</article>
+          <div className="text-lg">{user.bio}</div>
+          <div className="flex items-center gap-4">
+            <span>{user.following} following</span>
+            <span>{user.followers} followers</span>
+          </div>
         </div>
       </section>
-      <section className="border-x border-gray-500 grow">
-        {user.posts.map((post) => (
-          <PostCard
-            key={post.id}
-            post={{
-              id: post.id,
-              title: post.title,
-              content: post.content,
-              userId: post.userId,
-              likes: post.likes,
-              commentCount: post.commentsCount,
-              user: {
-                username: user.username,
-                firstName: user.firstName,
-                lastName: user.lastName,
-              },
-            }}
-          />
+      <Separator />
+      <section className="grow">
+        {user.posts.map((post, i) => (
+          <article key={post.id}>
+            {i > 0 && <Separator />}
+            <PostCard
+              key={post.id}
+              post={{
+                id: post.id,
+                title: post.title,
+                content: post.content,
+                userId: post.userId,
+                likes: post.likes,
+                commentCount: post.commentsCount,
+                user: {
+                  firstName: user.firstName,
+                  lastName: user.lastName,
+                  username: user.username,
+                },
+              }}
+            />
+          </article>
         ))}
       </section>
-    </main>
+    </ScrollArea>
   );
 }
