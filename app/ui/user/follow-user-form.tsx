@@ -6,28 +6,29 @@ import { usePathname } from "next/navigation";
 import { Field } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
+import { cn } from "@/lib/utils";
 
 export default function FollowUserForm({
   session,
-  userToFollow,
-  usersFollowed,
+  user,
+  isFollowed,
+  className,
 }: {
   session: Session | null;
-  userToFollow: {
+  user: {
     id: number;
     username: string;
   };
-  usersFollowed: {
-    follows: number;
-  }[];
+  isFollowed: boolean;
+  className?: string;
 }) {
   const pathaname = usePathname();
   const userFollowsWithId = userFollows.bind(
     null,
     { id: Number(session?.user?.id), username: session!.user!.email! },
     {
-      id: userToFollow.id,
-      username: userToFollow.username,
+      id: user.id,
+      username: user.username,
     },
     pathaname,
   );
@@ -46,29 +47,17 @@ export default function FollowUserForm({
     }
   }, [result]);
   return (
-    <form action={formAction}>
+    <form action={formAction} className={cn(className)}>
       <Field>
-        {usersFollowed.some((item) => item.follows === userToFollow.id) ? (
-          <Button
-            type="submit"
-            variant="secondary"
-            aria-disabled={isPending}
-            disabled={isPending}
-            className="px-4"
-          >
-            Unfollow
-          </Button>
-        ) : (
-          <Button
-            type="submit"
-            variant="default"
-            aria-disabled={isPending}
-            disabled={isPending}
-            className="px-4"
-          >
-            Follow
-          </Button>
-        )}
+        <Button
+          type="submit"
+          variant={isFollowed ? "secondary" : "default"}
+          aria-disabled={isPending}
+          disabled={isPending}
+          className="px-4"
+        >
+          {isFollowed ? "Unfollow" : "Follow"}
+        </Button>
       </Field>
     </form>
   );

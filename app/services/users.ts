@@ -96,7 +96,7 @@ export async function followUserTransaction(
     }
   });
 }
-export async function allUsersFollowedByUser(userId: number) {
+export async function allUsersFollowedByUserWithId(userId: number) {
   return db.query.userFollows.findMany({
     where: eq(userFollows.userId, userId),
     columns: { follows: true },

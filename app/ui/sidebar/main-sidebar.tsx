@@ -1,5 +1,5 @@
 import {
-  allUsersFollowedByUser,
+  allUsersFollowedByUserWithId,
   getRandomUsersExcludingUser,
 } from "@/app/services/users";
 import SidebarWrapper from "@/app/ui/sidebar/sidebar-wrapper";
@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default async function MainSidebar() {
   const session = await auth();
   const users = await getRandomUsersExcludingUser(Number(session?.user?.id));
-  const usersFollowedByUser = await allUsersFollowedByUser(
+  const usersFollowed = await allUsersFollowedByUserWithId(
     Number(session?.user?.id),
   );
   return (
@@ -31,7 +31,7 @@ export default async function MainSidebar() {
                   username: user.username,
                   fullname: `${user.firstName} ${user.lastName}`,
                 }}
-                usersFollowedByUser={usersFollowedByUser}
+                usersFollowed={usersFollowed}
               />
             ))}
           </ul>

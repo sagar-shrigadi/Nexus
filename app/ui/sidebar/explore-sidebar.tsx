@@ -1,5 +1,5 @@
 import {
-  allUsersFollowedByUser,
+  allUsersFollowedByUserWithId,
   getMostFollowedUsersExcludingUser,
 } from "@/app/services/users";
 import SidebarWrapper from "@/app/ui/sidebar/sidebar-wrapper";
@@ -12,7 +12,7 @@ export default async function ExploreSidebar() {
   const users = await getMostFollowedUsersExcludingUser(
     Number(session?.user?.id),
   );
-  const usersFollowedByUser = await allUsersFollowedByUser(
+  const usersFollowed = await allUsersFollowedByUserWithId(
     Number(session?.user?.id),
   );
   return (
@@ -33,7 +33,7 @@ export default async function ExploreSidebar() {
                   username: user.username,
                   fullname: `${user.firstName} ${user.lastName}`,
                 }}
-                usersFollowedByUser={usersFollowedByUser}
+                usersFollowed={usersFollowed}
               />
             ))}
           </ul>
