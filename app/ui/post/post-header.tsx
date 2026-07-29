@@ -17,7 +17,7 @@ export default async function PostHeader({
 }) {
   const session = await auth();
   return (
-    <div className="flex justify-between px-4 py-1">
+    <div className="flex justify-between px-4 py-1 gap-4">
       <UserNameCard
         className="flex"
         to={`/${post.user.username}`}

@@ -31,7 +31,7 @@ export default async function Navbar() {
           <span className="hidden lg:block">Explore</span>
         </Navlink>
 
-        <li className="my-auto sm:my-[unset] sm:mt-auto flex justify-center px-4 py-2">
+        <li className="my-auto sm:my-[unset] sm:mt-auto flex justify-between py-2">
           <DropdownMenu>
             <DropdownMenuTrigger
               className="flex lg:hidden"

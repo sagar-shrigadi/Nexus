@@ -28,72 +28,74 @@ export default async function UserPage({
   );
 
   return (
-    <ScrollArea className="mr-auto w-full h-[91dvh] sm:h-full max-w-3xl">
-      <section className="flex flex-col pb-4">
-        <div className="flex items-center gap-4 px-2 py-4">
-          <BackButton />
-          <h2 className="text-2xl">{`${user.firstName} ${user.lastName}`}</h2>
-        </div>
-        <div className="relative mb-15">
-          {/* keep the margin-bottom here exactly half of the Avatar size from below */}
-          <div className="w-full h-55 md:h-60 bg-gray-800"></div>
-          <div className="px-4 absolute z-2 bottom-0 translate-y-1/2 flex justify-between w-full">
-            <Avatar className="size-30">
-              <AvatarImage
-                src="/images/defaultProfile.png"
-                alt="Default User Avatar"
-                className="object-cover rounded-[4%]"
+    <div className="mr-auto w-full h-[91dvh] sm:h-dvh max-w-3xl flex flex-col">
+      <header className="flex items-center gap-4 px-2 py-4">
+        <BackButton />
+        <h2 className="text-2xl">{`${user.firstName} ${user.lastName}`}</h2>
+      </header>
+      <ScrollArea className="grow min-h-0 border rounded">
+        <section className="flex flex-col pb-4">
+          <div className="relative mb-15">
+            {/* keep the margin-bottom here exactly half of the Avatar size from below */}
+            <div className="w-full h-55 md:h-60 bg-gray-800"></div>
+            <div className="px-4 absolute z-2 bottom-0 translate-y-1/2 flex justify-between w-full">
+              <Avatar className="size-30">
+                <AvatarImage
+                  src="/images/defaultProfile.png"
+                  alt="Default User Avatar"
+                  className="object-cover rounded-[4%]"
+                />
+                <AvatarFallback className="rounded-[4%]">{"U"}</AvatarFallback>
+              </Avatar>
+              {session?.user?.email === username || (
+                <FollowUserForm
+                  session={session}
+                  user={{ id: user.id, username: user.username }}
+                  isFollowed={isFollowed ? true : false}
+                  className="self-end"
+                />
+              )}
+            </div>
+          </div>
+          <div className="px-4 pt-2 flex flex-col gap-3">
+            <div className="flex flex-col">
+              <h2 className="text-xl md:text-2xl font-bold">{`${user.firstName} ${user.lastName}`}</h2>
+              <p className="text-lg md:text-xl text-sidebar-ring">
+                @{user.username}
+              </p>
+            </div>
+            <div className="text-lg">{user.bio}</div>
+            <div className="flex items-center gap-4">
+              <span>{user.following} following</span>
+              <span>{user.followers} followers</span>
+            </div>
+          </div>
+        </section>
+        <Separator />
+        <section className="grow">
+          {user.posts.map((post, i) => (
+            <article key={post.id}>
+              {i > 0 && <Separator />}
+              <PostCard
+                key={post.id}
+                post={{
+                  id: post.id,
+                  title: post.title,
+                  content: post.content,
+                  userId: post.userId,
+                  likes: post.likes,
+                  commentCount: post.commentsCount,
+                  user: {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    username: user.username,
+                  },
+                }}
               />
-              <AvatarFallback className="rounded-[4%]">{"U"}</AvatarFallback>
-            </Avatar>
-            {session?.user?.email === username || (
-              <FollowUserForm
-                session={session}
-                user={{ id: user.id, username: user.username }}
-                isFollowed={isFollowed ? true : false}
-                className="self-end"
-              />
-            )}
-          </div>
-        </div>
-        <div className="px-4 pt-2 flex flex-col gap-3">
-          <div className="flex flex-col">
-            <h2 className="text-xl md:text-2xl font-bold">{`${user.firstName} ${user.lastName}`}</h2>
-            <p className="text-lg md:text-xl text-sidebar-ring">
-              @{user.username}
-            </p>
-          </div>
-          <div className="text-lg">{user.bio}</div>
-          <div className="flex items-center gap-4">
-            <span>{user.following} following</span>
-            <span>{user.followers} followers</span>
-          </div>
-        </div>
-      </section>
-      <Separator />
-      <section className="grow">
-        {user.posts.map((post, i) => (
-          <article key={post.id}>
-            {i > 0 && <Separator />}
-            <PostCard
-              key={post.id}
-              post={{
-                id: post.id,
-                title: post.title,
-                content: post.content,
-                userId: post.userId,
-                likes: post.likes,
-                commentCount: post.commentsCount,
-                user: {
-                  firstName: user.firstName,
-                  lastName: user.lastName,
-                  username: user.username,
-                },
-              }}
-            />
-          </article>
-        ))}
-      </section>
-    </ScrollArea>
+            </article>
+          ))}
+        </section>
+      </ScrollArea>
+    </div>
   );
 }

@@ -32,7 +32,7 @@ export default function UserNameCard({
           <span className="lg:text-base hover:underline transition-all">
             {fullname}
           </span>
-          <span className="text-(--lightText) text-sm">@{username}</span>
+          <span className="text-sidebar-ring text-sm">@{username}</span>
         </div>
       ) : (
         <span className="text-lg hover:underline transition-all">
