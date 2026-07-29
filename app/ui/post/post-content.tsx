@@ -21,7 +21,7 @@ export default async function PostContent({
   const session = await auth();
   const likedPosts = await getAllLikedPostsByUser(Number(session?.user?.id));
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 px-4 py-1">
       <Link
         href={`/${post.user.username}/status/${post.id}`}
         className="flex justify-center flex-col gap-1 px-6 py-2 cursor-pointer hover:bg-sidebar-accent rounded transition-colors"

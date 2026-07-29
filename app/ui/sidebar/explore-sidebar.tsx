@@ -5,6 +5,7 @@ import {
 import SidebarWrapper from "@/app/ui/sidebar/sidebar-wrapper";
 import FollowUserCard from "@/app/ui/user/follow-user-card";
 import { auth } from "@/auth";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function ExploreSidebar() {
   const session = await auth();
@@ -16,43 +17,51 @@ export default async function ExploreSidebar() {
   );
   return (
     <SidebarWrapper className="gap-8">
-      <section className="flex flex-col gap-4">
-        <h2 className="text-xl lg:text-2xl font-bold my-2 ml-4">
-          Trending Users
-        </h2>
-        <ul className="flex flex-col gap-3">
-          {users.map((user) => (
-            <FollowUserCard
-              key={user.id}
-              user={{
-                id: user.id,
-                username: user.username,
-                fullname: `${user.firstName} ${user.lastName}`,
-              }}
-              usersFollowedByUser={usersFollowedByUser}
-            />
-          ))}
-        </ul>
-      </section>
-      <section className="flex flex-col gap-4">
-        <h2 className="text-xl lg:text-2xl font-bold mt-3 mb-2 px-4">
-          Trends For You
-        </h2>
-        <div className="flex flex-col gap-6">
-          <div className="p-4">
-            <h3 className="text-lg cursor-pointer">Lorem ipsum dolor</h3>
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <h2 className="text-xl lg:text-2xl font-bold">Trending Users</h2>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul className="flex flex-col gap-3">
+            {users.map((user) => (
+              <FollowUserCard
+                key={user.id}
+                user={{
+                  id: user.id,
+                  username: user.username,
+                  fullname: `${user.firstName} ${user.lastName}`,
+                }}
+                usersFollowedByUser={usersFollowedByUser}
+              />
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <h2 className="text-xl lg:text-2xl font-bold">Trends For You</h2>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col gap-3.5">
+            <div className="px-4 py-3 border rounded">
+              <h3 className="text-lg cursor-pointer">Lorem ipsum dolor</h3>
+            </div>
+            <div className="px-4 py-3 border rounded">
+              <h3 className="text-lg cursor-pointer">Lorem ipsum dolor</h3>
+            </div>
+            <div className="px-4 py-3 border rounded">
+              <h3 className="text-lg cursor-pointer">Lorem ipsum dolor</h3>
+            </div>
+            <div className="px-4 py-3 border rounded">
+              <h3 className="text-lg cursor-pointer">Lorem ipsum dolor</h3>
+            </div>
           </div>
-          <div className="p-4">
-            <h3 className="text-lg cursor-pointer">Lorem ipsum dolor</h3>
-          </div>
-          <div className="p-4">
-            <h3 className="text-lg cursor-pointer">Lorem ipsum dolor</h3>
-          </div>
-          <div className="p-4">
-            <h3 className="text-lg cursor-pointer">Lorem ipsum dolor</h3>
-          </div>
-        </div>
-      </section>
+        </CardContent>
+      </Card>
     </SidebarWrapper>
   );
 }

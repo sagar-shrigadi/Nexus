@@ -17,7 +17,7 @@ export default async function FollowUserCard({
 }) {
   const session = await auth();
   return (
-    <li className="flex justify-between items-center px-4 py-1.5 border rounded">
+    <li className="flex justify-between items-center gap-4 px-4 py-1.5 border rounded">
       <UserNameCard
         className="flex gap-6"
         to={`/${user.username}`}
