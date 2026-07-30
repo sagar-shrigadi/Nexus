@@ -1,16 +1,12 @@
 import { getAllLikedCommentsByUserOnPost } from "@/app/services/comments";
-import {
-  getPostByIdWithComments,
-  isPostLikedByUser,
-} from "@/app/services/posts";
+import { getPostByIdWithComments } from "@/app/services/posts";
 import BackButton from "@/app/ui/button/back-button";
 import CommentCard from "@/app/ui/comment/comment-card";
 import CreateComment from "@/app/ui/comment/create-comment";
-import PostOptions from "@/app/ui/post/post-options";
-import SinglePostLikeForm from "@/app/ui/post/single-post-like-form";
-import UserNameCard from "@/app/ui/user/name-card";
+import PostCard from "@/app/ui/post/post-card";
 import { auth } from "@/auth";
-import { MessageSquare } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import { notFound } from "next/navigation";
 
 export default async function PostPage({
@@ -25,76 +21,62 @@ export default async function PostPage({
     Number(session?.user?.id),
     Number(id),
   );
-  const isLiked = await isPostLikedByUser(
-    Number(session?.user?.id),
-    Number(id),
-  );
+  // a set for fast lookups of each commentId for each comment card
+  // instead of using some() method on likedComments to check if a commentId exists in it or not
+  const likedCommentsIds = new Set(likedComments.map((c) => c.commentId));
 
   if (!post) {
     notFound();
   }
 
   return (
-    <main className="mx-auto flex flex-1 flex-col h-dvh w-full max-w-3xl">
-      <section className="grow w-full max-w-3xl flex flex-col gap-5 border-x rounded">
-        <div className="flex items-center gap-4 px-4 py-2 sticky border">
-          <BackButton />
-          <h2 className="text-2xl">Post</h2>
-        </div>
-        <div className="px-6 flex justify-between items-center">
-          <UserNameCard
-            className="flex gap-4"
-            to={`/${post.users.username}`}
-            fullname={`${post.users.firstName} ${post.users.lastName}`}
-            username={post.users.username}
-          />
-          {Number(session?.user?.id) === post.userId ? (
-            <PostOptions
-              session={session}
-              post={{ id: post.id, userId: post.userId }}
-            />
-          ) : (
-            ""
-          )}
-        </div>
-        <article className="px-6 flex flex-col gap-4">
-          <h2 className="text-2xl font-bold">{post.title}</h2>
-          <div className="text-lg">{post.content}</div>
-        </article>
-        <div className="px-6 flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <MessageSquare className="size-5.5" />
-            <span>{post.commentCount > 0 ? `${post.commentCount}` : ""}</span>
-          </div>
-          <SinglePostLikeForm
-            session={session}
+    <div className="mr-auto w-full h-[91dvh] sm:h-dvh max-w-3xl flex flex-col">
+      <header className="flex items-center gap-4 px-2 py-4">
+        <BackButton />
+        <h2 className="text-2xl">Post</h2>
+      </header>
+      <ScrollArea className="grow min-h-0 border rounded">
+        <section>
+          <PostCard
             post={{
               id: post.id,
+              title: post.title,
+              content: post.content,
+              userId: post.userId,
               likes: post.likes,
+              commentCount: post.commentCount,
+              user: {
+                ...post.users,
+              },
             }}
-            isLiked={{ postId: isLiked?.postId }}
           />
-        </div>
-        <div>
+        </section>
+        <Separator />
+        <section>
           <CreateComment postId={Number(id)} />
-          <article className="flex flex-col gap-4 py-4">
-            <h2 className="font-bold text-2xl px-6">
-              <span>Comments</span>
-            </h2>
-            <div>
-              {post.comments.map((comment) => (
-                <div key={comment.id} className="w-full border-y">
+          <Separator />
+          <section>
+            <header className="px-6 py-2">
+              <h2 className="font-bold text-2xl">Comments</h2>
+            </header>
+            <Separator />
+            <section className="grow">
+              {post.comments.map((comment, i) => (
+                <article key={comment.id}>
+                  {i > 0 && <Separator />}
                   <CommentCard
                     session={session}
-                    comment={comment}
-                    likedComments={likedComments}
+                    comment={{
+                      ...comment,
+                      isLiked: likedCommentsIds.has(comment.id),
+                    }}
                   />
-                </div>
+                </article>
               ))}
-            </div>
-          </article>
-        </div>
-      </section>
-    </main>
+            </section>
+          </section>
+        </section>
+      </ScrollArea>
+    </div>
   );
 }

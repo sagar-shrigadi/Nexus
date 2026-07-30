@@ -1,54 +1,67 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { createComment } from "@/lib/actions/comments";
-import { CircleAlert } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
 
 export default function CreateComment({ postId }: { postId: number }) {
   const createCommentToPost = createComment.bind(null, postId);
-  const [errorMessage, formAction, isPending] = useActionState(
+  const [result, formAction, isPending] = useActionState(
     createCommentToPost,
     undefined,
   );
+
+  useEffect(() => {
+    if (!result) return;
+    if (result.status === "error") {
+      toast.add({
+        type: "error",
+        description: result.message,
+      });
+    } else {
+      toast.add({
+        type: "success",
+        description: result.message,
+      });
+    }
+  }, [result]);
   return (
-    <section className="flex flex-col gap-4">
-      <form
-        action={formAction}
-        className="flex justify-between items-center gap-8 px-6 py-4 border-y"
-      >
-        <div className="grow">
-          <label htmlFor="comment">
-            <textarea
-              name="comment"
-              id="comment"
-              required
-              rows={1}
-              placeholder="Add a comment"
-              className="w-full rounded px-4 py-2 bg-dark-200 text-lg border"
-            ></textarea>
-          </label>
-        </div>
-        <button
-          aria-disabled={isPending}
-          disabled={isPending}
-          className="cursor-pointer rounded px-6 py-2 bg-(--hover) hover:bg-[hsl(210_7%_22%)] transition-colors"
-        >
-          Post
-        </button>
+    <article className="px-4 my-4">
+      <form action={formAction}>
+        <FieldGroup>
+          <Field>
+            <FieldLabel htmlFor="comment">
+              <Textarea
+                name="comment"
+                id="comment"
+                placeholder="Add a comment"
+                required
+              />
+            </FieldLabel>
+            {result?.errors?.comment && (
+              <FieldError>{result.errors?.comment}</FieldError>
+            )}
+          </Field>
+
+          <Field className="w-fit ml-auto">
+            <Button
+              type="submit"
+              aria-disabled={isPending}
+              disabled={isPending}
+            >
+              Comment
+            </Button>
+          </Field>
+        </FieldGroup>
       </form>
-      <div
-        className={`${errorMessage ? "flex" : "hidden"} px-6 flex flex-col gap-2`}
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        {errorMessage &&
-          errorMessage.map((err, index) => (
-            <div key={index} className="flex gap-2">
-              <CircleAlert className="size-5 text-red-500" />
-              <p className="text-red-500">{err.message}</p>
-            </div>
-          ))}
-      </div>
-    </section>
+    </article>
   );
 }

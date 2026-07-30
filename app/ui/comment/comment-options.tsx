@@ -1,37 +1,62 @@
 import DeleteComment from "@/app/ui/comment/delete-comment";
-import { Dispatch, SetStateAction } from "react";
-import PopoverButton from "@/app/ui/button/popover-button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Ellipsis, Pencil } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function CommentOptions({
-  commentId,
-  setIsEditing,
+  comment,
+  openEditForm,
 }: {
-  commentId: number;
-  setIsEditing: Dispatch<SetStateAction<boolean>>;
+  comment: { id: number; userId: number };
+  openEditForm: () => void;
 }) {
   return (
-    <>
-      <PopoverButton
-        popoverTarget={`${commentId}'sAction`}
-        style={{ anchorName: `${commentId}Pos` }}
-      />
-      <div
-        id={`${commentId}'sAction`}
-        aria-atomic="true"
-        popover="auto"
-        style={{ positionAnchor: `${commentId}Pos` }}
-        className="absolute [position-area:top_left] rounded shadow-md"
-      >
-        <div className="flex flex-col gap-2 p-2">
-          <DeleteComment commentId={commentId} />
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        nativeButton={true}
+        render={
           <button
-            onClick={() => setIsEditing(true)}
-            className="px-6 py-1.5 hover:bg-gray-200 rounded cursor-pointer transition-colors"
+            className={cn(
+              buttonVariants({
+                variant: "outline",
+                size: "icon",
+              }),
+            )}
           >
-            Edit
+            <Ellipsis />
           </button>
-        </div>
-      </div>
-    </>
+        }
+      />
+      <DropdownMenuContent>
+        <DropdownMenuGroup>
+          <DropdownMenuItem
+            nativeButton={true}
+            render={
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+                onClick={openEditForm}
+              >
+                <Pencil />
+                Edit
+              </Button>
+            }
+          />
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem render={<DeleteComment comment={comment} />} />
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

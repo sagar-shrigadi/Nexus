@@ -3,31 +3,32 @@
 import {
   deleteCommentById,
   editCommentById,
-  getCommentById,
   likeCommentTransaction,
   newComment,
 } from "@/app/services/comments";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
-import { $ZodIssue } from "zod/v4/core";
+import { ActionResult } from "@/lib/definitations";
 
 const CommentSchema = z.object({
-  comment: z.string().nonempty("Comment must not be empty."),
+  comment: z.string().min(1, "Comment is required."),
 });
 export async function createComment(
   postId: number,
-  prevState: $ZodIssue[] | undefined,
+  prevState: ActionResult | undefined,
   formData: FormData,
-) {
+): Promise<CommentAction | undefined> {
   const session = await auth();
   const validatedComment = CommentSchema.safeParse(
     Object.fromEntries(formData.entries()),
   );
 
   if (!validatedComment.success) {
-    return validatedComment.error.issues.map((issue) => issue);
+    return {
+      status: "error",
+      errors: z.flattenError(validatedComment.error).fieldErrors,
+    };
   }
 
   const { comment } = validatedComment.data;
@@ -38,69 +39,95 @@ export async function createComment(
     revalidatePath("/explore");
     revalidatePath(`/${session?.user?.email}`);
     revalidatePath(`/${session?.user?.email}/status/${postId}`);
+    return {
+      status: "success",
+      message: "Comment successfully posted!",
+    };
   } catch (error) {
     console.error(error);
-    throw error;
-  }
-}
-export async function deleteComment(commentId: number, pathname: string) {
-  const session = await auth();
-  try {
-    const commentToDelete = await getCommentById(commentId);
-    if (Number(session?.user?.id) !== commentToDelete?.userId) {
-      return [{ message: "You are not authorized to perform this action!" }];
-    }
-    await deleteCommentById(commentId);
-    revalidatePath(`${pathname}`);
-  } catch (error) {
-    console.error(error);
-    throw error;
+    return {
+      status: "error",
+      message: "Comment could not posted! Please try again!",
+    };
   }
 }
 export async function updateComment(
-  commentId: number,
+  comment: { id: number; userId: number },
   pathname: string,
-  prevState: $ZodIssue[] | { message: string }[] | undefined,
+  prevState: ActionResult | undefined,
   formData: FormData,
-) {
+): Promise<ActionResult | undefined> {
   const session = await auth();
+  if (comment.userId !== Number(session?.user?.id)) {
+    return {
+      status: "error",
+      message: "You are not authorized to edit this comment!",
+    };
+  }
   const validatedComment = CommentSchema.safeParse(
     Object.fromEntries(formData.entries()),
   );
 
   if (!validatedComment.success) {
-    return validatedComment.error.issues.map((issue) => issue);
+    return {
+      status: "error",
+      errors: z.flattenError(validatedComment.error).fieldErrors,
+    };
   }
-
-  const { comment } = validatedComment.data;
   try {
-    const commentToUpdate = await getCommentById(commentId);
-
-    if (
-      !commentToUpdate ||
-      commentToUpdate.userId !== Number(session?.user?.id)
-    ) {
-      return [{ message: "You are not authorized to perform this action!" }];
-    }
-    await editCommentById(commentId, comment);
+    await editCommentById(comment.id, validatedComment.data.comment);
     revalidatePath(`${pathname}`);
+    return {
+      status: "success",
+      message: "Comment successfully updated!",
+    };
   } catch (error) {
     console.error(error);
-    throw error;
+    return {
+      status: "error",
+      message: "Comment could not be updated! Please try again!",
+    };
   }
-  redirect(`${pathname}`);
+}
+export async function deleteComment(
+  comment: { id: number; userId: number },
+  pathname: string,
+): Promise<CommentAction | undefined> {
+  const session = await auth();
+  if (comment.userId !== Number(session?.user?.id)) {
+    return {
+      status: "error",
+      message: "You are not authorized to delete this comment!",
+    };
+  }
+  try {
+    await deleteCommentById(comment.id);
+    revalidatePath(`${pathname}`);
+    return {
+      status: "success",
+      message: "Comment successfully deleted!",
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: "error",
+      message: "Comment could not be deleted! Please try again!",
+    };
+  }
 }
 export async function likeComment(
   userId: number,
-  commentId: number,
-  postId: number,
+  comment: { id: number; postId: number },
   pathname: string,
-) {
+): Promise<ActionResult | undefined> {
   try {
-    await likeCommentTransaction(userId, commentId, postId);
+    await likeCommentTransaction(userId, comment.id, comment.postId);
     revalidatePath(`${pathname}`);
   } catch (error) {
     console.error(error);
-    throw error;
+    return {
+      status: "error",
+      message: "Error liking the comment! Please try again!",
+    };
   }
 }

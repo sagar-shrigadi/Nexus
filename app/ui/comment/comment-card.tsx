@@ -1,49 +1,34 @@
 "use client";
+
 import CommentOptions from "@/app/ui/comment/comment-options";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import EditCommentForm from "@/app/ui/comment/edit-comment";
 import { Session } from "next-auth";
-import { Heart } from "lucide-react";
-import { likeComment } from "@/lib/actions/comments";
-import { usePathname } from "next/navigation";
 import UserNameCard from "@/app/ui/user/name-card";
+import CommentLikeForm from "./comment-like-form";
 
 export default function CommentCard({
   session,
   comment,
-  likedComments,
 }: {
   session: Session | null;
   comment: {
     id: number;
     content: string;
+    postId: number;
     userId: number;
     createdAt: Date;
-    postId: number;
     likes: number;
+    isLiked: boolean;
     users: {
+      username: string;
       firstName: string;
       lastName: string;
-      username: string;
     };
   };
-  likedComments: {
-    commentId: number;
-  }[];
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  const pathname = usePathname();
-  const likeCommentWithId = likeComment.bind(
-    null,
-    Number(session?.user?.id),
-    comment.id,
-    comment.postId,
-    pathname,
-  );
-  const [errorMessage, formAction, isPending] = useActionState(
-    likeCommentWithId,
-    undefined,
-  );
+
   return (
     <div className="flex flex-col gap-8 py-4 px-4">
       <div className="flex justify-between">
@@ -53,7 +38,7 @@ export default function CommentCard({
             to={`/${comment.users.username}`}
             fullname={`${comment.users.firstName} ${comment.users.lastName}`}
           />
-          <span className="text-gray-300">
+          <span className="text-sidebar-ring">
             {comment.createdAt.toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
@@ -61,31 +46,36 @@ export default function CommentCard({
             })}
           </span>
         </div>
-        {Number(session?.user?.id) === comment.userId ? (
-          <CommentOptions commentId={comment.id} setIsEditing={setIsEditing} />
-        ) : (
-          ""
+        {comment.userId === Number(session?.user?.id) && (
+          <CommentOptions
+            comment={{ id: comment.id, userId: comment.userId }}
+            openEditForm={() => setIsEditing(true)}
+          />
         )}
       </div>
       {isEditing ? (
         <EditCommentForm
-          comment={{ id: comment.id, content: comment.content }}
+          comment={{
+            id: comment.id,
+            content: comment.content,
+            userId: comment.userId,
+          }}
+          closeEditForm={() => setIsEditing(false)}
         />
       ) : (
-        <div className="px-2 text-lg max-w-[55ch]">{comment.content}</div>
+        <div className="px-2 text-lg max-w-[55ch]">
+          <p>{comment.content}</p>
+        </div>
       )}
-      <div className="flex items-center gap-2.5 hover:text-pink-500 transition-colors">
-        <form action={formAction} className="flex items-center">
-          <button aria-disabled={isPending} disabled={isPending}>
-            <Heart
-              className={`size-6.5 ${likedComments.some((item) => item.commentId === comment.id) ? "fill-pink-500 stroke-pink-500" : ""} transition-colors cursor-pointer`}
-            />
-          </button>
-        </form>
-        <span className="transition-all">
-          {comment.likes > 0 ? `${comment.likes}` : ""}
-        </span>
-      </div>
+      <CommentLikeForm
+        session={session}
+        comment={{
+          id: comment.id,
+          postId: comment.postId,
+          likes: comment.likes,
+          isLiked: comment.isLiked,
+        }}
+      />
     </div>
   );
 }

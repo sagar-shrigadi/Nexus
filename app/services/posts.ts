@@ -65,6 +65,7 @@ export async function getPostByIdWithComments(id: number) {
             columns: { firstName: true, lastName: true, username: true },
           },
         },
+        orderBy: [desc(comments.createdAt)],
       },
     },
     extras: {
