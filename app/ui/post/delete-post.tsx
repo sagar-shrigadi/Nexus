@@ -11,6 +11,9 @@ export default function DeletePost({
   post: {
     id: number;
     userId: number;
+    user: {
+      username: string;
+    };
   };
 }) {
   const deletePostWithId = deletePost.bind(null, { ...post });

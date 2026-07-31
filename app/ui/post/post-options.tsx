@@ -21,6 +21,9 @@ export default function PostOptions({
   post: {
     id: number;
     userId: number;
+    user: {
+      username: string;
+    };
   };
 }) {
   return (
@@ -41,15 +44,17 @@ export default function PostOptions({
       />
       <DropdownMenuContent>
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Link
-              href={`/${session?.user?.email}/status/${post.id}/edit`}
-              className="flex items-center gap-1.5"
-            >
-              <Pencil />
-              Edit
-            </Link>
-          </DropdownMenuItem>
+          <DropdownMenuItem
+            render={
+              <Link
+                href={`/${session?.user?.email}/status/${post.id}/edit`}
+                className="flex items-center gap-1.5"
+              >
+                <Pencil />
+                Edit
+              </Link>
+            }
+          />
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>

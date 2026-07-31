@@ -26,7 +26,11 @@ export default async function PostHeader({
       {post.userId === Number(session?.user?.id) && (
         <PostOptions
           session={session}
-          post={{ userId: post.userId, id: post.id }}
+          post={{
+            id: post.id,
+            userId: post.userId,
+            user: { username: post.user.username },
+          }}
         />
       )}
     </div>

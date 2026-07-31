@@ -1,7 +1,19 @@
 "use client";
+
+import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/toast";
 import { updatePost } from "@/lib/actions/posts";
-import { CircleAlert } from "lucide-react";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import BackButton from "../button/back-button";
+import { Separator } from "@/components/ui/separator";
 
 export default function EditPostForm({
   post,
@@ -10,59 +22,80 @@ export default function EditPostForm({
     id: number;
     title: string;
     content: string;
+    userId: number;
+    user: {
+      username: string;
+    };
   };
 }) {
-  const updatePostWithId = updatePost.bind(null, post.id);
-  const [errorMessage, formAction, isPending] = useActionState(
+  const updatePostWithId = updatePost.bind(null, {
+    id: post.id,
+    userId: post.userId,
+    user: { ...post.user },
+  });
+  const [result, formAction, isPending] = useActionState(
     updatePostWithId,
     undefined,
   );
+
+  useEffect(() => {
+    if (!result) return;
+
+    if (result.status === "error") {
+      toast.add({
+        type: "error",
+        description: result.message,
+      });
+    }
+  }, [result]);
+
   return (
-    <section className="flex flex-col gap-2">
-      <h1 className="text-2xl font-bold text-center">Edit Post</h1>
-      <form action={formAction} className="w-full flex flex-col gap-4">
-        <label htmlFor="title" className="flex flex-col gap-2">
-          <span className="text-xl">Title</span>
-          <input
-            type="text"
-            name="title"
-            id="title"
-            placeholder="Title"
-            defaultValue={post.title}
-            className="w-full rounded-sm py-1.5 px-2 bg-dark-200 text-lg border"
-          />
-        </label>
-        <label htmlFor="content" className="flex flex-col gap-2">
-          <span className="text-xl">Content</span>
-          <textarea
-            name="content"
-            id="content"
-            rows={6}
-            placeholder="What's Happening?"
-            defaultValue={post.content}
-            className="w-full border p-2 rounded text-lg"
-          ></textarea>
-        </label>
-        <button
-          aria-disabled={isPending}
-          className="mt-4 self-center cursor-pointer rounded px-4 py-2 bg-(--hover) hover:bg-[hsl(210_7%_22%)] transition-colors"
-        >
-          Update
-        </button>
+    <article className="mr-auto w-full h-[91dvh] sm:h-dvh max-w-3xl flex flex-col border rounded">
+      <header className="flex items-center gap-4 px-2 py-4">
+        <BackButton />
+        <h2 className="text-2xl">Edit Post</h2>
+      </header>
+      <Separator />
+      <form action={formAction} className="px-4 my-4">
+        <FieldGroup>
+          <Field>
+            <FieldLabel htmlFor="title">Title</FieldLabel>
+            <Input
+              type="text"
+              name="title"
+              id="title"
+              placeholder="Title"
+              defaultValue={post.title}
+              required
+            />
+            {result?.errors?.title && (
+              <FieldError>{result.errors.title}</FieldError>
+            )}
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="content">Content</FieldLabel>
+            <Textarea
+              name="content"
+              id="content"
+              placeholder="What's Happening?"
+              defaultValue={post.content}
+              required
+            />
+            {result?.errors?.content && (
+              <FieldError>{result.errors.content}</FieldError>
+            )}
+          </Field>
+          <Field className="w-fit ml-auto">
+            <Button
+              type="submit"
+              aria-disabled={isPending}
+              disabled={isPending}
+            >
+              Update
+            </Button>
+          </Field>
+        </FieldGroup>
       </form>
-      <div
-        className={`${errorMessage ? "flex" : "hidden"} flex flex-col gap-2`}
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        {errorMessage &&
-          errorMessage.map((err, index) => (
-            <div key={index} className="flex gap-2">
-              <CircleAlert className="size-5 text-red-500" />
-              <p className="text-red-500">{err.message}</p>
-            </div>
-          ))}
-      </div>
-    </section>
+    </article>
   );
 }

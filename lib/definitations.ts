@@ -1,7 +1,15 @@
-export interface ActionResult {
+interface ActionResult {
   status: "success" | "error";
+  message?: string;
+}
+export interface CommentAction extends ActionResult {
   errors?: {
     comment?: string[];
   };
-  message?: string;
+}
+export interface PostAction extends ActionResult {
+  errors?: {
+    title?: string[];
+    content?: string[];
+  };
 }

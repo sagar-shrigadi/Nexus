@@ -1,5 +1,6 @@
 "use client";
-import { useActionState } from "react";
+
+import { useActionState, useEffect } from "react";
 import { createPost } from "@/lib/actions/posts";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,14 +13,23 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Session } from "next-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { toast } from "@/components/ui/toast";
 
 export default function CreatePost({ session }: { session: Session | null }) {
-  const [errorMessage, formAction, isPending] = useActionState(
-    createPost,
-    undefined,
-  );
+  const [result, formAction, isPending] = useActionState(createPost, undefined);
+
+  useEffect(() => {
+    if (!result) return;
+    if (result.status === "error") {
+      toast.add({
+        type: "error",
+        description: result.message,
+      });
+    }
+  }, [result]);
+
   return (
-    <section className="mt-4 px-2">
+    <article className="mt-4 px-2">
       <form action={formAction}>
         <div className="flex gap-4">
           <Avatar>
@@ -43,8 +53,8 @@ export default function CreatePost({ session }: { session: Session | null }) {
                   required
                 />
               </FieldLabel>
-              {errorMessage?.errors.title && (
-                <FieldError>{errorMessage.errors.title}</FieldError>
+              {result?.errors?.title && (
+                <FieldError>{result.errors.title}</FieldError>
               )}
             </Field>
             <Field>
@@ -54,10 +64,10 @@ export default function CreatePost({ session }: { session: Session | null }) {
                   id="content"
                   placeholder="What's Happening?"
                   required
-                ></Textarea>
+                />
               </FieldLabel>
-              {errorMessage?.errors.content && (
-                <FieldError>{errorMessage.errors.content}</FieldError>
+              {result?.errors?.content && (
+                <FieldError>{result.errors.content}</FieldError>
               )}
             </Field>
             <Field className="w-fit ml-auto">
@@ -65,7 +75,6 @@ export default function CreatePost({ session }: { session: Session | null }) {
                 type="submit"
                 aria-disabled={isPending}
                 disabled={isPending}
-                className="px-4 text-base"
               >
                 Post
               </Button>
@@ -73,6 +82,6 @@ export default function CreatePost({ session }: { session: Session | null }) {
           </FieldGroup>
         </div>
       </form>
-    </section>
+    </article>
   );
 }

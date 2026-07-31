@@ -5,28 +5,22 @@ import { auth } from "@/auth";
 import {
   deletePostById,
   editPostById,
-  getPostById,
   likePostTransaction,
   newPost,
 } from "@/app/services/posts";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { $ZodIssue } from "zod/v4/core";
+import { PostAction } from "@/lib/definitations";
 
 const PostSchema = z.object({
   title: z.string().trim().min(1, "Post Title is required."),
   content: z.string().trim().min(1, "Post Content is required."),
 });
-interface PostState {
-  errors?: {
-    title?: string[];
-    content?: string[];
-  };
-}
+
 export async function createPost(
-  prevState: PostState | undefined,
+  prevState: PostAction | undefined,
   formData: FormData,
-) {
+): Promise<PostAction> {
   const session = await auth();
   const validatedPost = PostSchema.safeParse(
     Object.fromEntries(formData.entries()),
@@ -34,6 +28,7 @@ export async function createPost(
 
   if (!validatedPost.success) {
     return {
+      status: "error",
       errors: z.flattenError(validatedPost.error).fieldErrors,
     };
   }
@@ -41,53 +36,68 @@ export async function createPost(
 
   try {
     await newPost(Number(session?.user?.id), title, content);
+    revalidatePath("/");
+    revalidatePath("/explore");
+    revalidatePath(`/${session?.user?.email}`);
+    return {
+      status: "success",
+      message: "Post successfully created!",
+    };
   } catch (error) {
-    throw error;
+    console.error(error);
+    return {
+      status: "error",
+      message: "Post could not be created! Please try again!",
+    };
   }
-  revalidatePath("/");
-  revalidatePath("/explore");
-  revalidatePath(`/${session?.user?.email}`);
-  redirect("/");
 }
 export async function updatePost(
-  postId: number,
-  prevState: $ZodIssue[] | undefined,
+  post: { id: number; userId: number; user: { username: string } },
+  prevState: PostAction | undefined,
   formData: FormData,
-) {
-  const post = await getPostById(postId);
+): Promise<PostAction> {
+  const session = await auth();
+  if (post.userId !== Number(session?.user?.id)) {
+    return {
+      status: "error",
+      message: "You are not authorized to edit this post!",
+    };
+  }
   const validatedPost = PostSchema.safeParse(
     Object.fromEntries(formData.entries()),
   );
-
   if (!validatedPost.success) {
-    return validatedPost.error.issues.map((issue) => issue);
+    return {
+      status: "error",
+      errors: z.flattenError(validatedPost.error).fieldErrors,
+    };
   }
   const { title, content } = validatedPost.data;
 
   try {
-    await editPostById(postId, title, content);
+    await editPostById(post.id, title, content);
     revalidatePath("/");
     revalidatePath("/explore");
-    revalidatePath(`/${post?.users.username}/status/${post?.id}`);
-    revalidatePath(`/${post?.users.username}`);
+    revalidatePath(`/${post.user.username}`);
+    revalidatePath(`/${post.user.username}/status/${post.id}`);
   } catch (error) {
-    throw error;
+    console.error(error);
+    return {
+      status: "error",
+      message: "Post could not be updated! Please try again!",
+    };
   }
-  redirect(`/${post?.users.username}/status/${post?.id}`);
+  redirect(`/${post.user.username}/status/${post.id}`, "replace");
 }
-
-interface ActionResult {
-  status: "error";
-  message: string;
-}
-
 export async function deletePost(post: {
   id: number;
   userId: number;
-}): Promise<ActionResult | undefined> {
+  user: {
+    username: string;
+  };
+}): Promise<PostAction> {
   const session = await auth();
-
-  if (Number(session?.user?.id) !== post.userId) {
+  if (post.userId !== Number(session?.user?.id)) {
     return {
       status: "error",
       message: "You are not authorized to delete this post!",
@@ -97,7 +107,7 @@ export async function deletePost(post: {
     await deletePostById(post.id);
     revalidatePath("/");
     revalidatePath("/explore");
-    revalidatePath(`/${session?.user?.email}`);
+    revalidatePath(`/${post.user.username}`);
   } catch (error) {
     console.error(error);
     return {
@@ -105,12 +115,13 @@ export async function deletePost(post: {
       message: "Post could not be deleted! Please try again!",
     };
   }
+  redirect("/");
 }
 export async function likePost(
   userId: number,
   postId: number,
   pathname: string,
-): Promise<ActionResult | undefined> {
+): Promise<PostAction | undefined> {
   try {
     await likePostTransaction(userId, postId);
     revalidatePath(`${pathname}`);
