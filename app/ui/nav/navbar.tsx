@@ -20,7 +20,7 @@ export default async function Navbar() {
 
   return (
     <nav>
-      <ul className="flex justify-between gap-6 p-2 sm:p-4 sm:flex-col sm:justify-stretch sm:text-xl sm:h-dvh lg:min-w-60">
+      <ul className="flex justify-between gap-6 p-2 sm:p-4 sm:flex-col sm:justify-stretch sm:text-xl sm:h-svh lg:min-w-60">
         <Navlink to="/">
           <House className="size-7" />
           <span className="hidden lg:block">Home</span>
@@ -83,15 +83,17 @@ export default async function Navbar() {
             </div>
             <DropdownMenuContent>
               <DropdownMenuGroup>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Link
-                    href={`/${session?.user?.email}`}
-                    className="flex items-center gap-1.5"
-                  >
-                    <BadgeCheck />
-                    Account
-                  </Link>
-                </DropdownMenuItem>
+                <DropdownMenuItem
+                  render={
+                    <Link
+                      href={`/${session?.user?.email}`}
+                      className="flex items-center gap-1.5"
+                    >
+                      <BadgeCheck />
+                      Account
+                    </Link>
+                  }
+                />
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>

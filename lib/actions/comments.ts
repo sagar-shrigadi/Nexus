@@ -9,14 +9,14 @@ import {
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { ActionResult } from "@/lib/definitations";
+import { CommentAction } from "@/lib/definitations";
 
 const CommentSchema = z.object({
   comment: z.string().min(1, "Comment is required."),
 });
 export async function createComment(
   postId: number,
-  prevState: ActionResult | undefined,
+  prevState: CommentAction | undefined,
   formData: FormData,
 ): Promise<CommentAction | undefined> {
   const session = await auth();
@@ -54,9 +54,9 @@ export async function createComment(
 export async function updateComment(
   comment: { id: number; userId: number },
   pathname: string,
-  prevState: ActionResult | undefined,
+  prevState: CommentAction | undefined,
   formData: FormData,
-): Promise<ActionResult | undefined> {
+): Promise<CommentAction> {
   const session = await auth();
   if (comment.userId !== Number(session?.user?.id)) {
     return {
@@ -119,7 +119,7 @@ export async function likeComment(
   userId: number,
   comment: { id: number; postId: number },
   pathname: string,
-): Promise<ActionResult | undefined> {
+): Promise<CommentAction | undefined> {
   try {
     await likeCommentTransaction(userId, comment.id, comment.postId);
     revalidatePath(`${pathname}`);

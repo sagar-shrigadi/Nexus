@@ -30,7 +30,7 @@ export default async function PostPage({
   }
 
   return (
-    <div className="mr-auto w-full h-[91dvh] sm:h-dvh max-w-3xl flex flex-col">
+    <div className="mr-auto w-full h-[91svh] sm:h-svh max-w-3xl flex flex-col">
       <header className="flex items-center gap-4 px-2 py-4">
         <BackButton />
         <h2 className="text-2xl">Post</h2>

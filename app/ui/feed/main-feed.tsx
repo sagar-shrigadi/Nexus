@@ -11,7 +11,7 @@ export default async function MainFeed() {
     Number(session?.user?.id),
   );
   return (
-    <article className="grow flex flex-col gap-4 w-full max-w-3xl h-[85dvh] sm:h-dvh">
+    <article className="grow flex flex-col gap-4 w-full max-w-3xl h-[85svh] sm:h-svh">
       <CreatePost session={session} />
       <section className="grow min-h-0">
         <ScrollArea className="h-full border rounded">

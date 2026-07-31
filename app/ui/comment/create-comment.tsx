@@ -33,6 +33,7 @@ export default function CreateComment({ postId }: { postId: number }) {
       });
     }
   }, [result]);
+
   return (
     <article className="px-4 my-4">
       <form action={formAction}>
@@ -47,7 +48,7 @@ export default function CreateComment({ postId }: { postId: number }) {
               />
             </FieldLabel>
             {result?.errors?.comment && (
-              <FieldError>{result.errors?.comment}</FieldError>
+              <FieldError>{result.errors.comment}</FieldError>
             )}
           </Field>
 

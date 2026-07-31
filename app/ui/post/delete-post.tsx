@@ -21,6 +21,7 @@ export default function DeletePost({
     deletePostWithId,
     undefined,
   );
+
   useEffect(() => {
     if (!result) return;
     if (result.status === "error") {
@@ -30,5 +31,6 @@ export default function DeletePost({
       });
     }
   }, [result]);
+
   return <DeleteForm action={formAction} isPending={isPending} />;
 }

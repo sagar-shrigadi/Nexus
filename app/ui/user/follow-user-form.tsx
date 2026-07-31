@@ -54,7 +54,6 @@ export default function FollowUserForm({
           variant={isFollowed ? "secondary" : "default"}
           aria-disabled={isPending}
           disabled={isPending}
-          className="px-4"
         >
           {isFollowed ? "Unfollow" : "Follow"}
         </Button>

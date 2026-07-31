@@ -42,6 +42,7 @@ export default function CommentLikeForm({
       });
     }
   }, [result]);
+
   return (
     <div className="flex items-center">
       <form action={formAction} className="flex items-center">

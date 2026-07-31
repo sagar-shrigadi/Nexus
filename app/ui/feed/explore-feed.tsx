@@ -7,7 +7,7 @@ export default async function ExploreFeed() {
   const posts = await getLatestPosts();
 
   return (
-    <article className="grow flex flex-col gap-4 w-full max-w-3xl h-[85dvh] sm:h-dvh">
+    <article className="grow flex flex-col gap-4 w-full max-w-3xl h-[85svh] sm:h-svh">
       <h1 className="text-2xl lg:text-3xl font-bold px-4 py-2">
         Explore Latest Tweets
       </h1>
