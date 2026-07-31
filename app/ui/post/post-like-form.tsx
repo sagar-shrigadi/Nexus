@@ -1,4 +1,5 @@
 "use client";
+
 import { Heart } from "lucide-react";
 import { useActionState, useEffect } from "react";
 import { likePost } from "@/lib/actions/posts";
@@ -11,18 +12,13 @@ import { toast } from "@/components/ui/toast";
 export default function PostLikeForm({
   session,
   post,
-  likedPosts,
 }: {
   session: Session | null;
   post: {
     id: number;
     likes: number;
+    isLiked: boolean;
   };
-  likedPosts: {
-    id: number;
-    userId: number;
-    postId: number;
-  }[];
 }) {
   const pathname = usePathname();
   const likePostWithId = likePost.bind(
@@ -56,7 +52,7 @@ export default function PostLikeForm({
             disabled={isPending}
           >
             <Heart
-              className={`size-6.5 ${likedPosts.some((item) => item.postId === post.id) ? "fill-pink-500 stroke-pink-500" : ""} transition-colors`}
+              className={`size-6.5 ${post.isLiked && "fill-pink-500 stroke-pink-500"} transition-colors`}
             />
           </Button>
         </Field>

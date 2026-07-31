@@ -54,7 +54,7 @@ export default function CommentLikeForm({
             disabled={isPending}
           >
             <Heart
-              className={`size-6.5 ${comment.isLiked ? "fill-pink-500 stroke-pink-500" : ""} transition-colors`}
+              className={`size-6.5 ${comment.isLiked && "fill-pink-500 stroke-pink-500"} transition-colors`}
             />
           </Button>
         </Field>

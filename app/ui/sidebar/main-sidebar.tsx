@@ -10,9 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default async function MainSidebar() {
   const session = await auth();
   const users = await getRandomUsersExcludingUser(Number(session?.user?.id));
-  const usersFollowed = await allUsersFollowedByUserWithId(
+  const followedUsers = await allUsersFollowedByUserWithId(
     Number(session?.user?.id),
   );
+  const followedUsersId = new Set(followedUsers.map((u) => u.follows));
   return (
     <SidebarWrapper>
       <Card>
@@ -30,8 +31,8 @@ export default async function MainSidebar() {
                   id: user.id,
                   username: user.username,
                   fullname: `${user.firstName} ${user.lastName}`,
+                  isFollowed: followedUsersId.has(user.id),
                 }}
-                usersFollowed={usersFollowed}
               />
             ))}
           </ul>

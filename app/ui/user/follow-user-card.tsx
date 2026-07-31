@@ -4,16 +4,13 @@ import UserNameCard from "@/app/ui/user/name-card";
 
 export default async function FollowUserCard({
   user,
-  usersFollowed,
 }: {
   user: {
     id: number;
     username: string;
     fullname: string;
+    isFollowed: boolean;
   };
-  usersFollowed: {
-    follows: number;
-  }[];
 }) {
   const session = await auth();
   return (
@@ -26,10 +23,11 @@ export default async function FollowUserCard({
       />
       <FollowUserForm
         session={session}
-        user={{ id: user.id, username: user.username }}
-        isFollowed={
-          usersFollowed.some((item) => item.follows === user.id) ? true : false
-        }
+        user={{
+          id: user.id,
+          username: user.username,
+          isFollowed: user.isFollowed,
+        }}
       />
     </li>
   );

@@ -12,9 +12,10 @@ export default async function ExploreSidebar() {
   const users = await getMostFollowedUsersExcludingUser(
     Number(session?.user?.id),
   );
-  const usersFollowed = await allUsersFollowedByUserWithId(
+  const followedUsers = await allUsersFollowedByUserWithId(
     Number(session?.user?.id),
   );
+  const followedUsersId = new Set(followedUsers.map((u) => u.follows));
   return (
     <SidebarWrapper className="gap-8">
       <Card>
@@ -32,8 +33,8 @@ export default async function ExploreSidebar() {
                   id: user.id,
                   username: user.username,
                   fullname: `${user.firstName} ${user.lastName}`,
+                  isFollowed: followedUsersId.has(user.id),
                 }}
-                usersFollowed={usersFollowed}
               />
             ))}
           </ul>

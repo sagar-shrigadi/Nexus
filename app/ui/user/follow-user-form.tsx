@@ -11,15 +11,14 @@ import { cn } from "@/lib/utils";
 export default function FollowUserForm({
   session,
   user,
-  isFollowed,
   className,
 }: {
   session: Session | null;
   user: {
     id: number;
     username: string;
+    isFollowed: boolean;
   };
-  isFollowed: boolean;
   className?: string;
 }) {
   const pathaname = usePathname();
@@ -51,11 +50,11 @@ export default function FollowUserForm({
       <Field>
         <Button
           type="submit"
-          variant={isFollowed ? "secondary" : "default"}
+          variant={user.isFollowed ? "secondary" : "default"}
           aria-disabled={isPending}
           disabled={isPending}
         >
-          {isFollowed ? "Unfollow" : "Follow"}
+          {user.isFollowed ? "Unfollow" : "Follow"}
         </Button>
       </Field>
     </form>

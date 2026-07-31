@@ -2,7 +2,6 @@ import { MessageSquare } from "lucide-react";
 import Link from "next/link";
 import PostLikeForm from "@/app/ui/post/post-like-form";
 import { auth } from "@/auth";
-import { getAllLikedPostsByUser } from "@/app/services/posts";
 
 export default async function PostContent({
   post,
@@ -13,13 +12,13 @@ export default async function PostContent({
     content: string;
     likes: number;
     commentCount: number;
+    isLiked: boolean;
     user: {
       username: string;
     };
   };
 }) {
   const session = await auth();
-  const likedPosts = await getAllLikedPostsByUser(Number(session?.user?.id));
   return (
     <div className="flex flex-col gap-4 px-4 py-1">
       <Link
@@ -36,8 +35,7 @@ export default async function PostContent({
         </div>
         <PostLikeForm
           session={session}
-          post={{ id: post.id, likes: post.likes }}
-          likedPosts={likedPosts}
+          post={{ id: post.id, likes: post.likes, isLiked: post.isLiked }}
         />
       </div>
     </div>

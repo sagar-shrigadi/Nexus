@@ -120,6 +120,7 @@ export async function likePostTransaction(userId: number, postId: number) {
 export async function getAllLikedPostsByUser(userId: number) {
   return db.query.postLikes.findMany({
     where: eq(postLikes.userId, userId),
+    columns: { postId: true },
   });
 }
 export async function isPostLikedByUser(userId: number, postId: number) {

@@ -1,5 +1,8 @@
 import { getAllLikedCommentsByUserOnPost } from "@/app/services/comments";
-import { getPostByIdWithComments } from "@/app/services/posts";
+import {
+  getPostByIdWithComments,
+  isPostLikedByUser,
+} from "@/app/services/posts";
 import BackButton from "@/app/ui/button/back-button";
 import CommentCard from "@/app/ui/comment/comment-card";
 import CreateComment from "@/app/ui/comment/create-comment";
@@ -17,6 +20,13 @@ export default async function PostPage({
   const session = await auth();
   const { id } = await params;
   const post = await getPostByIdWithComments(Number(id));
+  if (!post) {
+    notFound();
+  }
+  const isPostLiked = await isPostLikedByUser(
+    Number(session?.user?.id),
+    Number(id),
+  );
   const likedComments = await getAllLikedCommentsByUserOnPost(
     Number(session?.user?.id),
     Number(id),
@@ -24,11 +34,6 @@ export default async function PostPage({
   // a set for fast lookups of each commentId for each comment card
   // instead of using some() method on likedComments to check if a commentId exists in it or not
   const likedCommentsIds = new Set(likedComments.map((c) => c.commentId));
-
-  if (!post) {
-    notFound();
-  }
-
   return (
     <div className="mr-auto w-full h-[91svh] sm:h-svh max-w-3xl flex flex-col">
       <header className="flex items-center gap-4 px-2 py-4">
@@ -45,6 +50,7 @@ export default async function PostPage({
               userId: post.userId,
               likes: post.likes,
               commentCount: post.commentCount,
+              isLiked: !!isPostLiked,
               user: {
                 ...post.users,
               },

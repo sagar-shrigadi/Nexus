@@ -3,13 +3,19 @@ import CreatePost from "@/app/ui/post/create-post";
 import { Separator } from "@/components/ui/separator";
 import PostCard from "@/app/ui/post/post-card";
 import { auth } from "@/auth";
-import { getAllPostsByUserAndUsersFollowedByUser } from "@/app/services/posts";
+import {
+  getAllLikedPostsByUser,
+  getAllPostsByUserAndUsersFollowedByUser,
+} from "@/app/services/posts";
 
 export default async function MainFeed() {
   const session = await auth();
   const posts = await getAllPostsByUserAndUsersFollowedByUser(
     Number(session?.user?.id),
   );
+  const likedPosts = await getAllLikedPostsByUser(Number(session?.user?.id));
+  const likedPostsId = new Set(likedPosts.map((p) => p.postId));
+
   return (
     <article className="grow flex flex-col gap-4 w-full max-w-3xl h-[85svh] sm:h-svh">
       <CreatePost session={session} />
@@ -26,6 +32,7 @@ export default async function MainFeed() {
                   userId: post.userId,
                   likes: post.likes,
                   commentCount: post.commentsCount,
+                  isLiked: likedPostsId.has(post.id),
                   user: {
                     ...post.users,
                   },

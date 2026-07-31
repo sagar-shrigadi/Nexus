@@ -11,6 +11,7 @@ export default function PostCard({
     userId: number;
     likes: number;
     commentCount: number;
+    isLiked: boolean;
     user: {
       firstName: string;
       lastName: string;
@@ -36,6 +37,7 @@ export default function PostCard({
           content: post.content,
           likes: post.likes,
           commentCount: post.commentCount,
+          isLiked: post.isLiked,
           user: {
             username: post.user.username,
           },

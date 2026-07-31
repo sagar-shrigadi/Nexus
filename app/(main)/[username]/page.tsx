@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { auth } from "@/auth";
 import FollowUserForm from "@/app/ui/user/follow-user-form";
+import { getAllLikedPostsByUser } from "@/app/services/posts";
 
 export default async function UserPage({
   params,
@@ -24,8 +25,10 @@ export default async function UserPage({
   }
   const isFollowed = await isUserFollowedByUserWithId(
     Number(session?.user?.id),
-    user?.id,
+    user.id,
   );
+  const likedPosts = await getAllLikedPostsByUser(Number(session?.user?.id));
+  const likedPostsId = new Set(likedPosts.map((p) => p.postId));
 
   return (
     <div className="mr-auto w-full h-[91svh] sm:h-svh max-w-3xl flex flex-col">
@@ -50,8 +53,11 @@ export default async function UserPage({
               {session?.user?.email === username || (
                 <FollowUserForm
                   session={session}
-                  user={{ id: user.id, username: user.username }}
-                  isFollowed={isFollowed ? true : false}
+                  user={{
+                    id: user.id,
+                    username: user.username,
+                    isFollowed: !!isFollowed,
+                  }}
                   className="self-end"
                 />
               )}
@@ -85,6 +91,7 @@ export default async function UserPage({
                   userId: post.userId,
                   likes: post.likes,
                   commentCount: post.commentsCount,
+                  isLiked: likedPostsId.has(post.id),
                   user: {
                     firstName: user.firstName,
                     lastName: user.lastName,
