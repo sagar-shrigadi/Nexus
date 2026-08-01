@@ -30,7 +30,7 @@ export async function getAllPostsByUserAndUsersFollowedByUser(userId: number) {
 }
 export async function getLatestPosts() {
   return db.query.posts.findMany({
-    orderBy: [desc(posts.id)],
+    orderBy: [desc(posts.createdAt)],
     with: {
       users: { columns: { firstName: true, lastName: true, username: true } },
     },
@@ -69,7 +69,7 @@ export async function getPostByIdWithComments(id: number) {
       },
     },
     extras: {
-      commentCount: sql<number>`(
+      commentsCount: sql<number>`(
         SELECT COUNT(*) 
         FROM ${comments} 
         WHERE ${comments}.post_id = ${posts.id}

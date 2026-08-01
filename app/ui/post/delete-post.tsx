@@ -11,7 +11,7 @@ export default function DeletePost({
   post: {
     id: number;
     userId: number;
-    user: {
+    users: {
       username: string;
     };
   };

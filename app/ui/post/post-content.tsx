@@ -10,10 +10,11 @@ export default async function PostContent({
     id: number;
     title: string;
     content: string;
+    createdAt: Date;
     likes: number;
-    commentCount: number;
+    commentsCount: number;
     isLiked: boolean;
-    user: {
+    users: {
       username: string;
     };
   };
@@ -22,7 +23,7 @@ export default async function PostContent({
   return (
     <div className="flex flex-col gap-4 px-4 py-1">
       <Link
-        href={`/${post.user.username}/status/${post.id}`}
+        href={`/${post.users.username}/status/${post.id}`}
         className="flex justify-center flex-col gap-1 px-6 py-2 cursor-pointer hover:bg-sidebar-accent rounded transition-colors"
       >
         <h3 className="sm:text-lg font-bold">{post.title}</h3>
@@ -31,7 +32,7 @@ export default async function PostContent({
       <div className="flex items-center gap-6 px-6">
         <div className="flex items-center gap-2">
           <MessageSquare className="size-5.5" />
-          <span>{post.commentCount > 0 ? `${post.commentCount}` : ""}</span>
+          <span>{post.commentsCount > 0 ? `${post.commentsCount}` : ""}</span>
         </div>
         <PostLikeForm
           session={session}

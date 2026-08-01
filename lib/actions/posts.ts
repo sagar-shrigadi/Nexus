@@ -92,7 +92,7 @@ export async function updatePost(
 export async function deletePost(post: {
   id: number;
   userId: number;
-  user: {
+  users: {
     username: string;
   };
 }): Promise<PostAction> {
@@ -107,7 +107,7 @@ export async function deletePost(post: {
     await deletePostById(post.id);
     revalidatePath("/");
     revalidatePath("/explore");
-    revalidatePath(`/${post.user.username}`);
+    revalidatePath(`/${post.users.username}`);
   } catch (error) {
     console.error(error);
     return {

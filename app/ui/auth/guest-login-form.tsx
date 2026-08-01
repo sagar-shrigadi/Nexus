@@ -28,7 +28,7 @@ export default function GuestLoginForm({
         <Field>
           <Button
             type="submit"
-            variant="outline"
+            variant="secondary"
             disabled={isPending}
             aria-disabled={isPending}
           >

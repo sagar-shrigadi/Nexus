@@ -21,7 +21,7 @@ export default function PostOptions({
   post: {
     id: number;
     userId: number;
-    user: {
+    users: {
       username: string;
     };
   };

@@ -8,14 +8,15 @@ export default function PostCard({
     id: number;
     title: string;
     content: string;
+    createdAt: Date;
     userId: number;
     likes: number;
-    commentCount: number;
+    commentsCount: number;
     isLiked: boolean;
-    user: {
+    users: {
+      username: string;
       firstName: string;
       lastName: string;
-      username: string;
     };
   };
 }) {
@@ -25,8 +26,8 @@ export default function PostCard({
         post={{
           id: post.id,
           userId: post.userId,
-          user: {
-            ...post.user,
+          users: {
+            ...post.users,
           },
         }}
       />
@@ -36,10 +37,11 @@ export default function PostCard({
           title: post.title,
           content: post.content,
           likes: post.likes,
-          commentCount: post.commentCount,
+          commentsCount: post.commentsCount,
           isLiked: post.isLiked,
-          user: {
-            username: post.user.username,
+          createdAt: post.createdAt,
+          users: {
+            username: post.users.username,
           },
         }}
       />

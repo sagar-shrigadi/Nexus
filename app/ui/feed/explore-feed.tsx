@@ -23,16 +23,8 @@ export default async function ExploreFeed() {
               <PostCard
                 key={post.id}
                 post={{
-                  id: post.id,
-                  title: post.title,
-                  content: post.content,
-                  userId: post.userId,
-                  likes: post.likes,
-                  commentCount: post.commentsCount,
+                  ...post,
                   isLiked: likedPostsId.has(post.id),
-                  user: {
-                    ...post.users,
-                  },
                 }}
               />
             </article>

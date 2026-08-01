@@ -26,16 +26,8 @@ export default async function MainFeed() {
               {i > 0 && <Separator />}
               <PostCard
                 post={{
-                  id: post.id,
-                  title: post.title,
-                  content: post.content,
-                  userId: post.userId,
-                  likes: post.likes,
-                  commentCount: post.commentsCount,
+                  ...post,
                   isLiked: likedPostsId.has(post.id),
-                  user: {
-                    ...post.users,
-                  },
                 }}
               />
             </article>

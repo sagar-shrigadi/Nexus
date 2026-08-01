@@ -8,7 +8,7 @@ export default async function PostHeader({
   post: {
     id: number;
     userId: number;
-    user: {
+    users: {
       firstName: string;
       lastName: string;
       username: string;
@@ -20,8 +20,8 @@ export default async function PostHeader({
     <div className="flex justify-between px-4 py-1 gap-4">
       <UserNameCard
         className="flex"
-        to={`/${post.user.username}`}
-        fullname={`${post.user.firstName} ${post.user.lastName}`}
+        to={`/${post.users.username}`}
+        fullname={`${post.users.firstName} ${post.users.lastName}`}
       />
       {post.userId === Number(session?.user?.id) && (
         <PostOptions
@@ -29,7 +29,7 @@ export default async function PostHeader({
           post={{
             id: post.id,
             userId: post.userId,
-            user: { username: post.user.username },
+            users: { username: post.users.username },
           }}
         />
       )}

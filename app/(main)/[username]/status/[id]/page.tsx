@@ -42,20 +42,7 @@ export default async function PostPage({
       </header>
       <ScrollArea className="grow min-h-0 border rounded">
         <section>
-          <PostCard
-            post={{
-              id: post.id,
-              title: post.title,
-              content: post.content,
-              userId: post.userId,
-              likes: post.likes,
-              commentCount: post.commentCount,
-              isLiked: !!isPostLiked,
-              user: {
-                ...post.users,
-              },
-            }}
-          />
+          <PostCard post={{ ...post, isLiked: !!isPostLiked }} />
         </section>
         <Separator />
         <section>

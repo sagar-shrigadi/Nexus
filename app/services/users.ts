@@ -15,7 +15,7 @@ export async function getUserWithPostsByUsername(username: string) {
     where: eq(users.username, username),
     with: {
       posts: {
-        orderBy: [desc(posts.id)],
+        orderBy: [desc(posts.createdAt)],
         extras: {
           commentsCount: sql<number>`(
             SELECT COUNT(*) 
@@ -25,6 +25,9 @@ export async function getUserWithPostsByUsername(username: string) {
             .mapWith(Number)
             .as("comment_count"),
         },
+      },
+      comments: {
+        orderBy: [desc(comments.createdAt)],
       },
     },
   });
@@ -119,5 +122,91 @@ export async function isUserFollowedByUserWithId(
       eq(userFollows.userId, userId),
       eq(userFollows.follows, userToCheck),
     ),
+  });
+}
+export async function getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(
+  username: string,
+) {
+  return db.query.users.findFirst({
+    columns: { password: false },
+    where: eq(users.username, username),
+    with: {
+      posts: {
+        columns: { userId: false },
+        extras: {
+          commentsCount: sql<number>`(
+            SELECT COUNT(*) 
+            FROM ${comments} 
+            WHERE ${comments}.post_id = ${posts.id}
+          )`
+            .mapWith(Number)
+            .as("comment_count"),
+        },
+        orderBy: [desc(posts.createdAt)],
+      },
+      comments: {
+        columns: { userId: false },
+        orderBy: [desc(comments.createdAt)],
+      },
+      likedPosts: {
+        columns: { id: true },
+        with: {
+          posts: {
+            with: {
+              users: {
+                columns: {
+                  username: true,
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+            orderBy: [desc(posts.createdAt)],
+            extras: {
+              commentsCount: sql<number>`(
+            SELECT COUNT(*) 
+            FROM ${comments} 
+            WHERE ${comments}.post_id = ${posts.id}
+          )`
+                .mapWith(Number)
+                .as("comment_count"),
+            },
+          },
+        },
+      },
+      likedComments: {
+        columns: { id: true },
+        with: {
+          comments: {
+            with: {
+              users: {
+                columns: {
+                  username: true,
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+            orderBy: [desc(comments.createdAt)],
+          },
+        },
+      },
+    },
+  });
+}
+export async function getIdsOfAllLikedPostsAndLikedCommentsByUser(
+  userId: number,
+) {
+  return db.query.users.findFirst({
+    columns: { id: true },
+    where: eq(users.id, userId),
+    with: {
+      likedComments: {
+        columns: { commentId: true },
+      },
+      likedPosts: {
+        columns: { postId: true },
+      },
+    },
   });
 }
