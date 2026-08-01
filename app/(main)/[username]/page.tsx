@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import {
-  getUserWithPostsByUsername,
+  getIdsOfAllLikedPostsAndLikedCommentsByUser,
+  getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser,
   isUserFollowedByUserWithId,
 } from "@/app/services/users";
 import BackButton from "@/app/ui/button/back-button";
@@ -10,7 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { auth } from "@/auth";
 import FollowUserForm from "@/app/ui/user/follow-user-form";
-import { getAllLikedPostsByUser } from "@/app/services/posts";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CommentCard from "@/app/ui/comment/comment-card";
 
 export default async function UserPage({
   params,
@@ -19,7 +21,8 @@ export default async function UserPage({
 }) {
   const session = await auth();
   const { username } = await params;
-  const user = await getUserWithPostsByUsername(username);
+  const user =
+    await getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(username);
   if (!user) {
     notFound();
   }
@@ -27,8 +30,16 @@ export default async function UserPage({
     Number(session?.user?.id),
     user.id,
   );
-  const likedPosts = await getAllLikedPostsByUser(Number(session?.user?.id));
-  const likedPostsId = new Set(likedPosts.map((p) => p.postId));
+  const likedPostsAndLikedCommentsIdsByUser =
+    await getIdsOfAllLikedPostsAndLikedCommentsByUser(
+      Number(session?.user?.id),
+    )!;
+  const likedPostsId = new Set(
+    likedPostsAndLikedCommentsIdsByUser?.likedPosts.map((p) => p.postId),
+  );
+  const likedCommentsId = new Set(
+    likedPostsAndLikedCommentsIdsByUser?.likedComments.map((c) => c.commentId),
+  );
 
   return (
     <div className="mr-auto w-full h-[91svh] sm:h-svh max-w-3xl flex flex-col">
@@ -77,30 +88,85 @@ export default async function UserPage({
             </div>
           </div>
         </section>
-        <Separator />
         <section className="grow">
-          {user.posts.map((post, i) => (
-            <article key={post.id}>
-              {i > 0 && <Separator />}
-              <PostCard
-                key={post.id}
-                post={{
-                  id: post.id,
-                  title: post.title,
-                  content: post.content,
-                  userId: post.userId,
-                  likes: post.likes,
-                  commentCount: post.commentsCount,
-                  isLiked: likedPostsId.has(post.id),
-                  user: {
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    username: user.username,
-                  },
-                }}
-              />
-            </article>
-          ))}
+          <Tabs defaultValue="posts">
+            <TabsList
+              variant="line"
+              className="w-full flex justify-between items-center px-4"
+            >
+              <TabsTrigger value="posts">Posts</TabsTrigger>
+              <TabsTrigger value="comments">Comments</TabsTrigger>
+              <TabsTrigger value="likes">Likes</TabsTrigger>
+            </TabsList>
+            <Separator />
+            <TabsContent value="posts">
+              {user.posts.map((post, i) => (
+                <article key={post.id}>
+                  {i > 0 && <Separator />}
+                  <PostCard
+                    key={post.id}
+                    post={{
+                      ...post,
+                      userId: user.id,
+                      isLiked: likedPostsId.has(post.id),
+                      users: {
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        username: user.username,
+                      },
+                    }}
+                  />
+                </article>
+              ))}
+            </TabsContent>
+            <TabsContent value="comments">
+              {user.comments.map((comment, i) => (
+                <article key={comment.id}>
+                  {i > 0 && <Separator />}
+                  <CommentCard
+                    session={session}
+                    comment={{
+                      ...comment,
+                      userId: user.id,
+                      isLiked: likedCommentsId.has(comment.id),
+                      users: {
+                        username: user.username,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                      },
+                    }}
+                  />
+                </article>
+              ))}
+            </TabsContent>
+            <TabsContent value="likes">
+              {user.likedComments.map((c, i) => (
+                <article key={c.id}>
+                  {i > 0 && <Separator />}
+                  <CommentCard
+                    session={session}
+                    comment={{
+                      ...c.comments,
+                      isLiked: likedCommentsId.has(c.comments.id),
+                    }}
+                  />
+                </article>
+              ))}
+              <Separator />
+              {user.likedPosts.map((p, i) => (
+                <article key={p.id}>
+                  {i > 0 && <Separator />}
+                  <PostCard
+                    key={p.id}
+                    post={{
+                      ...p.posts,
+                      isLiked: likedPostsId.has(p.posts.id),
+                    }}
+                  />
+                </article>
+              ))}
+            </TabsContent>
+          </Tabs>
         </section>
       </ScrollArea>
     </div>
