@@ -13,6 +13,7 @@ import { auth } from "@/auth";
 import FollowUserForm from "@/app/ui/user/follow-user-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CommentCard from "@/app/ui/comment/comment-card";
+import EmptyListTemplate from "@/app/ui/empty-list-template";
 
 export default async function UserPage({
   params,
@@ -100,71 +101,85 @@ export default async function UserPage({
             </TabsList>
             <Separator />
             <TabsContent value="posts">
-              {user.posts.map((post, i) => (
-                <article key={post.id}>
-                  {i > 0 && <Separator />}
-                  <PostCard
-                    key={post.id}
-                    post={{
-                      ...post,
-                      userId: user.id,
-                      isLiked: likedPostsId.has(post.id),
-                      users: {
-                        firstName: user.firstName,
-                        lastName: user.lastName,
-                        username: user.username,
-                      },
-                    }}
-                  />
-                </article>
-              ))}
+              {user.posts.length > 0 ? (
+                user.posts.map((post, i) => (
+                  <article key={post.id}>
+                    {i > 0 && <Separator />}
+                    <PostCard
+                      key={post.id}
+                      post={{
+                        ...post,
+                        userId: user.id,
+                        isLiked: likedPostsId.has(post.id),
+                        users: {
+                          firstName: user.firstName,
+                          lastName: user.lastName,
+                          username: user.username,
+                        },
+                      }}
+                    />
+                  </article>
+                ))
+              ) : (
+                <EmptyListTemplate content="posts" className="min-h-50" />
+              )}
             </TabsContent>
             <TabsContent value="comments">
-              {user.comments.map((comment, i) => (
-                <article key={comment.id}>
-                  {i > 0 && <Separator />}
-                  <CommentCard
-                    session={session}
-                    comment={{
-                      ...comment,
-                      userId: user.id,
-                      isLiked: likedCommentsId.has(comment.id),
-                      users: {
-                        username: user.username,
-                        firstName: user.firstName,
-                        lastName: user.lastName,
-                      },
-                    }}
-                  />
-                </article>
-              ))}
+              {user.comments.length > 0 ? (
+                user.comments.map((comment, i) => (
+                  <article key={comment.id}>
+                    {i > 0 && <Separator />}
+                    <CommentCard
+                      session={session}
+                      comment={{
+                        ...comment,
+                        userId: user.id,
+                        isLiked: likedCommentsId.has(comment.id),
+                        users: {
+                          username: user.username,
+                          firstName: user.firstName,
+                          lastName: user.lastName,
+                        },
+                      }}
+                    />
+                  </article>
+                ))
+              ) : (
+                <EmptyListTemplate content="comments" className="min-h-50" />
+              )}
             </TabsContent>
             <TabsContent value="likes">
-              {user.likedComments.map((c, i) => (
-                <article key={c.id}>
-                  {i > 0 && <Separator />}
-                  <CommentCard
-                    session={session}
-                    comment={{
-                      ...c.comments,
-                      isLiked: likedCommentsId.has(c.comments.id),
-                    }}
-                  />
-                </article>
-              ))}
-              <Separator />
-              {user.likedPosts.map((p, i) => (
-                <article key={p.id}>
-                  {i > 0 && <Separator />}
-                  <PostCard
-                    key={p.id}
-                    post={{
-                      ...p.posts,
-                      isLiked: likedPostsId.has(p.posts.id),
-                    }}
-                  />
-                </article>
-              ))}
+              {user.likedComments.length > 0 && user.likedPosts.length > 0 ? (
+                <>
+                  {user.likedComments.map((c, i) => (
+                    <article key={c.id}>
+                      {i > 0 && <Separator />}
+                      <CommentCard
+                        session={session}
+                        comment={{
+                          ...c.comments,
+                          isLiked: likedCommentsId.has(c.comments.id),
+                        }}
+                      />
+                    </article>
+                  ))}
+                  <Separator />
+                  {user.likedPosts.map((p, i) => (
+                    <article key={p.id}>
+                      {i > 0 && <Separator />}
+                      <PostCard
+                        key={p.id}
+                        post={{
+                          ...p.posts,
+                          isLiked: likedPostsId.has(p.posts.id),
+                        }}
+                      />
+                    </article>
+                  ))}
+                </>
+              ) : (
+                <EmptyListTemplate content="likes" className="min-h-50" />
+              )}
             </TabsContent>
           </Tabs>
         </section>

@@ -3,6 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import PostCard from "@/app/ui/post/post-card";
 import { auth } from "@/auth";
+import EmptyListTemplate from "@/app/ui/empty-list-template";
 
 export default async function ExploreFeed() {
   const session = await auth();
@@ -17,18 +18,22 @@ export default async function ExploreFeed() {
       </h1>
       <section className="grow min-h-0">
         <ScrollArea className="h-full border rounded">
-          {posts.map((post, i) => (
-            <article key={post.id}>
-              {i > 0 && <Separator />}
-              <PostCard
-                key={post.id}
-                post={{
-                  ...post,
-                  isLiked: likedPostsId.has(post.id),
-                }}
-              />
-            </article>
-          ))}
+          {posts.length > 0 ? (
+            posts.map((post, i) => (
+              <article key={post.id}>
+                {i > 0 && <Separator />}
+                <PostCard
+                  key={post.id}
+                  post={{
+                    ...post,
+                    isLiked: likedPostsId.has(post.id),
+                  }}
+                />
+              </article>
+            ))
+          ) : (
+            <EmptyListTemplate content="posts" />
+          )}
         </ScrollArea>
       </section>
     </article>

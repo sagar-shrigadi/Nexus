@@ -6,6 +6,7 @@ import {
 import BackButton from "@/app/ui/button/back-button";
 import CommentCard from "@/app/ui/comment/comment-card";
 import CreateComment from "@/app/ui/comment/create-comment";
+import EmptyListTemplate from "@/app/ui/empty-list-template";
 import PostCard from "@/app/ui/post/post-card";
 import { auth } from "@/auth";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -49,23 +50,27 @@ export default async function PostPage({
           <CreateComment postId={Number(id)} />
           <Separator />
           <section>
-            <header className="px-6 py-2">
+            <header className="px-6 py-4">
               <h2 className="font-bold text-2xl">Comments</h2>
             </header>
             <Separator />
             <section className="grow">
-              {post.comments.map((comment, i) => (
-                <article key={comment.id}>
-                  {i > 0 && <Separator />}
-                  <CommentCard
-                    session={session}
-                    comment={{
-                      ...comment,
-                      isLiked: likedCommentsIds.has(comment.id),
-                    }}
-                  />
-                </article>
-              ))}
+              {post.comments.length > 0 ? (
+                post.comments.map((comment, i) => (
+                  <article key={comment.id}>
+                    {i > 0 && <Separator />}
+                    <CommentCard
+                      session={session}
+                      comment={{
+                        ...comment,
+                        isLiked: likedCommentsIds.has(comment.id),
+                      }}
+                    />
+                  </article>
+                ))
+              ) : (
+                <EmptyListTemplate content="comments" className="min-h-50" />
+              )}
             </section>
           </section>
         </section>
