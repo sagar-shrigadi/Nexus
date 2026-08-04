@@ -78,6 +78,13 @@
       "when": 1785825640490,
       "tag": "0010_bored_lake",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1785854824123,
+      "tag": "0011_familiar_energizer",
+      "breakpoints": true
     }
   ]
 }

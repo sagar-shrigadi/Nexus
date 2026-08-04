@@ -40,6 +40,7 @@ export const postLikes = pgTable(
     postId: integer("post_id")
       .notNull()
       .references(() => posts.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [unique("unique_user_post_like").on(table.userId, table.postId)],
 );
@@ -70,6 +71,7 @@ export const commentLikes = pgTable(
     postId: integer("post_id")
       .notNull()
       .references(() => posts.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
     unique("unique_user_comment_like").on(table.userId, table.commentId),

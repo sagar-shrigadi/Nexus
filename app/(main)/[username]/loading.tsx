@@ -35,7 +35,7 @@ export default async function UserPageSkeleton() {
           </div>
         </section>
         <section className="grow min-h-0">
-          <FeedSkeleton count={2} />
+          <FeedSkeleton />
         </section>
       </div>
     </div>

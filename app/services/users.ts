@@ -161,11 +161,10 @@ export async function getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(
                 },
               },
             },
-            orderBy: [desc(posts.createdAt)],
             extras: {
               commentsCount: sql<number>`(
-            SELECT COUNT(*) 
-            FROM ${comments} 
+            SELECT COUNT(*)
+            FROM ${comments}
             WHERE ${comments}.post_id = ${posts.id}
           )`
                 .mapWith(Number)
@@ -173,6 +172,7 @@ export async function getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(
             },
           },
         },
+        orderBy: (likedPosts, { desc }) => [desc(likedPosts.createdAt)],
       },
       likedComments: {
         columns: { id: true },
@@ -187,9 +187,9 @@ export async function getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(
                 },
               },
             },
-            orderBy: [desc(comments.createdAt)],
           },
         },
+        orderBy: (likedComments, { desc }) => [desc(likedComments.createdAt)],
       },
     },
   });
