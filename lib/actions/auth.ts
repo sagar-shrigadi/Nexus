@@ -76,6 +76,7 @@ export async function register(
   try {
     await postUser(firstname, lastname, username, hashedPassword);
   } catch (error) {
+    console.error(error);
     return {
       message:
         "Database error: Failed to create your account. Please Try again!",
