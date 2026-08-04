@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { Suspense, useActionState } from "react";
 import { authenticate } from "@/lib/actions/auth";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -67,10 +67,12 @@ export default function LoginForm() {
           </Field>
         </FieldGroup>
       </form>
-      <GuestLoginForm
-        formAction={guestLoginFormAction}
-        isPending={guestLoginPending}
-      />
+      <Suspense>
+        <GuestLoginForm
+          formAction={guestLoginFormAction}
+          isPending={guestLoginPending}
+        />
+      </Suspense>
     </>
   );
 }
