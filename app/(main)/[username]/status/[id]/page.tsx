@@ -69,7 +69,7 @@ export default async function PostPage({
                   </article>
                 ))
               ) : (
-                <EmptyListTemplate content="comments" className="min-h-50" />
+                <EmptyListTemplate content="comments" />
               )}
             </section>
           </section>

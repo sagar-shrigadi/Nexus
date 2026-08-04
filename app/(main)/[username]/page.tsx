@@ -119,7 +119,7 @@ export default async function UserPage({
                   </article>
                 ))
               ) : (
-                <EmptyListTemplate content="posts" className="min-h-50" />
+                <EmptyListTemplate content="posts" />
               )}
             </TabsContent>
             <TabsContent value="comments">
@@ -143,7 +143,7 @@ export default async function UserPage({
                   </article>
                 ))
               ) : (
-                <EmptyListTemplate content="comments" className="min-h-50" />
+                <EmptyListTemplate content="comments" />
               )}
             </TabsContent>
             <TabsContent value="likes">
@@ -176,7 +176,7 @@ export default async function UserPage({
                   ))}
                 </>
               ) : (
-                <EmptyListTemplate content="likes" className="min-h-50" />
+                <EmptyListTemplate content="likes" />
               )}
             </TabsContent>
           </Tabs>

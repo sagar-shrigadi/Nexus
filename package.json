@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "tsx": "tsx",
+    "tsc": "tsc",
     "db:seed": "tsx db/seed.ts"
   },
   "dependencies": {
