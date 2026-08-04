@@ -52,7 +52,7 @@ export default async function UserPage({
         <section className="flex flex-col pb-4">
           <div className="relative mb-15">
             {/* keep the margin-bottom here exactly half of the Avatar size from below */}
-            <div className="w-full h-55 md:h-60 bg-muted dark:bg-muted"></div>
+            <div className="w-full h-55 md:h-60 bg-muted" />
             <div className="px-4 absolute z-2 bottom-0 translate-y-1/2 flex justify-between w-full">
               <Avatar className="size-30">
                 <AvatarImage
@@ -78,9 +78,7 @@ export default async function UserPage({
           <div className="px-4 pt-2 flex flex-col gap-3">
             <div className="flex flex-col">
               <h2 className="text-xl md:text-2xl font-bold">{`${user.firstName} ${user.lastName}`}</h2>
-              <p className="text-lg md:text-xl text-sidebar-ring">
-                @{user.username}
-              </p>
+              <p className="text-lg text-sidebar-ring">@{user.username}</p>
             </div>
             <div className="text-lg">{user.bio}</div>
             <div className="flex items-center gap-4">
