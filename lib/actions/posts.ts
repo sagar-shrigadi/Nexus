@@ -119,7 +119,7 @@ export async function deletePost(
     };
   }
   if (shouldRedirect) {
-    redirect("/");
+    redirect("/", "replace");
   }
 }
 export async function likePost(
