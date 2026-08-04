@@ -26,7 +26,7 @@ export const posts = pgTable("posts", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   userId: integer("user_id")
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: "cascade" }),
   likes: integer("likes").notNull().default(0),
 });
 
@@ -36,10 +36,10 @@ export const postLikes = pgTable(
     id: integer("id").notNull().primaryKey().generatedAlwaysAsIdentity(),
     userId: integer("user_id")
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, { onDelete: "cascade" }),
     postId: integer("post_id")
       .notNull()
-      .references(() => posts.id),
+      .references(() => posts.id, { onDelete: "cascade" }),
   },
   (table) => [unique("unique_user_post_like").on(table.userId, table.postId)],
 );
@@ -50,10 +50,10 @@ export const comments = pgTable("comments", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   userId: integer("user_id")
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: "cascade" }),
   postId: integer("post_id")
     .notNull()
-    .references(() => posts.id),
+    .references(() => posts.id, { onDelete: "cascade" }),
   likes: integer("likes").notNull().default(0),
 });
 
@@ -63,13 +63,13 @@ export const commentLikes = pgTable(
     id: integer("id").notNull().primaryKey().generatedAlwaysAsIdentity(),
     userId: integer("user_id")
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, { onDelete: "cascade" }),
     commentId: integer("comment_id")
       .notNull()
-      .references(() => comments.id),
+      .references(() => comments.id, { onDelete: "cascade" }),
     postId: integer("post_id")
       .notNull()
-      .references(() => posts.id),
+      .references(() => posts.id, { onDelete: "cascade" }),
   },
   (table) => [
     unique("unique_user_comment_like").on(table.userId, table.commentId),
@@ -82,10 +82,10 @@ export const userFollows = pgTable(
     id: integer("id").notNull().primaryKey().generatedAlwaysAsIdentity(),
     userId: integer("user_id") // follower
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, { onDelete: "cascade" }),
     follows: integer("follows") // following
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, { onDelete: "cascade" }),
   },
   (table) => [unique("unique_user_follows").on(table.userId, table.follows)],
 );
