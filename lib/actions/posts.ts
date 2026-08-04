@@ -89,13 +89,16 @@ export async function updatePost(
   }
   redirect(`/${post.user.username}/status/${post.id}`, "replace");
 }
-export async function deletePost(post: {
-  id: number;
-  userId: number;
-  users: {
-    username: string;
-  };
-}): Promise<PostAction> {
+export async function deletePost(
+  post: {
+    id: number;
+    userId: number;
+    users: {
+      username: string;
+    };
+  },
+  shouldRedirect: boolean,
+): Promise<PostAction | undefined> {
   const session = await auth();
   if (post.userId !== Number(session?.user?.id)) {
     return {
@@ -115,7 +118,9 @@ export async function deletePost(post: {
       message: "Post could not be deleted! Please try again!",
     };
   }
-  redirect("/");
+  if (shouldRedirect) {
+    redirect("/");
+  }
 }
 export async function likePost(
   userId: number,

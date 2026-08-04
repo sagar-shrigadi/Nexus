@@ -4,6 +4,7 @@ import { useActionState, useEffect } from "react";
 import { deletePost } from "@/lib/actions/posts";
 import DeleteForm from "@/app/ui/delete-form";
 import { toast } from "@/components/ui/toast";
+import { usePathname } from "next/navigation";
 
 export default function DeletePost({
   post,
@@ -16,7 +17,12 @@ export default function DeletePost({
     };
   };
 }) {
-  const deletePostWithId = deletePost.bind(null, { ...post });
+  const pathname = usePathname();
+  const deletePostWithId = deletePost.bind(
+    null,
+    { ...post },
+    pathname.split("/").includes("status"),
+  );
   const [result, formAction, isPending] = useActionState(
     deletePostWithId,
     undefined,
