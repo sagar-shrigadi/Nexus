@@ -10,12 +10,22 @@ export const { auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
       async authorize(credentials) {
+        const isGuest = credentials?.isGuestLogin === "true";
+
+        let incomingCredentials = credentials;
+
+        if (isGuest) {
+          incomingCredentials = {
+            username: process.env.GUEST_USERNAME ?? "",
+            password: process.env.GUEST_PASSWORD ?? "",
+          };
+        }
         const parsedCredentials = z
           .object({
             username: z.string().trim().min(1, "Username is required"),
             password: z.string().trim().min(1, "Password is required"),
           })
-          .safeParse(credentials);
+          .safeParse(incomingCredentials);
 
         if (parsedCredentials.success) {
           const { username, password } = parsedCredentials.data;

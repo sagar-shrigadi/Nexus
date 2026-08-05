@@ -15,16 +15,7 @@ export default function GuestLoginForm({
   return (
     <>
       <form action={formAction} className="w-full flex">
-        <input
-          type="hidden"
-          name="username"
-          value={process.env.GUEST_USERNAME}
-        />
-        <input
-          type="hidden"
-          name="password"
-          value={process.env.GUEST_PASSWORD}
-        />
+        <input type="hidden" name="isGuestLogin" value="true" />
         <Field>
           <Button
             type="submit"
