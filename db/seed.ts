@@ -16,7 +16,7 @@ const MAX_POSTS_PER_USER = 5;
 const MAX_COMMENTS_PER_POST = 8;
 const MAX_FOLLOWS_PER_USER = 8;
 
-// how "engaged" the fake user base is — tweak to taste
+// how "engaged" the fake user base is
 const POST_LIKE_CHANCE = 0.4; // chance a given user likes a given post
 const COMMENT_LIKE_CHANCE = 0.3;
 
@@ -118,7 +118,11 @@ async function seedPostLikes(
       if (seen.has(key)) continue;
       seen.add(key);
 
-      rows.push({ userId: user.id, postId: post.id });
+      rows.push({
+        userId: user.id,
+        postId: post.id,
+        createdAt: faker.date.between({ from: post.createdAt, to: new Date() }),
+      });
       likeCounts.set(post.id, (likeCounts.get(post.id) ?? 0) + 1);
     }
   }
@@ -153,6 +157,10 @@ async function seedCommentLikes(
         userId: user.id,
         commentId: comment.id,
         postId: comment.postId, // kept in sync with the comment's post
+        createdAt: faker.date.between({
+          from: comment.createdAt,
+          to: new Date(),
+        }),
       });
       likeCounts.set(comment.id, (likeCounts.get(comment.id) ?? 0) + 1);
     }
