@@ -7,6 +7,7 @@ interface UserNameCardProps {
   to: LinkProps["href"];
   fullname: string;
   username?: string;
+  userAvatar?: string | null;
 }
 
 export default function UserNameCard({
@@ -14,18 +15,19 @@ export default function UserNameCard({
   to,
   fullname,
   username,
+  userAvatar,
 }: UserNameCardProps) {
+  const avatarSrc = userAvatar ?? "/images/defaultProfile.png";
   return (
     <Link
       href={to}
       className={cn("grow items-center gap-3.5 cursor-pointer", className)}
     >
       <Avatar>
-        <AvatarImage
-          src="/images/defaultProfile.png"
-          alt="Default User Avatar"
-        />
-        <AvatarFallback>{"U"}</AvatarFallback>
+        <AvatarImage src={avatarSrc} alt="User Avatar" />
+        <AvatarFallback>
+          {username?.charAt(0).toUpperCase() ?? "U"}
+        </AvatarFallback>
       </Avatar>
       {username ? (
         <div className="flex flex-col">

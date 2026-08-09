@@ -158,6 +158,7 @@ export async function getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(
                   username: true,
                   firstName: true,
                   lastName: true,
+                  avatar: true,
                 },
               },
             },
@@ -184,6 +185,7 @@ export async function getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(
                   username: true,
                   firstName: true,
                   lastName: true,
+                  avatar: true,
                 },
               },
             },
@@ -208,5 +210,17 @@ export async function getIdsOfAllLikedPostsAndLikedCommentsByUser(
         columns: { postId: true },
       },
     },
+  });
+}
+export async function updateAvatar(userId: number, avatarUrl: string) {
+  return db
+    .update(users)
+    .set({ avatar: avatarUrl })
+    .where(eq(users.id, userId));
+}
+export async function getUserAvatar(userId: number) {
+  return db.query.users.findFirst({
+    columns: { avatar: true },
+    where: eq(users.id, userId),
   });
 }

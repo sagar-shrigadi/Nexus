@@ -1,6 +1,6 @@
 "use server";
 
-import { signIn } from "@/auth";
+import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -25,7 +25,9 @@ export async function authenticate(
     throw error;
   }
 }
-
+export async function logout() {
+  await signOut({ redirectTo: "/login" });
+}
 const SignUpSchema = z.object({
   firstname: z
     .string()

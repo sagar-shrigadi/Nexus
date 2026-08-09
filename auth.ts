@@ -5,7 +5,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { getUser } from "@/app/services/users";
 
-export const { auth, signIn, signOut } = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [
     Credentials({
@@ -37,7 +37,8 @@ export const { auth, signIn, signOut } = NextAuth({
             return {
               id: String(user.id),
               name: `${user.firstName} ${user.lastName}`,
-              email: `${user.username}`,
+              email: user.username,
+              image: user.avatar,
             };
           }
         }
@@ -47,9 +48,12 @@ export const { auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.user = user;
+      }
+      if (trigger === "update" && session) {
+        token.user = { ...(token.user as object), ...session };
       }
       return token;
     },

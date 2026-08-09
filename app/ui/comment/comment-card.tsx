@@ -24,6 +24,7 @@ export default function CommentCard({
       username: string;
       firstName: string;
       lastName: string;
+      avatar: string | null;
     };
   };
 }) {
@@ -37,6 +38,7 @@ export default function CommentCard({
             className="flex"
             to={`/${comment.users.username}`}
             fullname={`${comment.users.firstName} ${comment.users.lastName}`}
+            userAvatar={comment.users.avatar}
           />
           <span className="text-sidebar-ring">
             {comment.createdAt.toLocaleDateString("en-US", {

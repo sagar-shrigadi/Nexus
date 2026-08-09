@@ -14,6 +14,7 @@ import FollowUserForm from "@/app/ui/user/follow-user-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CommentCard from "@/app/ui/comment/comment-card";
 import EmptyListTemplate from "@/app/ui/empty-list-template";
+import UploadAvatar from "@/app/ui/user/upload-user-avatar";
 
 export default async function UserPage({
   params,
@@ -54,14 +55,23 @@ export default async function UserPage({
             {/* keep the margin-bottom here exactly half of the Avatar size from below */}
             <div className="w-full h-55 md:h-60 bg-muted" />
             <div className="px-4 absolute z-2 bottom-0 translate-y-1/2 flex justify-between w-full">
-              <Avatar className="size-30">
-                <AvatarImage
-                  src="/images/defaultProfile.png"
-                  alt="Default User Avatar"
-                  className="object-cover rounded-[4%]"
-                />
-                <AvatarFallback className="rounded-[4%]">{"U"}</AvatarFallback>
-              </Avatar>
+              <div className="flex">
+                <Avatar className="size-30">
+                  <AvatarImage
+                    src={user.avatar ?? "/images/defaultProfile.png"}
+                    alt={user.avatar ? "User Avatar" : "Default User Avatar"}
+                    className="object-cover rounded-[4%]"
+                  />
+                  <AvatarFallback className="rounded-[4%]">
+                    {"U"}
+                  </AvatarFallback>
+                </Avatar>
+                {Number(session?.user?.id) === user.id && (
+                  <UploadAvatar
+                    user={{ id: user.id, username: user.username }}
+                  />
+                )}
+              </div>
               {session?.user?.email === username || (
                 <FollowUserForm
                   session={session}
@@ -113,6 +123,7 @@ export default async function UserPage({
                           firstName: user.firstName,
                           lastName: user.lastName,
                           username: user.username,
+                          avatar: user.avatar,
                         },
                       }}
                     />
@@ -137,6 +148,7 @@ export default async function UserPage({
                           username: user.username,
                           firstName: user.firstName,
                           lastName: user.lastName,
+                          avatar: user.avatar,
                         },
                       }}
                     />

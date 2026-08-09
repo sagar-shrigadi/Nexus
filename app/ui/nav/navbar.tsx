@@ -1,6 +1,5 @@
 import { BadgeCheck, Ellipsis, House, LogOut, Search } from "lucide-react";
 import Navlink from "@/app/ui/nav/navlink";
-import { signOut, auth } from "@/auth";
 import Link from "next/link";
 import UserNameCard from "@/app/ui/user/name-card";
 import {
@@ -12,12 +11,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { buttonVariants } from "@/components/ui/button";
+import { logout } from "@/lib/actions/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { auth } from "@/auth";
+import { getUserAvatar } from "@/app/services/users";
 
 export default async function Navbar() {
   const session = await auth();
-
+  const user = await getUserAvatar(Number(session?.user?.id));
   return (
     <nav>
       <ul className="flex justify-between gap-6 p-2 sm:p-4 sm:flex-col sm:justify-stretch sm:text-xl sm:h-svh lg:min-w-60">
@@ -31,10 +33,9 @@ export default async function Navbar() {
           <span className="hidden lg:block">Explore</span>
         </Navlink>
 
-        <li className="my-auto sm:my-[unset] sm:mt-auto flex justify-between py-2">
+        <li className="my-auto sm:my-[unset] sm:mt-auto flex justify-between px-4 py-2">
           <DropdownMenu>
             <DropdownMenuTrigger
-              className="flex lg:hidden"
               render={
                 <button
                   className={cn(
@@ -42,16 +43,13 @@ export default async function Navbar() {
                       variant: "ghost",
                       size: "icon",
                     }),
+                    "lg:hidden",
                   )}
                 >
                   <Avatar>
                     <AvatarImage
-                      src={session?.user?.image ?? "/images/defaultProfile.png"}
-                      alt={
-                        session?.user?.image
-                          ? "User Avatar"
-                          : "Default User Avatar"
-                      }
+                      src={user?.avatar ?? "/images/defaultProfile.png"}
+                      alt={user?.avatar ? "User Avatar" : "Default User Avatar"}
                     />
                     <AvatarFallback>
                       {session?.user?.name?.charAt(0).toUpperCase() ?? "U"}
@@ -64,7 +62,8 @@ export default async function Navbar() {
               <UserNameCard
                 className="flex"
                 to={`/${session?.user?.email}`}
-                fullname={`${session?.user?.name}`}
+                fullname={session!.user!.name!}
+                userAvatar={user?.avatar}
               />
               <DropdownMenuTrigger
                 render={
@@ -90,26 +89,27 @@ export default async function Navbar() {
                       className="flex items-center gap-1.5"
                     >
                       <BadgeCheck />
-                      Account
+                      Profile
                     </Link>
                   }
                 />
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem variant="destructive">
-                  <form
-                    action={async () => {
-                      "use server";
-                      await signOut({ redirectTo: "/login" });
-                    }}
-                  >
-                    <button className="flex items-center gap-1.5">
-                      <LogOut />
-                      Sign Out
-                    </button>
-                  </form>
-                </DropdownMenuItem>
+                <DropdownMenuItem
+                  variant="destructive"
+                  render={
+                    <form action={logout}>
+                      <button
+                        type="submit"
+                        className="flex items-center gap-1.5"
+                      >
+                        <LogOut />
+                        Sign Out
+                      </button>
+                    </form>
+                  }
+                />
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>

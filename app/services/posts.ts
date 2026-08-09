@@ -16,6 +16,7 @@ export async function getAllPostsByUserAndUsersFollowedByUser(userId: number) {
         username: users.username,
         firstName: users.firstName,
         lastName: users.lastName,
+        avatar: users.avatar,
       },
     })
     .from(posts)
@@ -32,7 +33,14 @@ export async function getLatestPosts() {
   return db.query.posts.findMany({
     orderBy: [desc(posts.createdAt)],
     with: {
-      users: { columns: { firstName: true, lastName: true, username: true } },
+      users: {
+        columns: {
+          firstName: true,
+          lastName: true,
+          username: true,
+          avatar: true,
+        },
+      },
     },
     extras: {
       commentsCount: sql<number>`(
@@ -58,11 +66,23 @@ export async function getPostByIdWithComments(id: number) {
   return db.query.posts.findFirst({
     where: eq(posts.id, id),
     with: {
-      users: { columns: { firstName: true, lastName: true, username: true } },
+      users: {
+        columns: {
+          firstName: true,
+          lastName: true,
+          username: true,
+          avatar: true,
+        },
+      },
       comments: {
         with: {
           users: {
-            columns: { firstName: true, lastName: true, username: true },
+            columns: {
+              firstName: true,
+              lastName: true,
+              username: true,
+              avatar: true,
+            },
           },
         },
         orderBy: [desc(comments.createdAt)],

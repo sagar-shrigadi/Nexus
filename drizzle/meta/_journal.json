@@ -85,6 +85,13 @@
       "when": 1785854824123,
       "tag": "0011_familiar_energizer",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1786084813824,
+      "tag": "0012_glamorous_reavers",
+      "breakpoints": true
     }
   ]
 }

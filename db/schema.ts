@@ -15,6 +15,7 @@ export const users = pgTable("users", {
   username: varchar("username", { length: 255 }).notNull().unique(),
   password: text("password").notNull(),
   bio: text("bio"),
+  avatar: text("avatar"),
   followers: integer("followers").notNull().default(0),
   following: integer("following").notNull().default(0),
 });
