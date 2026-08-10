@@ -72,7 +72,12 @@ export default async function UserPage({
                 </Avatar>
                 {Number(session?.user?.id) === user.id && (
                   <UploadAvatar
-                    user={{ id: user.id, username: user.username }}
+                    user={{
+                      id: user.id,
+                      username: user.username,
+                      avatarId: user.avatarId,
+                      avatar: user.avatar,
+                    }}
                   />
                 )}
               </div>

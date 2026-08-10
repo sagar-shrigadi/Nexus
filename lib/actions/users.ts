@@ -1,16 +1,14 @@
 "use server";
 
 import {
+  deleteUserAvatar,
   followUserTransaction,
   updateAvatarTransaction,
 } from "@/app/services/users";
 import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase";
+import type { ActionResult, UploadAvatar } from "@/lib/definitations";
 
-interface ActionResult {
-  status: "error";
-  message: string;
-}
 export async function userFollows(
   user: { id: number; username: string },
   userToFollow: { id: number; username: string },
@@ -32,11 +30,7 @@ export async function userFollows(
 export async function avatarUpload(
   user: { id: number; username: string },
   formData: FormData,
-): Promise<{
-  status: "success" | "error";
-  message?: string;
-  url?: string;
-}> {
+): Promise<UploadAvatar> {
   try {
     const file = formData.get("file") as File;
     if (!file || file.size === 0) {
@@ -104,4 +98,45 @@ export async function avatarUpload(
       message: "Error updating profile! Please try again!",
     };
   }
+}
+export async function deleteAvatar(user: {
+  id: number;
+  username: string;
+  avatarId: number | null;
+  avatar: {
+    fileName: string;
+    publicUrl: string;
+  } | null;
+}): Promise<ActionResult> {
+  if (!user.avatarId) {
+    return { status: "error", message: "Avatar doesn't exist!" };
+  }
+  // delete the avatar file from supabase storage
+  const { error } = await supabase.storage
+    .from("avatars")
+    .remove([user.avatar!.fileName]);
+  if (error) {
+    return {
+      status: "error",
+      message: error.message,
+    };
+  }
+  try {
+    // delete the db record
+    await deleteUserAvatar(user.avatarId);
+  } catch (error) {
+    console.error(error);
+    return {
+      status: "error",
+      message: "Unable to delete avatar! Please try again!",
+    };
+  }
+  revalidatePath("/");
+  revalidatePath("/explore");
+  revalidatePath(`/${user.username}`);
+  revalidatePath(`/${user.username}/status`);
+  return {
+    status: "success",
+    message: "Profile successfully updated!",
+  };
 }

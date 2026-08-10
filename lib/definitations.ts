@@ -1,4 +1,4 @@
-interface ActionResult {
+export interface ActionResult {
   status: "success" | "error";
   message?: string;
 }
@@ -12,4 +12,7 @@ export interface PostAction extends ActionResult {
     title?: string[];
     content?: string[];
   };
+}
+export interface UploadAvatar extends ActionResult {
+  url?: string;
 }

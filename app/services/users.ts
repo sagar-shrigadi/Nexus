@@ -137,11 +137,11 @@ export async function getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(
   username: string,
 ) {
   return db.query.users.findFirst({
-    columns: { password: false, avatarId: false },
+    columns: { password: false },
     where: eq(users.username, username),
     with: {
       avatar: {
-        columns: { publicUrl: true },
+        columns: { publicUrl: true, fileName: true },
       },
       posts: {
         columns: { userId: false },
@@ -286,4 +286,7 @@ export async function getUserAvatar(userId: number) {
     where: eq(users.id, userId),
     with: { avatar: { columns: { publicUrl: true } } },
   });
+}
+export async function deleteUserAvatar(avatarId: number) {
+  return db.delete(avatars).where(eq(avatars.id, avatarId));
 }

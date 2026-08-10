@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { avatarUpload } from "@/lib/actions/users";
+import { avatarUpload, deleteAvatar } from "@/lib/actions/users";
 import {
   Dialog,
   DialogClose,
@@ -31,18 +31,27 @@ export default function UploadAvatar({
   user: {
     id: number;
     username: string;
+    avatarId: number | null;
+    avatar: {
+      fileName: string;
+      publicUrl: string;
+    } | null;
   };
 }) {
   const { update } = useSession();
   const [openDialog, setOpenDialog] = useState(false);
-  const [isPending, setIsPending] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [disableDelete, setDisableDelete] = useState(
+    user.avatarId ? false : true,
+  );
+  const [isDeleting, setIsDeleting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage(null);
-    setIsPending(true);
+    setIsUploading(true);
 
     if (!formRef.current) return;
     // Wrap file into standard browser FormData
@@ -55,14 +64,14 @@ export default function UploadAvatar({
         description: "No file selected!",
       });
       setErrorMessage("Please select a file to upload.");
-      setIsPending(false);
+      setIsUploading(false);
       return;
     }
 
     // Dispatch directly to the Server Action
     const result = await avatarUpload(user, formData);
 
-    setIsPending(false);
+    setIsUploading(false);
 
     if (result.status === "error") {
       toast.add({
@@ -80,13 +89,50 @@ export default function UploadAvatar({
       // close the modal
       setOpenDialog(false);
 
+      // enable the delete avatar button
+      setDisableDelete(false);
       // update the session object with profile avatar
       await update({
         image: result.url,
       });
 
       toast.add({
-        type: "sucess",
+        type: "success",
+        description: result.message,
+      });
+    }
+  };
+  const handleDelete = async () => {
+    setErrorMessage(null);
+    setDisableDelete(true);
+    setIsDeleting(true);
+
+    // call the server action to initiate the user avatar deletion
+    const result = await deleteAvatar(user);
+
+    if (result.status === "error") {
+      setErrorMessage(result.message!);
+      setDisableDelete(false);
+      setIsDeleting(false);
+      toast.add({
+        type: "error",
+        description: result.message,
+      });
+    } else {
+      setErrorMessage(null);
+
+      // disable the delete avatar button
+      setDisableDelete(true);
+
+      setIsDeleting(false);
+      setOpenDialog(false);
+
+      // update the session object with profile avatar
+      await update({
+        image: null,
+      });
+      toast.add({
+        type: "success",
         description: result.message,
       });
     }
@@ -117,8 +163,8 @@ export default function UploadAvatar({
                 name="file"
                 type="file"
                 accept="image/jpeg, image/png, image/webp, image/gif"
-                disabled={isPending}
-                aria-disabled={isPending}
+                disabled={isUploading}
+                aria-disabled={isUploading}
               />
               {errorMessage ? (
                 <FieldError aria-atomic="true">{errorMessage}</FieldError>
@@ -129,14 +175,25 @@ export default function UploadAvatar({
               )}
             </Field>
             <DialogFooter>
+              <Button
+                onClick={handleDelete}
+                type="button"
+                variant="destructive"
+                disabled={disableDelete}
+                aria-disabled={disableDelete}
+                className="mr-auto"
+              >
+                {isDeleting ? "Deleting" : "Delete"}
+                {isDeleting && <Spinner data-icon="inline-end" />}
+              </Button>
               <DialogClose render={<Button variant="outline">Cancel</Button>} />
               <Button
                 type="submit"
-                disabled={isPending}
-                aria-disabled={isPending}
+                disabled={isUploading}
+                aria-disabled={isUploading}
               >
-                {isPending ? "Updating" : "Update"}
-                {isPending && <Spinner data-icon="inline-end" />}
+                {isUploading ? "Updating" : "Update"}
+                {isUploading && <Spinner data-icon="inline-end" />}
               </Button>
             </DialogFooter>
           </form>
