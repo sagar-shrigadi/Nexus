@@ -17,7 +17,9 @@ export default function PostCard({
       username: string;
       firstName: string;
       lastName: string;
-      avatar: string | null;
+      avatar: {
+        publicUrl: string;
+      } | null;
     };
   };
 }) {

@@ -23,7 +23,7 @@ export default function EditPostForm({
     title: string;
     content: string;
     userId: number;
-    user: {
+    users: {
       username: string;
     };
   };
@@ -31,7 +31,7 @@ export default function EditPostForm({
   const updatePostWithId = updatePost.bind(null, {
     id: post.id,
     userId: post.userId,
-    user: { ...post.user },
+    user: post.users,
   });
   const [result, formAction, isPending] = useActionState(
     updatePostWithId,

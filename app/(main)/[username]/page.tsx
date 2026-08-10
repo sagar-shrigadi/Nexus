@@ -58,8 +58,12 @@ export default async function UserPage({
               <div className="flex">
                 <Avatar className="size-30">
                   <AvatarImage
-                    src={user.avatar ?? "/images/defaultProfile.png"}
-                    alt={user.avatar ? "User Avatar" : "Default User Avatar"}
+                    src={user.avatar?.publicUrl ?? "/images/defaultProfile.png"}
+                    alt={
+                      user.avatar?.publicUrl
+                        ? "User Avatar"
+                        : "Default User Avatar"
+                    }
                     className="object-cover rounded-[4%]"
                   />
                   <AvatarFallback className="rounded-[4%]">

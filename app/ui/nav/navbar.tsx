@@ -48,8 +48,14 @@ export default async function Navbar() {
                 >
                   <Avatar>
                     <AvatarImage
-                      src={user?.avatar ?? "/images/defaultProfile.png"}
-                      alt={user?.avatar ? "User Avatar" : "Default User Avatar"}
+                      src={
+                        user?.avatar?.publicUrl ?? "/images/defaultProfile.png"
+                      }
+                      alt={
+                        user?.avatar?.publicUrl
+                          ? "User Avatar"
+                          : "Default User Avatar"
+                      }
                     />
                     <AvatarFallback>
                       {session?.user?.name?.charAt(0).toUpperCase() ?? "U"}
@@ -63,7 +69,7 @@ export default async function Navbar() {
                 className="flex"
                 to={`/${session?.user?.email}`}
                 fullname={session!.user!.name!}
-                userAvatar={user?.avatar}
+                userAvatar={user?.avatar?.publicUrl}
               />
               <DropdownMenuTrigger
                 render={

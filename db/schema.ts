@@ -15,9 +15,17 @@ export const users = pgTable("users", {
   username: varchar("username", { length: 255 }).notNull().unique(),
   password: text("password").notNull(),
   bio: text("bio"),
-  avatar: text("avatar"),
+  avatarId: integer("avatar_id").references(() => avatars.id, {
+    onDelete: "set null",
+  }),
   followers: integer("followers").notNull().default(0),
   following: integer("following").notNull().default(0),
+});
+
+export const avatars = pgTable("avatars", {
+  id: integer("id").notNull().primaryKey().generatedAlwaysAsIdentity(),
+  fileName: text("file_name").notNull().unique(),
+  publicUrl: text("publicUrl").notNull(),
 });
 
 export const posts = pgTable("posts", {
@@ -93,13 +101,20 @@ export const userFollows = pgTable(
   (table) => [unique("unique_user_follows").on(table.userId, table.follows)],
 );
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
   posts: many(posts),
   comments: many(comments),
   likedPosts: many(postLikes),
   likedComments: many(commentLikes),
   followers: many(userFollows, { relationName: "following" }),
   following: many(userFollows, { relationName: "follower" }),
+  avatar: one(avatars, {
+    fields: [users.avatarId],
+    references: [avatars.id],
+  }),
+}));
+export const avatarsRelations = relations(avatars, ({ one }) => ({
+  user: one(users),
 }));
 export const userFollowsRelations = relations(userFollows, ({ one }) => ({
   followers: one(users, {

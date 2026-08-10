@@ -1,5 +1,6 @@
 import { db } from "@/db";
-import { comments, posts, userFollows, users } from "@/db/schema";
+import { avatars, comments, posts, userFollows, users } from "@/db/schema";
+import { supabase } from "@/lib/supabase";
 import { and, desc, eq, not, sql } from "drizzle-orm";
 
 export async function getRandomUsersExcludingUser(userId: number) {
@@ -34,6 +35,14 @@ export async function getUserWithPostsByUsername(username: string) {
 }
 export async function getUser(username: string) {
   return db.query.users.findFirst({
+    columns: {
+      id: true,
+      username: true,
+      password: true,
+      firstName: true,
+      lastName: true,
+    },
+    with: { avatar: { columns: { publicUrl: true } } },
     where: eq(users.username, username),
   });
 }
@@ -128,15 +137,18 @@ export async function getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(
   username: string,
 ) {
   return db.query.users.findFirst({
-    columns: { password: false },
+    columns: { password: false, avatarId: false },
     where: eq(users.username, username),
     with: {
+      avatar: {
+        columns: { publicUrl: true },
+      },
       posts: {
         columns: { userId: false },
         extras: {
           commentsCount: sql<number>`(
-            SELECT COUNT(*) 
-            FROM ${comments} 
+            SELECT COUNT(*)
+            FROM ${comments}
             WHERE ${comments}.post_id = ${posts.id}
           )`
             .mapWith(Number)
@@ -158,7 +170,11 @@ export async function getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(
                   username: true,
                   firstName: true,
                   lastName: true,
-                  avatar: true,
+                },
+                with: {
+                  avatar: {
+                    columns: { publicUrl: true },
+                  },
                 },
               },
             },
@@ -185,7 +201,11 @@ export async function getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(
                   username: true,
                   firstName: true,
                   lastName: true,
-                  avatar: true,
+                },
+                with: {
+                  avatar: {
+                    columns: { publicUrl: true },
+                  },
                 },
               },
             },
@@ -212,15 +232,58 @@ export async function getIdsOfAllLikedPostsAndLikedCommentsByUser(
     },
   });
 }
-export async function updateAvatar(userId: number, avatarUrl: string) {
-  return db
-    .update(users)
-    .set({ avatar: avatarUrl })
-    .where(eq(users.id, userId));
+export async function updateAvatarTransaction(
+  userId: number,
+  fileName: string,
+  publicUrl: string,
+) {
+  return db.transaction(async (tx) => {
+    // get the current user avatar id
+    const user = await tx.query.users.findFirst({
+      columns: { avatarId: true },
+      with: {
+        avatar: { columns: { fileName: true } },
+      },
+      where: eq(users.id, userId),
+    });
+
+    if (!user) throw new Error("User does not exist!");
+    if (user.avatarId) {
+      // user avatar exists then
+      // delete the previous avatar file supabase storage
+      const { error } = await supabase.storage
+        .from("avatars")
+        .remove([user.avatar!.fileName]);
+
+      if (error === null) {
+        // update the avatar from avatars table
+        await tx
+          .update(avatars)
+          .set({ fileName, publicUrl })
+          .where(eq(avatars.id, user.avatarId));
+      } else {
+        throw error;
+      }
+    } else {
+      // user avatar doesn't exist
+      // create new record in avatars table
+      const [newAvatar] = await tx
+        .insert(avatars)
+        .values({ fileName, publicUrl })
+        .returning();
+
+      // update the users table and with the id retrived from above
+      await tx
+        .update(users)
+        .set({ avatarId: newAvatar.id })
+        .where(eq(users.id, userId));
+    }
+  });
 }
 export async function getUserAvatar(userId: number) {
   return db.query.users.findFirst({
-    columns: { avatar: true },
+    columns: {},
     where: eq(users.id, userId),
+    with: { avatar: { columns: { publicUrl: true } } },
   });
 }

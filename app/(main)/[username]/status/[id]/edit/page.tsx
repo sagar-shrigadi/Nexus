@@ -14,17 +14,5 @@ export default async function EditPost({
     notFound();
   }
 
-  return (
-    <EditPostForm
-      post={{
-        id: post.id,
-        title: post.title,
-        content: post.content,
-        userId: post.userId,
-        user: {
-          username: post.users.username,
-        },
-      }}
-    />
-  );
+  return <EditPostForm post={post} />;
 }

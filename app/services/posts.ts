@@ -1,33 +1,38 @@
 import { db } from "@/db";
-import { comments, postLikes, posts, userFollows, users } from "@/db/schema";
+import { comments, postLikes, posts, userFollows } from "@/db/schema";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 
 export async function getAllPostsByUserAndUsersFollowedByUser(userId: number) {
-  return db
-    .select({
-      id: posts.id,
-      title: posts.title,
-      content: posts.content,
-      createdAt: posts.createdAt,
-      userId: posts.userId,
-      likes: posts.likes,
-      commentsCount: sql<number>`(SELECT COUNT(*) FROM ${comments} WHERE ${comments.postId} = ${posts.id})`,
+  return db.query.posts.findMany({
+    with: {
       users: {
-        username: users.username,
-        firstName: users.firstName,
-        lastName: users.lastName,
-        avatar: users.avatar,
+        columns: {
+          username: true,
+          firstName: true,
+          lastName: true,
+        },
+        with: {
+          avatar: {
+            columns: { publicUrl: true },
+          },
+        },
       },
-    })
-    .from(posts)
-    .innerJoin(users, eq(posts.userId, users.id))
-    .where(
-      or(
-        eq(posts.userId, userId),
-        sql`${posts.userId} in (SELECT ${userFollows.follows} FROM ${userFollows} WHERE ${userFollows.userId} = ${userId})`,
-      ),
-    )
-    .orderBy(desc(posts.createdAt));
+    },
+    where: or(
+      eq(posts.userId, userId),
+      sql`${posts.userId} in (SELECT ${userFollows}.follows FROM ${userFollows} WHERE ${userFollows.userId} = ${userId})`,
+    ),
+    extras: {
+      commentsCount: sql<number>`(
+        SELECT COUNT(*) 
+        FROM ${comments} 
+        WHERE ${comments}.post_id = ${posts.id}
+      )`
+        .mapWith(Number)
+        .as("comment_count"),
+    },
+    orderBy: [desc(posts.createdAt)],
+  });
 }
 export async function getLatestPosts() {
   return db.query.posts.findMany({
@@ -38,7 +43,13 @@ export async function getLatestPosts() {
           firstName: true,
           lastName: true,
           username: true,
-          avatar: true,
+        },
+        with: {
+          avatar: {
+            columns: {
+              publicUrl: true,
+            },
+          },
         },
       },
     },
@@ -53,11 +64,14 @@ export async function getLatestPosts() {
     },
   });
 }
-export async function getPostById(id: number) {
+export async function getPostById(postId: number) {
   return db.query.posts.findFirst({
-    where: eq(posts.id, id),
+    columns: { id: true, title: true, content: true, userId: true },
+    where: eq(posts.id, postId),
     with: {
-      users: { columns: { firstName: true, lastName: true, username: true } },
+      users: {
+        columns: { username: true },
+      },
     },
   });
 }
@@ -71,7 +85,11 @@ export async function getPostByIdWithComments(id: number) {
           firstName: true,
           lastName: true,
           username: true,
-          avatar: true,
+        },
+        with: {
+          avatar: {
+            columns: { publicUrl: true },
+          },
         },
       },
       comments: {
@@ -81,7 +99,11 @@ export async function getPostByIdWithComments(id: number) {
               firstName: true,
               lastName: true,
               username: true,
-              avatar: true,
+            },
+            with: {
+              avatar: {
+                columns: { publicUrl: true },
+              },
             },
           },
         },

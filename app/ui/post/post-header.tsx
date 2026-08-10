@@ -12,7 +12,9 @@ export default async function PostHeader({
       firstName: string;
       lastName: string;
       username: string;
-      avatar: string | null;
+      avatar: {
+        publicUrl: string;
+      } | null;
     };
   };
 }) {
@@ -23,7 +25,7 @@ export default async function PostHeader({
         className="flex"
         to={`/${post.users.username}`}
         fullname={`${post.users.firstName} ${post.users.lastName}`}
-        userAvatar={post.users.avatar}
+        userAvatar={post.users.avatar?.publicUrl}
       />
       {post.userId === Number(session?.user?.id) && (
         <PostOptions

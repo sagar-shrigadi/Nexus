@@ -1,6 +1,9 @@
 "use server";
 
-import { followUserTransaction, updateAvatar } from "@/app/services/users";
+import {
+  followUserTransaction,
+  updateAvatarTransaction,
+} from "@/app/services/users";
 import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase";
 
@@ -82,7 +85,7 @@ export async function avatarUpload(
       .getPublicUrl(data.path);
 
     // update the user in db
-    await updateAvatar(user.id, urlData.publicUrl);
+    await updateAvatarTransaction(user.id, filePath, urlData.publicUrl);
 
     revalidatePath("/");
     revalidatePath("/explore");
