@@ -290,3 +290,6 @@ export async function getUserAvatar(userId: number) {
 export async function deleteUserAvatar(avatarId: number) {
   return db.delete(avatars).where(eq(avatars.id, avatarId));
 }
+export async function updateUserBio(userId: number, bio: string) {
+  return db.update(users).set({ bio }).where(eq(users.id, userId));
+}

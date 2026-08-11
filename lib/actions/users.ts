@@ -4,10 +4,13 @@ import {
   deleteUserAvatar,
   followUserTransaction,
   updateAvatarTransaction,
+  updateUserBio,
 } from "@/app/services/users";
 import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase";
-import type { ActionResult, UploadAvatar } from "@/lib/definitations";
+import type { ActionResult, UploadAvatar, UserBio } from "@/lib/definitations";
+import z from "zod";
+import { auth } from "@/auth";
 
 export async function userFollows(
   user: { id: number; username: string },
@@ -135,6 +138,39 @@ export async function deleteAvatar(user: {
   revalidatePath("/explore");
   revalidatePath(`/${user.username}`);
   revalidatePath(`/${user.username}/status`);
+  return {
+    status: "success",
+    message: "Profile successfully updated!",
+  };
+}
+
+const UserBioSchema = z.object({
+  bio: z.string().trim().min(1, "Bio is required"),
+});
+export async function updateBio(formData: FormData): Promise<UserBio> {
+  const session = await auth();
+  const validatedBio = UserBioSchema.safeParse(
+    Object.fromEntries(formData.entries()),
+  );
+
+  if (!validatedBio.success) {
+    return {
+      status: "error",
+      errors: z.flattenError(validatedBio.error).fieldErrors,
+    };
+  }
+  const { bio: newUserBio } = validatedBio.data;
+
+  try {
+    await updateUserBio(Number(session?.user?.id), newUserBio);
+  } catch (error) {
+    console.error(error);
+    return {
+      status: "error",
+      message: "Failed to updated profile! Please try again!",
+    };
+  }
+  revalidatePath(`/${session?.user?.email}`);
   return {
     status: "success",
     message: "Profile successfully updated!",

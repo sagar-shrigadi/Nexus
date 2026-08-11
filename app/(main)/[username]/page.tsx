@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CommentCard from "@/app/ui/comment/comment-card";
 import EmptyListTemplate from "@/app/ui/empty-list-template";
 import UploadAvatar from "@/app/ui/user/upload-user-avatar";
+import UserBioCard from "@/app/ui/user/user-bio-card";
 
 export default async function UserPage({
   params,
@@ -99,7 +100,11 @@ export default async function UserPage({
               <h2 className="text-xl md:text-2xl font-bold">{`${user.firstName} ${user.lastName}`}</h2>
               <p className="text-lg text-sidebar-ring">@{user.username}</p>
             </div>
-            <div className="text-lg">{user.bio}</div>
+            {session?.user?.email === username ? (
+              <UserBioCard userBio={user.bio} />
+            ) : (
+              <div className="text-lg">{user.bio}</div>
+            )}
             <div className="flex items-center gap-4">
               <span>{user.following} following</span>
               <span>{user.followers} followers</span>

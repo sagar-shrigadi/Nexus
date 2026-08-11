@@ -16,3 +16,8 @@ export interface PostAction extends ActionResult {
 export interface UploadAvatar extends ActionResult {
   url?: string;
 }
+export interface UserBio extends ActionResult {
+  errors?: {
+    bio?: string[];
+  };
+}
