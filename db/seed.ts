@@ -8,6 +8,7 @@ import {
   postLikes,
   commentLikes,
   userFollows,
+  avatars,
 } from "@/db/schema";
 import bcrypt from "bcryptjs";
 
@@ -20,19 +21,39 @@ const MAX_FOLLOWS_PER_USER = 8;
 const POST_LIKE_CHANCE = 0.4; // chance a given user likes a given post
 const COMMENT_LIKE_CHANCE = 0.3;
 
-async function seedUsers() {
+async function seedUserAvatars() {
+  const rows = [];
+
+  while (rows.length < NUM_USERS / 2) {
+    rows.push({
+      fileName: `${faker.string.uuid()}.jpg`,
+      publicUrl: faker.image.avatarGitHub(),
+    });
+  }
+  return db.insert(avatars).values(rows).returning({ id: avatars.id });
+}
+
+type SeedUsersPreview = Omit<
+  typeof users.$inferSelect,
+  "id" | "followers" | "following"
+>[];
+type SeededAvatars = Pick<typeof avatars.$inferSelect, "id">;
+
+async function seedUsers(seededAvatars: SeededAvatars[]) {
   const usernamesSeen = new Set<string>();
   const guestUserPass = await bcrypt.hash("12345678", 10);
-  const rows = [
+  const rows: SeedUsersPreview = [
     {
       firstName: "Guest",
       lastName: "User",
       username: "Guest123",
       password: guestUserPass,
       bio: "Default Bio",
+      avatarId: null,
     },
   ];
 
+  let avatarIndex = 0;
   while (rows.length < NUM_USERS) {
     const username = faker.internet.username();
     if (usernamesSeen.has(username)) continue; // avoid unique constraint collision
@@ -49,6 +70,7 @@ async function seedUsers() {
       username,
       password,
       bio: faker.person.bio(),
+      avatarId: rows.length % 2 === 0 ? seededAvatars[avatarIndex++].id : null,
     });
   }
 
@@ -216,8 +238,11 @@ async function seedUserFollows(seededUsers: (typeof users.$inferSelect)[]) {
 }
 
 async function seed() {
+  console.log("Seeding user avatars...");
+  const seededAvatars = await seedUserAvatars();
+
   console.log("Seeding users...");
-  const seededUsers = await seedUsers();
+  const seededUsers = await seedUsers(seededAvatars);
 
   console.log("Seeding posts...");
   const seededPosts = await seedPosts(seededUsers);
