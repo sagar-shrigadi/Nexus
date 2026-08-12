@@ -1,8 +1,13 @@
 import { db } from "@/db";
 import { comments, postLikes, posts, userFollows } from "@/db/schema";
-import { and, desc, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
 
 export async function getAllPostsByUserAndUsersFollowedByUser(userId: number) {
+  const userIdFollowedByUser = await db.query.userFollows.findMany({
+    columns: { follows: true },
+    where: eq(userFollows.userId, userId),
+  });
+  const userIdArrays = userIdFollowedByUser.map((u) => u.follows);
   return db.query.posts.findMany({
     with: {
       users: {
@@ -18,10 +23,7 @@ export async function getAllPostsByUserAndUsersFollowedByUser(userId: number) {
         },
       },
     },
-    where: or(
-      eq(posts.userId, userId),
-      sql`${posts.userId} in (SELECT ${userFollows}.follows FROM ${userFollows} WHERE ${userFollows.userId} = ${userId})`,
-    ),
+    where: or(eq(posts.userId, userId), inArray(posts.userId, userIdArrays)),
     extras: {
       commentsCount: sql<number>`(
         SELECT COUNT(*) 
