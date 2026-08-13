@@ -36,6 +36,9 @@ export const posts = pgTable("posts", {
   userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
+  mediaId: integer("media_id").references(() => media.id, {
+    onDelete: "cascade",
+  }),
   likes: integer("likes").notNull().default(0),
 });
 
@@ -101,6 +104,12 @@ export const userFollows = pgTable(
   (table) => [unique("unique_user_follows").on(table.userId, table.follows)],
 );
 
+export const media = pgTable("media", {
+  id: integer("id").notNull().primaryKey().generatedAlwaysAsIdentity(),
+  fileName: text("file_name").notNull().unique(),
+  publicUrl: text("public_url").notNull(),
+});
+
 export const usersRelations = relations(users, ({ many, one }) => ({
   posts: many(posts),
   comments: many(comments),
@@ -135,6 +144,10 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
   }),
   comments: many(comments),
   likes: many(postLikes),
+  media: one(media, {
+    fields: [posts.mediaId],
+    references: [media.id],
+  }),
 }));
 export const postLikesRelations = relations(postLikes, ({ one }) => ({
   users: one(users, {
@@ -170,4 +183,7 @@ export const commentLikesRelations = relations(commentLikes, ({ one }) => ({
     fields: [commentLikes.commentId],
     references: [comments.id],
   }),
+}));
+export const mediaRelations = relations(media, ({ one }) => ({
+  posts: one(posts),
 }));

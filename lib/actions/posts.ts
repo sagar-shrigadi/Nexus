@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { auth } from "@/auth";
 import {
+  deleteMediaPostByFileName,
   deletePostById,
   editPostById,
   likePostTransaction,
@@ -11,10 +12,12 @@ import {
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { PostAction } from "@/lib/definitations";
+import { supabase } from "@/lib/supabase";
 
 const PostSchema = z.object({
   title: z.string().trim().min(1, "Post Title is required."),
   content: z.string().trim().min(1, "Post Content is required."),
+  file: z.file().optional(),
 });
 
 export async function createPost(
@@ -32,23 +35,76 @@ export async function createPost(
       errors: z.flattenError(validatedPost.error).fieldErrors,
     };
   }
-  const { title, content } = validatedPost.data;
+  const { title, content, file } = validatedPost.data;
+  // if file doesnt exist, file size is 0 in that case
+  if (!file || file.size === 0) {
+    try {
+      await newPost(Number(session?.user?.id), title, content, null);
+      revalidatePath("/");
+      revalidatePath("/explore");
+      revalidatePath(`/${session?.user?.email}`);
+      return {
+        status: "success",
+        message: "Post successfully created!",
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        status: "error",
+        message: "Post could not be created! Please try again!",
+      };
+    }
+  } else {
+    // file exists here
+    if (file.size > 3 * 1024 * 1024) {
+      return {
+        status: "error",
+        message: "File size too large! (MAX 3MB).",
+      };
+    }
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return {
+        status: "error",
+        message: "Invalid format. Only JPEG, PNG, WEBP are allowed.",
+      };
+    }
+    // 2. Parse binary stream and build unique name to avoid system overrides
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    const field = crypto.randomUUID();
+    const filePath = `${field}-${file.name}`;
+    // 3. Admin bypass upload into your public storage container
+    const { data, error } = await supabase.storage
+      .from("media")
+      .upload(filePath, fileBuffer, {
+        contentType: file.type,
+        upsert: false, // Prevent file overwriting
+      });
 
-  try {
-    await newPost(Number(session?.user?.id), title, content);
-    revalidatePath("/");
-    revalidatePath("/explore");
-    revalidatePath(`/${session?.user?.email}`);
-    return {
-      status: "success",
-      message: "Post successfully created!",
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      status: "error",
-      message: "Post could not be created! Please try again!",
-    };
+    if (error) return { status: "error", message: error.message };
+    // 4. Synchronously retrieve CDN link string
+    const { data: urlData } = supabase.storage
+      .from("media")
+      .getPublicUrl(data.path);
+    try {
+      await newPost(Number(session?.user?.id), title, content, {
+        fileName: data.path,
+        publicUrl: urlData.publicUrl,
+      });
+      revalidatePath("/");
+      revalidatePath("/explore");
+      revalidatePath(`/${session?.user?.email}`);
+      return {
+        status: "success",
+        message: "Post successfully created!",
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        status: "error",
+        message: "Post could not be created! Please try again!",
+      };
+    }
   }
 }
 export async function updatePost(
@@ -96,6 +152,10 @@ export async function deletePost(
     users: {
       username: string;
     };
+    media: {
+      fileName: string;
+      publicUrl: string;
+    } | null;
   },
   shouldRedirect: boolean,
 ): Promise<PostAction | undefined> {
@@ -106,17 +166,38 @@ export async function deletePost(
       message: "You are not authorized to delete this post!",
     };
   }
-  try {
-    await deletePostById(post.id);
-    revalidatePath("/");
-    revalidatePath("/explore");
-    revalidatePath(`/${post.users.username}`);
-  } catch (error) {
-    console.error(error);
-    return {
-      status: "error",
-      message: "Post could not be deleted! Please try again!",
-    };
+
+  if (post.media != null) {
+    const { error } = await supabase.storage
+      .from("media")
+      .remove([post.media.fileName]);
+
+    if (error) return { status: "error", message: error.message };
+    try {
+      await deleteMediaPostByFileName(post.media.fileName);
+      revalidatePath("/");
+      revalidatePath("/explore");
+      revalidatePath(`/${post.users.username}`);
+    } catch (error) {
+      console.error(error);
+      return {
+        status: "error",
+        message: "Post could not be deleted! Please try again!",
+      };
+    }
+  } else {
+    try {
+      await deletePostById(post.id);
+      revalidatePath("/");
+      revalidatePath("/explore");
+      revalidatePath(`/${post.users.username}`);
+    } catch (error) {
+      console.error(error);
+      return {
+        status: "error",
+        message: "Post could not be deleted! Please try again!",
+      };
+    }
   }
   if (shouldRedirect) {
     redirect("/", "replace");

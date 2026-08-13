@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { comments, postLikes, posts, userFollows } from "@/db/schema";
+import { comments, media, postLikes, posts, userFollows } from "@/db/schema";
 import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
 
 export async function getAllPostsByUserAndUsersFollowedByUser(userId: number) {
@@ -21,6 +21,9 @@ export async function getAllPostsByUserAndUsersFollowedByUser(userId: number) {
             columns: { publicUrl: true },
           },
         },
+      },
+      media: {
+        columns: { fileName: true, publicUrl: true },
       },
     },
     where: or(eq(posts.userId, userId), inArray(posts.userId, userIdArrays)),
@@ -54,6 +57,9 @@ export async function getLatestPosts() {
           },
         },
       },
+      media: {
+        columns: { fileName: true, publicUrl: true },
+      },
     },
     extras: {
       commentsCount: sql<number>`(
@@ -68,11 +74,20 @@ export async function getLatestPosts() {
 }
 export async function getPostById(postId: number) {
   return db.query.posts.findFirst({
-    columns: { id: true, title: true, content: true, userId: true },
+    columns: {
+      id: true,
+      title: true,
+      content: true,
+      userId: true,
+      mediaId: true,
+    },
     where: eq(posts.id, postId),
     with: {
       users: {
         columns: { username: true },
+      },
+      media: {
+        columns: { fileName: true, publicUrl: true },
       },
     },
   });
@@ -93,6 +108,9 @@ export async function getPostByIdWithComments(id: number) {
             columns: { publicUrl: true },
           },
         },
+      },
+      media: {
+        columns: { fileName: true, publicUrl: true },
       },
       comments: {
         with: {
@@ -123,11 +141,31 @@ export async function getPostByIdWithComments(id: number) {
     },
   });
 }
-export async function newPost(userId: number, title: string, content: string) {
+export async function newPost(
+  userId: number,
+  title: string,
+  content: string,
+  file: { fileName: string; publicUrl: string } | null,
+) {
+  if (file != null) {
+    const [mediaId] = await db
+      .insert(media)
+      .values({ fileName: file.fileName, publicUrl: file.publicUrl })
+      .returning({ id: media.id });
+    return db.insert(posts).values({
+      title,
+      content,
+      userId,
+      mediaId: mediaId.id,
+    });
+  }
   return db.insert(posts).values({ title, content, userId });
 }
 export async function deletePostById(postId: number) {
   return db.delete(posts).where(eq(posts.id, postId));
+}
+export async function deleteMediaPostByFileName(fileName: string) {
+  return db.delete(media).where(eq(media.fileName, fileName));
 }
 export async function editPostById(
   postId: number,

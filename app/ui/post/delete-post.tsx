@@ -15,6 +15,10 @@ export default function DeletePost({
     users: {
       username: string;
     };
+    media: {
+      fileName: string;
+      publicUrl: string;
+    } | null;
   };
 }) {
   const pathname = usePathname();

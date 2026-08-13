@@ -145,6 +145,11 @@ export async function getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(
       },
       posts: {
         columns: { userId: false },
+        with: {
+          media: {
+            columns: { fileName: true, publicUrl: true },
+          },
+        },
         extras: {
           commentsCount: sql<number>`(
             SELECT COUNT(*)
@@ -176,6 +181,9 @@ export async function getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(
                     columns: { publicUrl: true },
                   },
                 },
+              },
+              media: {
+                columns: { fileName: true, publicUrl: true },
               },
             },
             extras: {

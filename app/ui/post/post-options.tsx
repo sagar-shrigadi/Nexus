@@ -24,6 +24,10 @@ export default function PostOptions({
     users: {
       username: string;
     };
+    media: {
+      fileName: string;
+      publicUrl: string;
+    } | null;
   };
 }) {
   return (

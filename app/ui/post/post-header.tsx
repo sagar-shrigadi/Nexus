@@ -16,6 +16,10 @@ export default async function PostHeader({
         publicUrl: string;
       } | null;
     };
+    media: {
+      fileName: string;
+      publicUrl: string;
+    } | null;
   };
 }) {
   const session = await auth();
@@ -34,6 +38,7 @@ export default async function PostHeader({
             id: post.id,
             userId: post.userId,
             users: { username: post.users.username },
+            media: post.media,
           }}
         />
       )}

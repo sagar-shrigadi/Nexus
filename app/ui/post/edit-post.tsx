@@ -14,6 +14,8 @@ import { updatePost } from "@/lib/actions/posts";
 import { useActionState, useEffect } from "react";
 import BackButton from "../button/back-button";
 import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 export default function EditPostForm({
   post,
@@ -23,9 +25,14 @@ export default function EditPostForm({
     title: string;
     content: string;
     userId: number;
+    mediaId: number | null;
     users: {
       username: string;
     };
+    media: {
+      fileName: string;
+      publicUrl: string;
+    } | null;
   };
 }) {
   const updatePostWithId = updatePost.bind(null, {
@@ -85,6 +92,20 @@ export default function EditPostForm({
               <FieldError>{result.errors.content}</FieldError>
             )}
           </Field>
+          {post.media && (
+            <Image
+              src={post.media.publicUrl}
+              alt={post.content}
+              width={250}
+              height={150}
+              className={cn(
+                post.mediaId ? "block" : "hidden",
+                "mx-auto object-cover w-auto h-[400]",
+              )}
+              unoptimized
+              loading="eager"
+            />
+          )}
           <Field className="w-fit ml-auto">
             <Button
               type="submit"

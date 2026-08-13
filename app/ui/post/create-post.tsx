@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { createPost } from "@/lib/actions/posts";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,9 +14,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Session } from "next-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/components/ui/toast";
+import { ImageIcon } from "lucide-react";
 
 export default function CreatePost({ session }: { session: Session | null }) {
   const [result, formAction, isPending] = useActionState(createPost, undefined);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      fileInputRef.current?.click();
+    }
+  };
 
   useEffect(() => {
     if (!result) return;
@@ -69,6 +78,26 @@ export default function CreatePost({ session }: { session: Session | null }) {
               {result?.errors?.content && (
                 <FieldError>{result.errors.content}</FieldError>
               )}
+            </Field>
+            <Field className="w-fit">
+              <FieldLabel
+                htmlFor="file"
+                className="cursor-pointer hover:bg-sidebar-accent rounded transition-colors p-1.5"
+                tabIndex={0}
+                onKeyDown={handleKeyDown}
+                role="button"
+                aria-label="Upload image"
+              >
+                <ImageIcon />
+              </FieldLabel>
+              <Input
+                ref={fileInputRef}
+                type="file"
+                id="file"
+                name="file"
+                accept="image/jpeg, image/png, image/webp"
+                className="hidden"
+              />
             </Field>
             <Field className="w-fit ml-auto">
               <Button

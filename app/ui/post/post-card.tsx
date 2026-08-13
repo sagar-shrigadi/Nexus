@@ -10,6 +10,7 @@ export default function PostCard({
     content: string;
     createdAt: Date;
     userId: number;
+    mediaId: number | null;
     likes: number;
     commentsCount: number;
     isLiked: boolean;
@@ -21,6 +22,10 @@ export default function PostCard({
         publicUrl: string;
       } | null;
     };
+    media: {
+      fileName: string;
+      publicUrl: string;
+    } | null;
   };
 }) {
   return (
@@ -32,6 +37,7 @@ export default function PostCard({
           users: {
             ...post.users,
           },
+          media: post.media,
         }}
       />
       <PostContent
@@ -43,9 +49,11 @@ export default function PostCard({
           commentsCount: post.commentsCount,
           isLiked: post.isLiked,
           createdAt: post.createdAt,
+          mediaId: post.mediaId,
           users: {
             username: post.users.username,
           },
+          media: post.media,
         }}
       />
     </div>
