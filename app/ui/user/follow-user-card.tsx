@@ -3,12 +3,15 @@ import { auth } from "@/auth";
 import UserNameCard from "@/app/ui/user/name-card";
 
 export default async function FollowUserCard({
-  user,
+  users,
 }: {
-  user: {
+  users: {
     id: number;
     username: string;
     fullname: string;
+    avatar: {
+      publicUrl: string;
+    } | null;
     isFollowed: boolean;
   };
 }) {
@@ -17,16 +20,17 @@ export default async function FollowUserCard({
     <li className="flex justify-between items-center gap-4 px-4 py-1.5 border rounded">
       <UserNameCard
         className="flex gap-6"
-        to={`/${user.username}`}
-        fullname={user.fullname}
-        username={user.username}
+        to={`/${users.username}`}
+        fullname={users.fullname}
+        username={users.username}
+        userAvatar={users.avatar?.publicUrl}
       />
       <FollowUserForm
         session={session}
         user={{
-          id: user.id,
-          username: user.username,
-          isFollowed: user.isFollowed,
+          id: users.id,
+          username: users.username,
+          isFollowed: users.isFollowed,
         }}
       />
     </li>

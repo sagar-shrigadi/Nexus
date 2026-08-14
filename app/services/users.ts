@@ -8,7 +8,19 @@ export async function getRandomUsersExcludingUser(userId: number) {
     where: not(eq(users.id, userId)),
     orderBy: sql`RANDOM()`,
     limit: 10,
-    columns: { password: false, bio: false },
+    columns: {
+      password: false,
+      bio: false,
+      followers: false,
+      following: false,
+    },
+    with: {
+      avatar: {
+        columns: {
+          publicUrl: true,
+        },
+      },
+    },
   });
 }
 export async function getUserWithPostsByUsername(username: string) {
@@ -116,7 +128,17 @@ export async function allUsersFollowedByUserWithId(userId: number) {
 }
 export async function getMostFollowedUsersExcludingUser(userId: number) {
   return db.query.users.findMany({
-    columns: { id: true, username: true, firstName: true, lastName: true },
+    columns: {
+      password: false,
+      bio: false,
+      followers: false,
+      following: false,
+    },
+    with: {
+      avatar: {
+        columns: { publicUrl: true },
+      },
+    },
     where: not(eq(users.id, userId)),
     orderBy: [desc(users.followers)],
     limit: 3,

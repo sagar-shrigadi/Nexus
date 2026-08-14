@@ -29,10 +29,11 @@ export default async function ExploreSidebar() {
             {users.map((user) => (
               <FollowUserCard
                 key={user.id}
-                user={{
+                users={{
                   id: user.id,
                   username: user.username,
                   fullname: `${user.firstName} ${user.lastName}`,
+                  avatar: user.avatar,
                   isFollowed: followedUsersId.has(user.id),
                 }}
               />
