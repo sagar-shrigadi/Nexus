@@ -106,6 +106,13 @@
       "when": 1786543988795,
       "tag": "0014_fair_callisto",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1786629579823,
+      "tag": "0015_fancy_wolfsbane",
+      "breakpoints": true
     }
   ]
 }

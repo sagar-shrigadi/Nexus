@@ -1,0 +1,2 @@
+ALTER TABLE "comments" ADD COLUMN "media_id" integer;--> statement-breakpoint
+ALTER TABLE "comments" ADD CONSTRAINT "comments_media_id_media_id_fk" FOREIGN KEY ("media_id") REFERENCES "public"."media"("id") ON DELETE cascade ON UPDATE no action;

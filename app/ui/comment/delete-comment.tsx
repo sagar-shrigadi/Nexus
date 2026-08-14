@@ -12,6 +12,10 @@ export default function DeleteComment({
   comment: {
     id: number;
     userId: number;
+    media: {
+      fileName: string;
+      publicUrl: string;
+    } | null;
   };
 }) {
   const pathname = usePathname();

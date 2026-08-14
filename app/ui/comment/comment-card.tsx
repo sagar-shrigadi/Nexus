@@ -5,7 +5,9 @@ import { useState } from "react";
 import EditCommentForm from "@/app/ui/comment/edit-comment";
 import { Session } from "next-auth";
 import UserNameCard from "@/app/ui/user/name-card";
-import CommentLikeForm from "./comment-like-form";
+import CommentLikeForm from "@/app/ui/comment/comment-like-form";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 export default function CommentCard({
   session,
@@ -20,6 +22,7 @@ export default function CommentCard({
     createdAt: Date;
     likes: number;
     isLiked: boolean;
+    mediaId: number | null;
     users: {
       username: string;
       firstName: string;
@@ -28,6 +31,10 @@ export default function CommentCard({
         publicUrl: string;
       } | null;
     };
+    media: {
+      fileName: string;
+      publicUrl: string;
+    } | null;
   };
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -52,7 +59,11 @@ export default function CommentCard({
         </div>
         {comment.userId === Number(session?.user?.id) && (
           <CommentOptions
-            comment={{ id: comment.id, userId: comment.userId }}
+            comment={{
+              id: comment.id,
+              userId: comment.userId,
+              media: comment.media,
+            }}
             openEditForm={() => setIsEditing(true)}
           />
         )}
@@ -63,12 +74,28 @@ export default function CommentCard({
             id: comment.id,
             content: comment.content,
             userId: comment.userId,
+            mediaId: comment.mediaId,
+            media: comment.media,
           }}
           closeEditForm={() => setIsEditing(false)}
         />
       ) : (
-        <div className="px-2 text-lg max-w-[55ch]">
-          <p>{comment.content}</p>
+        <div className="px-2">
+          <p className="text-lg max-w-[55ch]">{comment.content}</p>
+          {comment.media && (
+            <Image
+              src={comment.media.publicUrl}
+              alt={comment.content}
+              width={250}
+              height={150}
+              className={cn(
+                comment.mediaId ? "block" : "hidden",
+                "mx-auto object-cover w-auto h-[200]",
+              )}
+              unoptimized
+              loading="eager"
+            />
+          )}
         </div>
       )}
       <CommentLikeForm

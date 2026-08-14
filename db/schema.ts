@@ -67,6 +67,9 @@ export const comments = pgTable("comments", {
   postId: integer("post_id")
     .notNull()
     .references(() => posts.id, { onDelete: "cascade" }),
+  mediaId: integer("media_id").references(() => media.id, {
+    onDelete: "cascade",
+  }),
   likes: integer("likes").notNull().default(0),
 });
 
@@ -169,6 +172,10 @@ export const commentsRelations = relations(comments, ({ one, many }) => ({
     references: [posts.id],
   }),
   likes: many(commentLikes),
+  media: one(media, {
+    fields: [comments.mediaId],
+    references: [media.id],
+  }),
 }));
 export const commentLikesRelations = relations(commentLikes, ({ one }) => ({
   users: one(users, {
@@ -186,4 +193,5 @@ export const commentLikesRelations = relations(commentLikes, ({ one }) => ({
 }));
 export const mediaRelations = relations(media, ({ one }) => ({
   posts: one(posts),
+  comments: one(comments),
 }));

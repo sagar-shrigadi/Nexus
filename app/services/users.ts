@@ -163,6 +163,9 @@ export async function getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(
       },
       comments: {
         columns: { userId: false },
+        with: {
+          media: { columns: { fileName: true, publicUrl: true } },
+        },
         orderBy: [desc(comments.createdAt)],
       },
       likedPosts: {
@@ -215,6 +218,9 @@ export async function getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(
                     columns: { publicUrl: true },
                   },
                 },
+              },
+              media: {
+                columns: { fileName: true, publicUrl: true },
               },
             },
           },

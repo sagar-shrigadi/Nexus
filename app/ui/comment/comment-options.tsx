@@ -15,7 +15,14 @@ export default function CommentOptions({
   comment,
   openEditForm,
 }: {
-  comment: { id: number; userId: number };
+  comment: {
+    id: number;
+    userId: number;
+    media: {
+      fileName: string;
+      publicUrl: string;
+    } | null;
+  };
   openEditForm: () => void;
 }) {
   return (

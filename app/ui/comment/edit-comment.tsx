@@ -12,6 +12,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 export default function EditCommentForm({
   comment,
@@ -21,6 +23,11 @@ export default function EditCommentForm({
     id: number;
     content: string;
     userId: number;
+    mediaId: number | null;
+    media: {
+      fileName: string;
+      publicUrl: string;
+    } | null;
   };
   closeEditForm: () => void;
 }) {
@@ -69,6 +76,20 @@ export default function EditCommentForm({
             <FieldError>{result.errors.comment}</FieldError>
           )}
         </Field>
+        {comment.media && (
+          <Image
+            src={comment.media.publicUrl}
+            alt={comment.content}
+            width={250}
+            height={150}
+            className={cn(
+              comment.mediaId ? "block" : "hidden",
+              "mx-auto object-cover w-auto h-[200]",
+            )}
+            unoptimized
+            loading="eager"
+          />
+        )}
         <Field className="w-fit ml-auto" orientation="horizontal">
           <Button type="button" variant="outline" onClick={closeEditForm}>
             Cancel

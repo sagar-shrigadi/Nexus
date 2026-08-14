@@ -3,8 +3,8 @@
 import { z } from "zod";
 import { auth } from "@/auth";
 import {
-  deleteMediaPostByFileName,
-  deletePostById,
+  deleteMediaPostByFileNameTransaction,
+  deletePostByIdTransaction,
   editPostById,
   likePostTransaction,
   newPost,
@@ -174,7 +174,10 @@ export async function deletePost(
 
     if (error) return { status: "error", message: error.message };
     try {
-      await deleteMediaPostByFileName(post.media.fileName);
+      await deleteMediaPostByFileNameTransaction({
+        id: post.id,
+        media: { fileName: post.media.fileName },
+      });
       revalidatePath("/");
       revalidatePath("/explore");
       revalidatePath(`/${post.users.username}`);
@@ -187,7 +190,7 @@ export async function deletePost(
     }
   } else {
     try {
-      await deletePostById(post.id);
+      await deletePostByIdTransaction(post.id);
       revalidatePath("/");
       revalidatePath("/explore");
       revalidatePath(`/${post.users.username}`);

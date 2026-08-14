@@ -1,6 +1,9 @@
 import { db } from "@/db";
 import { comments, media, postLikes, posts, userFollows } from "@/db/schema";
+import { supabase } from "@/lib/supabase";
 import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
+import { deleteMediaByArrayOfIds } from "@/app/services/media";
+import { getAllCommentsOfPostWithMedia } from "@/app/services/comments";
 
 export async function getAllPostsByUserAndUsersFollowedByUser(userId: number) {
   const userIdFollowedByUser = await db.query.userFollows.findMany({
@@ -126,6 +129,9 @@ export async function getPostByIdWithComments(id: number) {
               },
             },
           },
+          media: {
+            columns: { fileName: true, publicUrl: true },
+          },
         },
         orderBy: [desc(comments.createdAt)],
       },
@@ -161,11 +167,49 @@ export async function newPost(
   }
   return db.insert(posts).values({ title, content, userId });
 }
-export async function deletePostById(postId: number) {
-  return db.delete(posts).where(eq(posts.id, postId));
+export async function deletePostByIdTransaction(postId: number) {
+  return db.transaction(async (tx) => {
+    const allCommentsWithMediaOnPost =
+      await getAllCommentsOfPostWithMedia(postId);
+    if (allCommentsWithMediaOnPost != null) {
+      const allCommentsWithMedia = allCommentsWithMediaOnPost.comments
+        .map((c) => c.media)
+        .filter((c) => c !== null);
+
+      for (const comment of allCommentsWithMedia) {
+        const { error } = await supabase.storage
+          .from("media")
+          .remove([comment.fileName]);
+        if (error) throw error;
+      }
+      await deleteMediaByArrayOfIds(allCommentsWithMedia.map((c) => c.id));
+    }
+    await tx.delete(posts).where(eq(posts.id, postId));
+  });
 }
-export async function deleteMediaPostByFileName(fileName: string) {
-  return db.delete(media).where(eq(media.fileName, fileName));
+export async function deleteMediaPostByFileNameTransaction(post: {
+  id: number;
+  media: { fileName: string };
+}) {
+  return db.transaction(async (tx) => {
+    const allCommentsWithMediaOnPost = await getAllCommentsOfPostWithMedia(
+      post.id,
+    );
+    if (allCommentsWithMediaOnPost != null) {
+      const allCommentsWithMedia = allCommentsWithMediaOnPost.comments
+        .map((c) => c.media)
+        .filter((c) => c !== null);
+
+      for (const comment of allCommentsWithMedia) {
+        const { error } = await supabase.storage
+          .from("media")
+          .remove([comment.fileName]);
+        if (error) throw error;
+      }
+      await deleteMediaByArrayOfIds(allCommentsWithMedia.map((c) => c.id));
+    }
+    await tx.delete(media).where(eq(media.fileName, post.media.fileName));
+  });
 }
 export async function editPostById(
   postId: number,
