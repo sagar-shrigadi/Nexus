@@ -8,7 +8,12 @@ import {
 } from "@/app/services/users";
 import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase";
-import type { ActionResult, UploadAvatar, UserBio } from "@/lib/definitations";
+import type {
+  ActionResult,
+  DeleteAvatar,
+  UploadAvatar,
+  UserBio,
+} from "@/lib/definitations";
 import z from "zod";
 import { auth } from "@/auth";
 
@@ -30,57 +35,68 @@ export async function userFollows(
     };
   }
 }
+const AvatarUploadSchema = z.object({
+  file: z.file().optional(),
+});
 export async function avatarUpload(
   user: { id: number; username: string },
   formData: FormData,
 ): Promise<UploadAvatar> {
+  const validatedAvatar = AvatarUploadSchema.safeParse(
+    Object.fromEntries(formData.entries()),
+  );
+
+  if (!validatedAvatar.success) {
+    return {
+      status: "error",
+      errors: z.flattenError(validatedAvatar.error).fieldErrors,
+    };
+  }
+
+  const { file } = validatedAvatar.data;
+  if (!file || file.size === 0) {
+    return { status: "error", errors: { file: ["No file selected!"] } };
+  }
+  // 1. Enforce strict server-side file safety limits (Crucial for resume pieces)
+  const MAX_SIZE = 3 * 1024 * 1024; // 3MB limit
+  if (file.size > MAX_SIZE) {
+    return {
+      status: "error",
+      errors: { file: ["File size too large. (MAX 3MB)"] },
+      message: "File is too large. (Max 3MB)",
+    };
+  }
+
+  const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    return {
+      status: "error",
+      errors: { file: ["Invalid File format!"] },
+      message: "Invalid format. Only JPEG, PNG, WEBP, and GIFs are allowed.",
+    };
+  }
+
+  // 2. Parse binary stream and build unique name to avoid system overrides
+  const fileBuffer = Buffer.from(await file.arrayBuffer());
+  const field = crypto.randomUUID();
+  const filePath = `${field}-${file.name}`;
+
+  // 3. Admin bypass upload into your public storage container
+  const { data, error } = await supabase.storage
+    .from("avatars")
+    .upload(filePath, fileBuffer, {
+      contentType: file.type,
+      upsert: false, // Prevent file overwriting
+    });
+
+  if (error) return { status: "error", message: error.message };
+
+  // 4. Synchronously retrieve CDN link string
+  const { data: urlData } = supabase.storage
+    .from("avatars")
+    .getPublicUrl(data.path);
+
   try {
-    const file = formData.get("file") as File;
-    if (!file || file.size === 0) {
-      return { status: "error", message: "No file Selected." };
-    }
-    // 1. Enforce strict server-side file safety limits (Crucial for resume pieces)
-    const MAX_SIZE = 3 * 1024 * 1024; // 3MB limit
-    if (file.size > MAX_SIZE) {
-      return {
-        status: "error",
-        message: "File is too large. (Max 3MB)",
-      };
-    }
-
-    const ALLOWED_TYPES = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/gif",
-    ];
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      return {
-        status: "error",
-        message: "Invalid format. Only JPEG, PNG, WEBP, and GIFs are allowed.",
-      };
-    }
-
-    // 2. Parse binary stream and build unique name to avoid system overrides
-    const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const field = crypto.randomUUID();
-    const filePath = `${field}-${file.name}`;
-
-    // 3. Admin bypass upload into your public storage container
-    const { data, error } = await supabase.storage
-      .from("avatars")
-      .upload(filePath, fileBuffer, {
-        contentType: file.type,
-        upsert: false, // Prevent file overwriting
-      });
-
-    if (error) return { status: "error", message: error.message };
-
-    // 4. Synchronously retrieve CDN link string
-    const { data: urlData } = supabase.storage
-      .from("avatars")
-      .getPublicUrl(data.path);
-
     // update the user in db
     await updateAvatarTransaction(user.id, filePath, urlData.publicUrl);
 
@@ -110,9 +126,9 @@ export async function deleteAvatar(user: {
     fileName: string;
     publicUrl: string;
   } | null;
-}): Promise<ActionResult> {
+}): Promise<DeleteAvatar> {
   if (!user.avatarId) {
-    return { status: "error", message: "Avatar doesn't exist!" };
+    return { status: "error", errors: { file: ["Avatar doesn't exist!"] } };
   }
   // delete the avatar file from supabase storage
   const { error } = await supabase.storage
@@ -127,6 +143,15 @@ export async function deleteAvatar(user: {
   try {
     // delete the db record
     await deleteUserAvatar(user.avatarId);
+
+    revalidatePath("/");
+    revalidatePath("/explore");
+    revalidatePath(`/${user.username}`);
+    revalidatePath(`/${user.username}/status`);
+    return {
+      status: "success",
+      message: "Profile successfully updated!",
+    };
   } catch (error) {
     console.error(error);
     return {
@@ -134,14 +159,6 @@ export async function deleteAvatar(user: {
       message: "Unable to delete avatar! Please try again!",
     };
   }
-  revalidatePath("/");
-  revalidatePath("/explore");
-  revalidatePath(`/${user.username}`);
-  revalidatePath(`/${user.username}/status`);
-  return {
-    status: "success",
-    message: "Profile successfully updated!",
-  };
 }
 
 const UserBioSchema = z.object({
@@ -163,6 +180,11 @@ export async function updateBio(formData: FormData): Promise<UserBio> {
 
   try {
     await updateUserBio(Number(session?.user?.id), newUserBio);
+    revalidatePath(`/${session?.user?.email}`);
+    return {
+      status: "success",
+      message: "Profile successfully updated!",
+    };
   } catch (error) {
     console.error(error);
     return {
@@ -170,9 +192,4 @@ export async function updateBio(formData: FormData): Promise<UserBio> {
       message: "Failed to updated profile! Please try again!",
     };
   }
-  revalidatePath(`/${session?.user?.email}`);
-  return {
-    status: "success",
-    message: "Profile successfully updated!",
-  };
 }

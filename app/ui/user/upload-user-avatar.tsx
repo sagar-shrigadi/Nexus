@@ -45,7 +45,7 @@ export default function UploadAvatar({
     user.avatarId ? false : true,
   );
   const [isDeleting, setIsDeleting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string[] | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -63,7 +63,7 @@ export default function UploadAvatar({
         type: "error",
         description: "No file selected!",
       });
-      setErrorMessage("Please select a file to upload.");
+      setErrorMessage(["Please select a file to upload."]);
       setIsUploading(false);
       return;
     }
@@ -74,17 +74,23 @@ export default function UploadAvatar({
     setIsUploading(false);
 
     if (result.status === "error") {
-      toast.add({
-        type: "error",
-        description: result.message,
-      });
-      setErrorMessage(result.message!);
+      if (result.message) {
+        toast.add({
+          type: "error",
+          description: result.message,
+        });
+      }
+      if (result.errors?.file) {
+        setErrorMessage(result.errors.file);
+      }
       return;
     }
 
     if (result.status === "success") {
       // Clear form input fields after successful submission
       formRef.current.reset();
+
+      setErrorMessage(null);
 
       // close the modal
       setOpenDialog(false);
@@ -111,7 +117,9 @@ export default function UploadAvatar({
     const result = await deleteAvatar(user);
 
     if (result.status === "error") {
-      setErrorMessage(result.message!);
+      if (result.errors?.file) {
+        setErrorMessage(result.errors.file);
+      }
       setDisableDelete(false);
       setIsDeleting(false);
       toast.add({

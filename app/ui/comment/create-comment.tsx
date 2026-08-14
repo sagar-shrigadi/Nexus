@@ -96,6 +96,9 @@ export default function CreateComment({ postId }: { postId: number }) {
               accept="image/jpeg, image/png, image/webp, image/gif"
               className="hidden"
             />
+            {result?.errors?.file && (
+              <FieldError>{result.errors.file}</FieldError>
+            )}
           </Field>
 
           <Field className="w-fit ml-auto">
