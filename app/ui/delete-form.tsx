@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
 import { Trash } from "lucide-react";
 
 export default function DeleteForm({
@@ -20,7 +21,8 @@ export default function DeleteForm({
           className="flex justify-start"
         >
           <Trash />
-          Delete
+          {isPending ? "Deleting" : "Delete"}
+          {isPending ? <Spinner data-icon="inline-end" /> : ""}
         </Button>
       </Field>
     </form>

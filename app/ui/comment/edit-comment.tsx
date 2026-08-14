@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function EditCommentForm({
   comment,
@@ -91,11 +92,18 @@ export default function EditCommentForm({
           />
         )}
         <Field className="w-fit ml-auto" orientation="horizontal">
-          <Button type="button" variant="outline" onClick={closeEditForm}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={closeEditForm}
+            disabled={isPending}
+            aria-disabled={isPending}
+          >
             Cancel
           </Button>
           <Button type="submit" aria-disabled={isPending} disabled={isPending}>
-            Update
+            {isPending ? "Updating" : "Update"}
+            {isPending ? <Spinner data-icon="inline-end" /> : ""}
           </Button>
         </Field>
       </FieldGroup>

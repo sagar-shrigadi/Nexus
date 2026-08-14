@@ -65,6 +65,8 @@ export default function UserBioCard({ userBio }: { userBio: string | null }) {
                 onClick={() => setIsEditing(false)}
                 type="button"
                 variant="outline"
+                disabled={isUpdating}
+                aria-disabled={isUpdating}
               >
                 Cancel
               </Button>

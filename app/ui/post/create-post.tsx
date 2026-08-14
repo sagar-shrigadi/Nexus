@@ -15,6 +15,7 @@ import { Session } from "next-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/components/ui/toast";
 import { Check, ImageIcon } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function CreatePost({ session }: { session: Session | null }) {
   const [result, formAction, isPending] = useActionState(createPost, undefined);
@@ -125,7 +126,8 @@ export default function CreatePost({ session }: { session: Session | null }) {
                 aria-disabled={isPending}
                 disabled={isPending}
               >
-                Post
+                {isPending ? "Posting" : "Post"}
+                {isPending ? <Spinner data-icon="inline-end" /> : ""}
               </Button>
             </Field>
           </FieldGroup>

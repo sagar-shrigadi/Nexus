@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { Check, ImageIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function CreateComment({ postId }: { postId: number }) {
   const createCommentToPost = createComment.bind(null, postId);
@@ -108,7 +109,8 @@ export default function CreateComment({ postId }: { postId: number }) {
               aria-disabled={isPending}
               disabled={isPending}
             >
-              Comment
+              {isPending ? "Commenting" : "Comment"}
+              {isPending ? <Spinner data-icon="inline-end" /> : ""}
             </Button>
           </Field>
         </FieldGroup>

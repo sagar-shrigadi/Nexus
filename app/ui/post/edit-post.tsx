@@ -16,6 +16,7 @@ import BackButton from "../button/back-button";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function EditPostForm({
   post,
@@ -112,7 +113,8 @@ export default function EditPostForm({
               aria-disabled={isPending}
               disabled={isPending}
             >
-              Update
+              {isPending ? "Updating" : "Update"}
+              {isPending ? <Spinner data-icon="inline-end" /> : ""}
             </Button>
           </Field>
         </FieldGroup>
