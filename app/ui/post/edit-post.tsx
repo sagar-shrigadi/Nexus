@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import { updatePost } from "@/lib/actions/posts";
 import { useActionState, useEffect } from "react";
-import BackButton from "../button/back-button";
+import BackButton from "@/app/ui/button/back-button";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { cn } from "@/lib/utils";

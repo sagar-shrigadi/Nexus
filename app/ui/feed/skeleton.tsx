@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function FeedSkeleton() {
   return (
     <section className="grow min-h-0 h-full border rounded overflow-hidden">
-      {Array.from({ length: 5 }).map((_, i) => (
+      {Array.from({ length: 5 }, (_, i) => (
         <article key={i}>
           {i > 0 && <Separator />}
           <PostCardSkeleton />

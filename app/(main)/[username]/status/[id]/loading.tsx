@@ -27,7 +27,7 @@ export default function PostPageSkeleton() {
             </header>
             <Separator />
             <section className="grow">
-              {Array.from({ length: 2 }).map((_, i) => (
+              {Array.from({ length: 2 }, (_, i) => (
                 <article key={i}>
                   {i > 0 && <Separator />}
                   <CommentCardSkeleton />

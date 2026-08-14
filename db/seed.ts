@@ -41,12 +41,12 @@ type SeededAvatars = Pick<typeof avatars.$inferSelect, "id">;
 
 async function seedUsers(seededAvatars: SeededAvatars[]) {
   const usernamesSeen = new Set<string>();
-  const guestUserPass = await bcrypt.hash("12345678", 10);
+  const guestUserPass = await bcrypt.hash(process.env.GUEST_PASSWORD!, 10);
   const rows: SeedUsersPreview = [
     {
       firstName: "Guest",
       lastName: "User",
-      username: "Guest123",
+      username: process.env.GUEST_USERNAME!,
       password: guestUserPass,
       bio: "Default Bio",
       avatarId: null,

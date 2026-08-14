@@ -14,7 +14,7 @@ export function MainSidebarSkeleton() {
         </CardHeader>
         <CardContent>
           <ul className="flex flex-col gap-3">
-            {Array.from({ length: 10 }).map((_, i) => (
+            {Array.from({ length: 10 }, (_, i) => (
               <FollowUserCardSkeletion key={i} />
             ))}
           </ul>
@@ -34,7 +34,7 @@ export function ExploreSidebarSkeleton() {
         </CardHeader>
         <CardContent>
           <ul className="flex flex-col gap-3">
-            {Array.from({ length: 3 }).map((_, i) => (
+            {Array.from({ length: 3 }, (_, i) => (
               <FollowUserCardSkeletion key={i} />
             ))}
           </ul>
@@ -48,7 +48,7 @@ export function ExploreSidebarSkeleton() {
         </CardHeader>
         <CardContent>
           <ul className="flex flex-col gap-3">
-            {Array.from({ length: 4 }).map((_, i) => (
+            {Array.from({ length: 4 }, (_, i) => (
               <FollowUserCardSkeletion key={i} />
             ))}
           </ul>
