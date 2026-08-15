@@ -99,7 +99,7 @@ export default async function UserPage({
           <div className="px-4 pt-2 flex flex-col gap-3">
             <div className="flex flex-col">
               <h2 className="text-xl md:text-2xl font-bold">{`${user.firstName} ${user.lastName}`}</h2>
-              <p className="text-lg text-sidebar-ring">@{user.username}</p>
+              <p className="text-lg text-muted-foreground">@{user.username}</p>
             </div>
             {sessionUser.email === username ? (
               <UserBioCard user={{ id: user.id, bio: user.bio }} />
