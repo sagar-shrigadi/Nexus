@@ -62,11 +62,16 @@ export async function createPost(
         message: "File size too large! (MAX 3MB).",
       };
     }
-    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+    const ALLOWED_TYPES = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+    ];
     if (!ALLOWED_TYPES.includes(file.type)) {
       return {
         status: "error",
-        message: "Invalid format. Only JPEG, PNG, WEBP are allowed.",
+        message: "Invalid format. Only JPEG, PNG, WEBP and GIFs are allowed.",
       };
     }
     // 2. Parse binary stream and build unique name to avoid system overrides

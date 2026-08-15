@@ -43,7 +43,7 @@ export default async function PostContent({
             height={150}
             className={cn(
               post.mediaId ? "block" : "hidden",
-              "mx-auto object-cover w-auto h-[400]",
+              "mx-auto object-cover w-auto h-auto max-h-[400]",
             )}
             unoptimized
             loading="eager"

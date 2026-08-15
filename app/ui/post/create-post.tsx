@@ -112,7 +112,7 @@ export default function CreatePost({ session }: { session: Session | null }) {
                 type="file"
                 id="file"
                 name="file"
-                accept="image/jpeg, image/png, image/webp"
+                accept="image/jpeg, image/png, image/webp, image/gif"
                 className="hidden"
               />
               {result?.errors?.file && (

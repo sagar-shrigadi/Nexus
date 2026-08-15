@@ -40,7 +40,7 @@ export default function CommentCard({
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className="flex flex-col gap-8 py-4 px-4">
+    <div className="flex flex-col gap-6 py-4 px-4">
       <div className="flex justify-between">
         <div className="flex gap-3 items-center">
           <UserNameCard
@@ -49,7 +49,7 @@ export default function CommentCard({
             fullname={`${comment.users.firstName} ${comment.users.lastName}`}
             userAvatar={comment.users.avatar?.publicUrl}
           />
-          <span className="text-sidebar-ring">
+          <span className="text-sidebar-ring text-sm">
             {comment.createdAt.toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
@@ -90,7 +90,7 @@ export default function CommentCard({
               height={150}
               className={cn(
                 comment.mediaId ? "block" : "hidden",
-                "mx-auto object-cover w-auto h-[200]",
+                "mx-auto object-cover w-auto h-auto max-h-[200]",
               )}
               unoptimized
               loading="eager"
