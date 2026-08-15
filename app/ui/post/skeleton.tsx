@@ -43,6 +43,7 @@ export function CreatePostSkeleton() {
       <div className="flex grow flex-col gap-7">
         <Skeleton className="h-8 w-full" />
         <Skeleton className="h-8 w-full" />
+        <Skeleton className="w-8 h-8 rounded mr-auto" />
         <Skeleton className="h-8 w-24 ml-auto" />
       </div>
     </div>

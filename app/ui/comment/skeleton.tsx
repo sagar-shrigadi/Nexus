@@ -9,6 +9,7 @@ export function CreateCommentSkeleton() {
           <div>
             <Skeleton className="w-full h-25" />
           </div>
+          <Skeleton className="w-8 h-8 rounded mr-auto" />
           <Skeleton className="w-35 h-10 ml-auto" />
         </div>
       </div>
