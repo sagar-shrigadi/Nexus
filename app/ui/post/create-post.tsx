@@ -22,13 +22,6 @@ export default function CreatePost({ sessionUser }: { sessionUser: User }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isFileSelected, setIsFileSelected] = useState<string | null>(null);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      fileInputRef.current?.click();
-    }
-  };
-
   useEffect(() => {
     if (!result) return;
     if (result.status === "error") {
@@ -83,16 +76,15 @@ export default function CreatePost({ sessionUser }: { sessionUser: User }) {
             </Field>
             <Field className="w-fit">
               <div className="flex items-center justify-center gap-4">
-                <FieldLabel
-                  htmlFor="file"
-                  className="cursor-pointer hover:bg-sidebar-accent rounded transition-colors p-1.5"
-                  tabIndex={0}
-                  onKeyDown={handleKeyDown}
-                  role="button"
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
                   aria-label="Upload image"
+                  onClick={() => fileInputRef.current?.click()}
                 >
                   <ImageIcon />
-                </FieldLabel>
+                </Button>
                 {isFileSelected && (
                   <div className="px-2 py-1 rounded bg-accent flex items-center justify-center gap-2">
                     {isFileSelected}
