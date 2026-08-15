@@ -1,7 +1,6 @@
 import { MessageSquare } from "lucide-react";
 import Link from "next/link";
 import PostLikeForm from "@/app/ui/post/post-like-form";
-import { auth } from "@/auth";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
@@ -26,7 +25,6 @@ export default async function PostContent({
     } | null;
   };
 }) {
-  const session = await auth();
   return (
     <div className="flex flex-col gap-4 px-4 py-1">
       <Link
@@ -56,7 +54,6 @@ export default async function PostContent({
           <span>{post.commentsCount > 0 ? `${post.commentsCount}` : ""}</span>
         </div>
         <PostLikeForm
-          session={session}
           post={{ id: post.id, likes: post.likes, isLiked: post.isLiked }}
         />
       </div>

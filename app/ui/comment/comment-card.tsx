@@ -3,17 +3,17 @@
 import CommentOptions from "@/app/ui/comment/comment-options";
 import { useState } from "react";
 import EditCommentForm from "@/app/ui/comment/edit-comment";
-import { Session } from "next-auth";
+import { User } from "next-auth";
 import UserNameCard from "@/app/ui/user/name-card";
 import CommentLikeForm from "@/app/ui/comment/comment-like-form";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export default function CommentCard({
-  session,
+  sessionUser,
   comment,
 }: {
-  session: Session | null;
+  sessionUser: User;
   comment: {
     id: number;
     content: string;
@@ -57,7 +57,7 @@ export default function CommentCard({
             })}
           </span>
         </div>
-        {comment.userId === Number(session?.user?.id) && (
+        {comment.userId === Number(sessionUser.id) && (
           <CommentOptions
             comment={{
               id: comment.id,
@@ -99,7 +99,6 @@ export default function CommentCard({
         </div>
       )}
       <CommentLikeForm
-        session={session}
         comment={{
           id: comment.id,
           postId: comment.postId,

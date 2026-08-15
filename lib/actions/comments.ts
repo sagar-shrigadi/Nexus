@@ -7,11 +7,11 @@ import {
   likeCommentTransaction,
   newComment,
 } from "@/app/services/comments";
-import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { CommentAction } from "@/lib/definitations";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
+import { requireAuth } from "@/lib/actions/auth";
 
 const CommentSchema = z.object({
   comment: z.string().min(1, "Comment is required."),
@@ -22,7 +22,10 @@ export async function createComment(
   prevState: CommentAction | undefined,
   formData: FormData,
 ): Promise<CommentAction> {
-  const session = await auth();
+  const authResult = await requireAuth();
+  if (!authResult.success) return authResult.error;
+  const { sessionUser } = authResult;
+
   const validatedComment = CommentSchema.safeParse(
     Object.fromEntries(formData.entries()),
   );
@@ -38,11 +41,11 @@ export async function createComment(
 
   if (!file || file.size === 0) {
     try {
-      await newComment(Number(session?.user?.id), postId, comment, null);
+      await newComment(Number(sessionUser.id), postId, comment, null);
       revalidatePath("/");
       revalidatePath("/explore");
-      revalidatePath(`/${session?.user?.email}`);
-      revalidatePath(`/${session?.user?.email}/status/${postId}`);
+      revalidatePath(`/${sessionUser.email}`);
+      revalidatePath(`/${sessionUser.email}/status/${postId}`);
       return {
         status: "success",
         message: "Comment successfully posted!",
@@ -78,7 +81,7 @@ export async function createComment(
     const field = crypto.randomUUID();
     const filePath = `${field}-${file.name}`;
     // 3. Admin bypass upload into your public storage container
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabaseAdmin.storage
       .from("media")
       .upload(filePath, fileBuffer, {
         contentType: file.type,
@@ -89,19 +92,19 @@ export async function createComment(
       return { status: "error", message: error.message };
     }
     // 4. Synchronously retrieve CDN link string
-    const { data: urlData } = supabase.storage
+    const { data: urlData } = supabaseAdmin.storage
       .from("media")
       .getPublicUrl(data.path);
 
     try {
-      await newComment(Number(session?.user?.id), postId, comment, {
+      await newComment(Number(sessionUser.id), postId, comment, {
         fileName: data.path,
         publicUrl: urlData.publicUrl,
       });
       revalidatePath("/");
       revalidatePath("/explore");
-      revalidatePath(`/${session?.user?.email}`);
-      revalidatePath(`/${session?.user?.email}/status/${postId}`);
+      revalidatePath(`/${sessionUser.email}`);
+      revalidatePath(`/${sessionUser.email}/status/${postId}`);
       return {
         status: "success",
         message: "Comment successfully posted!",
@@ -121,8 +124,11 @@ export async function updateComment(
   prevState: CommentAction | undefined,
   formData: FormData,
 ): Promise<CommentAction> {
-  const session = await auth();
-  if (comment.userId !== Number(session?.user?.id)) {
+  const authResult = await requireAuth();
+  if (!authResult.success) return authResult.error;
+  const { sessionUser } = authResult;
+
+  if (comment.userId !== Number(sessionUser.id)) {
     return {
       status: "error",
       message: "You are not authorized to edit this comment!",
@@ -163,16 +169,19 @@ export async function deleteComment(
     } | null;
   },
   pathname: string,
-): Promise<CommentAction | undefined> {
-  const session = await auth();
-  if (comment.userId !== Number(session?.user?.id)) {
+) {
+  const authResult = await requireAuth();
+  if (!authResult.success) return authResult.error;
+  const { sessionUser } = authResult;
+
+  if (comment.userId !== Number(sessionUser.id)) {
     return {
       status: "error",
       message: "You are not authorized to delete this comment!",
     };
   }
   if (comment.media != null) {
-    const { error } = await supabase.storage
+    const { error } = await supabaseAdmin.storage
       .from("media")
       .remove([comment.media.fileName]);
 
@@ -208,12 +217,18 @@ export async function deleteComment(
   }
 }
 export async function likeComment(
-  userId: number,
   comment: { id: number; postId: number },
   pathname: string,
-): Promise<CommentAction | undefined> {
+) {
+  const authResult = await requireAuth();
+  if (!authResult.success) return authResult.error;
+  const { sessionUser } = authResult;
   try {
-    await likeCommentTransaction(userId, comment.id, comment.postId);
+    await likeCommentTransaction(
+      Number(sessionUser.id),
+      comment.id,
+      comment.postId,
+    );
     revalidatePath(`${pathname}`);
   } catch (error) {
     console.error(error);

@@ -2,13 +2,16 @@ import { getAllLikedPostsByUser, getLatestPosts } from "@/app/services/posts";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import PostCard from "@/app/ui/post/post-card";
-import { auth } from "@/auth";
 import EmptyListTemplate from "@/app/ui/empty-list-template";
+import { User } from "next-auth";
 
-export default async function ExploreFeed() {
-  const session = await auth();
+export default async function ExploreFeed({
+  sessionUser,
+}: {
+  sessionUser: User;
+}) {
   const posts = await getLatestPosts();
-  const likedPosts = await getAllLikedPostsByUser(Number(session?.user?.id));
+  const likedPosts = await getAllLikedPostsByUser(Number(sessionUser.id));
   const likedPostsId = new Set(likedPosts.map((p) => p.postId));
 
   return (

@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import {
   getIdsOfAllLikedPostsAndLikedCommentsByUser,
   getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser,
@@ -23,6 +23,10 @@ export default async function UserPage({
   params: Promise<{ username: string }>;
 }) {
   const session = await auth();
+  if (!session || !session.user) {
+    redirect("/login");
+  }
+  const sessionUser = session.user;
   const { username } = await params;
   const user =
     await getAllPostsAndCommentsAndLikedPostsAndLikedCommentsByUser(username);
@@ -30,13 +34,11 @@ export default async function UserPage({
     notFound();
   }
   const isFollowed = await isUserFollowedByUserWithId(
-    Number(session?.user?.id),
+    Number(sessionUser.id),
     user.id,
   );
   const likedPostsAndLikedCommentsIdsByUser =
-    await getIdsOfAllLikedPostsAndLikedCommentsByUser(
-      Number(session?.user?.id),
-    )!;
+    await getIdsOfAllLikedPostsAndLikedCommentsByUser(Number(sessionUser.id))!;
   const likedPostsId = new Set(
     likedPostsAndLikedCommentsIdsByUser?.likedPosts.map((p) => p.postId),
   );
@@ -71,7 +73,7 @@ export default async function UserPage({
                     {"U"}
                   </AvatarFallback>
                 </Avatar>
-                {Number(session?.user?.id) === user.id && (
+                {Number(sessionUser.id) === user.id && (
                   <UploadAvatar
                     user={{
                       id: user.id,
@@ -82,10 +84,9 @@ export default async function UserPage({
                   />
                 )}
               </div>
-              {session?.user?.email === username || (
+              {sessionUser.email === username || (
                 <FollowUserForm
-                  session={session}
-                  user={{
+                  userToFollow={{
                     id: user.id,
                     username: user.username,
                     isFollowed: !!isFollowed,
@@ -100,8 +101,8 @@ export default async function UserPage({
               <h2 className="text-xl md:text-2xl font-bold">{`${user.firstName} ${user.lastName}`}</h2>
               <p className="text-lg text-sidebar-ring">@{user.username}</p>
             </div>
-            {session?.user?.email === username ? (
-              <UserBioCard userBio={user.bio} />
+            {sessionUser.email === username ? (
+              <UserBioCard user={{ id: user.id, bio: user.bio }} />
             ) : (
               <div className="text-lg">{user.bio}</div>
             )}
@@ -153,7 +154,7 @@ export default async function UserPage({
                   <article key={comment.id}>
                     {i > 0 && <Separator />}
                     <CommentCard
-                      session={session}
+                      sessionUser={sessionUser}
                       comment={{
                         ...comment,
                         userId: user.id,
@@ -179,7 +180,7 @@ export default async function UserPage({
                     <article key={c.id}>
                       {i > 0 && <Separator />}
                       <CommentCard
-                        session={session}
+                        sessionUser={sessionUser}
                         comment={{
                           ...c.comments,
                           isLiked: likedCommentsId.has(c.comments.id),

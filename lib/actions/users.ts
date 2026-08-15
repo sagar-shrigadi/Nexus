@@ -3,11 +3,12 @@
 import {
   deleteUserAvatar,
   followUserTransaction,
+  getUserAvatarIdByUserId,
   updateAvatarTransaction,
   updateUserBio,
 } from "@/app/services/users";
 import { revalidatePath } from "next/cache";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
 import type {
   ActionResult,
   DeleteAvatar,
@@ -15,17 +16,20 @@ import type {
   UserBio,
 } from "@/lib/definitations";
 import z from "zod";
-import { auth } from "@/auth";
+import { requireAuth } from "@/lib/actions/auth";
 
 export async function userFollows(
-  user: { id: number; username: string },
   userToFollow: { id: number; username: string },
   pathname: string,
 ): Promise<ActionResult | undefined> {
+  const authResult = await requireAuth();
+  if (!authResult.success) return authResult.error;
+  const { sessionUser } = authResult;
+
   try {
-    await followUserTransaction(user.id, userToFollow.id);
+    await followUserTransaction(Number(sessionUser.id), userToFollow.id);
     revalidatePath(`${pathname}`);
-    revalidatePath(`/${user.username}`);
+    revalidatePath(`/${sessionUser.email}`);
     revalidatePath(`/${userToFollow.username}`);
   } catch (error) {
     console.error(error);
@@ -38,10 +42,11 @@ export async function userFollows(
 const AvatarUploadSchema = z.object({
   file: z.file().optional(),
 });
-export async function avatarUpload(
-  user: { id: number; username: string },
-  formData: FormData,
-): Promise<UploadAvatar> {
+export async function avatarUpload(formData: FormData): Promise<UploadAvatar> {
+  const authResult = await requireAuth();
+  if (!authResult.success) return authResult.error;
+  const { sessionUser } = authResult;
+
   const validatedAvatar = AvatarUploadSchema.safeParse(
     Object.fromEntries(formData.entries()),
   );
@@ -82,7 +87,7 @@ export async function avatarUpload(
   const filePath = `${field}-${file.name}`;
 
   // 3. Admin bypass upload into your public storage container
-  const { data, error } = await supabase.storage
+  const { data, error } = await supabaseAdmin.storage
     .from("avatars")
     .upload(filePath, fileBuffer, {
       contentType: file.type,
@@ -92,18 +97,22 @@ export async function avatarUpload(
   if (error) return { status: "error", message: error.message };
 
   // 4. Synchronously retrieve CDN link string
-  const { data: urlData } = supabase.storage
+  const { data: urlData } = supabaseAdmin.storage
     .from("avatars")
     .getPublicUrl(data.path);
 
   try {
     // update the user in db
-    await updateAvatarTransaction(user.id, filePath, urlData.publicUrl);
+    await updateAvatarTransaction(
+      Number(sessionUser.id),
+      filePath,
+      urlData.publicUrl,
+    );
 
     revalidatePath("/");
     revalidatePath("/explore");
-    revalidatePath(`/${user.username}`);
-    revalidatePath(`/${user.username}/status`);
+    revalidatePath(`/${sessionUser.email}`);
+    revalidatePath(`/${sessionUser.email}/status`);
     // 5. Success return (Ready to save directly inside your postgres posts table)
     return {
       status: "success",
@@ -127,13 +136,27 @@ export async function deleteAvatar(user: {
     publicUrl: string;
   } | null;
 }): Promise<DeleteAvatar> {
-  if (!user.avatarId) {
+  if (!user.avatarId || !user.avatar) {
     return { status: "error", errors: { file: ["Avatar doesn't exist!"] } };
   }
+
+  const authResult = await requireAuth();
+  if (!authResult.success) return authResult.error;
+  const { sessionUser } = authResult;
+
+  const userAvatarToDelete = await getUserAvatarIdByUserId(
+    Number(sessionUser.id),
+  );
+  if (userAvatarToDelete && userAvatarToDelete.avatarId !== user.avatarId) {
+    return {
+      status: "error",
+      message: "You are not authorized to update this avatar!",
+    };
+  }
   // delete the avatar file from supabase storage
-  const { error } = await supabase.storage
+  const { error } = await supabaseAdmin.storage
     .from("avatars")
-    .remove([user.avatar!.fileName]);
+    .remove([user.avatar.fileName]);
   if (error) {
     return {
       status: "error",
@@ -146,8 +169,8 @@ export async function deleteAvatar(user: {
 
     revalidatePath("/");
     revalidatePath("/explore");
-    revalidatePath(`/${user.username}`);
-    revalidatePath(`/${user.username}/status`);
+    revalidatePath(`/${sessionUser.email}`);
+    revalidatePath(`/${sessionUser.email}/status`);
     return {
       status: "success",
       message: "Profile successfully updated!",
@@ -164,8 +187,21 @@ export async function deleteAvatar(user: {
 const UserBioSchema = z.object({
   bio: z.string().trim().min(1, "Bio is required"),
 });
-export async function updateBio(formData: FormData): Promise<UserBio> {
-  const session = await auth();
+export async function updateBio(
+  user: { id: number },
+  formData: FormData,
+): Promise<UserBio> {
+  const authResult = await requireAuth();
+  if (!authResult.success) return authResult.error;
+  const { sessionUser } = authResult;
+
+  if (user.id !== Number(sessionUser.id)) {
+    return {
+      status: "error",
+      message: "You are not authorized to update this bio!",
+    };
+  }
+
   const validatedBio = UserBioSchema.safeParse(
     Object.fromEntries(formData.entries()),
   );
@@ -179,8 +215,8 @@ export async function updateBio(formData: FormData): Promise<UserBio> {
   const { bio: newUserBio } = validatedBio.data;
 
   try {
-    await updateUserBio(Number(session?.user?.id), newUserBio);
-    revalidatePath(`/${session?.user?.email}`);
+    await updateUserBio(Number(sessionUser.id), newUserBio);
+    revalidatePath(`/${sessionUser.email}`);
     return {
       status: "success",
       message: "Profile successfully updated!",

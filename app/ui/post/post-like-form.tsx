@@ -3,17 +3,14 @@
 import { Heart } from "lucide-react";
 import { useActionState, useEffect } from "react";
 import { likePost } from "@/lib/actions/posts";
-import { Session } from "next-auth";
 import { usePathname } from "next/navigation";
 import { Field } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 
 export default function PostLikeForm({
-  session,
   post,
 }: {
-  session: Session | null;
   post: {
     id: number;
     likes: number;
@@ -21,12 +18,7 @@ export default function PostLikeForm({
   };
 }) {
   const pathname = usePathname();
-  const likePostWithId = likePost.bind(
-    null,
-    Number(session?.user?.id),
-    post.id,
-    pathname,
-  );
+  const likePostWithId = likePost.bind(null, post.id, pathname);
   const [result, formAction, isPending] = useActionState(
     likePostWithId,
     undefined,

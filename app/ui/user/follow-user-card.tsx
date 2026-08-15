@@ -1,5 +1,4 @@
 import FollowUserForm from "@/app/ui/user/follow-user-form";
-import { auth } from "@/auth";
 import UserNameCard from "@/app/ui/user/name-card";
 
 export default async function FollowUserCard({
@@ -15,7 +14,6 @@ export default async function FollowUserCard({
     isFollowed: boolean;
   };
 }) {
-  const session = await auth();
   return (
     <li className="flex justify-between items-center gap-4 px-4 py-1.5 border rounded">
       <UserNameCard
@@ -26,8 +24,7 @@ export default async function FollowUserCard({
         userAvatar={users.avatar?.publicUrl}
       />
       <FollowUserForm
-        session={session}
-        user={{
+        userToFollow={{
           id: users.id,
           username: users.username,
           isFollowed: users.isFollowed,

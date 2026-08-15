@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { comments, media, postLikes, posts, userFollows } from "@/db/schema";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
 import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
 import { deleteMediaByArrayOfIds } from "@/app/services/media";
 import { getAllCommentsOfPostWithMedia } from "@/app/services/comments";
@@ -177,7 +177,7 @@ export async function deletePostByIdTransaction(postId: number) {
         .filter((c) => c !== null);
 
       for (const comment of allCommentsWithMedia) {
-        const { error } = await supabase.storage
+        const { error } = await supabaseAdmin.storage
           .from("media")
           .remove([comment.fileName]);
         if (error) throw error;
@@ -201,7 +201,7 @@ export async function deleteMediaPostByFileNameTransaction(post: {
         .filter((c) => c !== null);
 
       for (const comment of allCommentsWithMedia) {
-        const { error } = await supabase.storage
+        const { error } = await supabaseAdmin.storage
           .from("media")
           .remove([comment.fileName]);
         if (error) throw error;

@@ -14,12 +14,11 @@ import { buttonVariants } from "@/components/ui/button";
 import { logout } from "@/lib/actions/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { auth } from "@/auth";
 import { getUserAvatar } from "@/app/services/users";
+import { User } from "next-auth";
 
-export default async function Navbar() {
-  const session = await auth();
-  const user = await getUserAvatar(Number(session?.user?.id));
+export default async function Navbar({ sessionUser }: { sessionUser: User }) {
+  const user = await getUserAvatar(Number(sessionUser.id));
   return (
     <nav>
       <ul className="flex justify-between gap-6 p-2 sm:p-4 sm:flex-col sm:justify-stretch sm:text-xl sm:h-svh lg:min-w-60">
@@ -58,7 +57,7 @@ export default async function Navbar() {
                       }
                     />
                     <AvatarFallback>
-                      {session?.user?.name?.charAt(0).toUpperCase() ?? "U"}
+                      {sessionUser.name?.charAt(0).toUpperCase() ?? "U"}
                     </AvatarFallback>
                   </Avatar>
                 </button>
@@ -67,8 +66,8 @@ export default async function Navbar() {
             <div className="grow hidden lg:flex items-center gap-4">
               <UserNameCard
                 className="flex"
-                to={`/${session?.user?.email}`}
-                fullname={session!.user!.name!}
+                to={`/${sessionUser.email}`}
+                fullname={sessionUser.name!}
                 userAvatar={user?.avatar?.publicUrl}
               />
               <DropdownMenuTrigger
@@ -91,7 +90,7 @@ export default async function Navbar() {
                 <DropdownMenuItem
                   render={
                     <Link
-                      href={`/${session?.user?.email}`}
+                      href={`/${sessionUser.email}`}
                       className="flex items-center gap-1.5"
                     >
                       <BadgeCheck />

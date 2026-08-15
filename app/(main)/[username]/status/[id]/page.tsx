@@ -11,7 +11,7 @@ import PostCard from "@/app/ui/post/post-card";
 import { auth } from "@/auth";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 export default async function PostPage({
   params,
@@ -19,17 +19,21 @@ export default async function PostPage({
   params: Promise<{ id: string }>;
 }) {
   const session = await auth();
+  if (!session || !session.user) {
+    redirect("/login");
+  }
+  const sessionUser = session.user;
   const { id } = await params;
   const post = await getPostByIdWithComments(Number(id));
   if (!post) {
     notFound();
   }
   const isPostLiked = await isPostLikedByUser(
-    Number(session?.user?.id),
+    Number(sessionUser.id),
     Number(id),
   );
   const likedComments = await getAllLikedCommentsByUserOnPost(
-    Number(session?.user?.id),
+    Number(sessionUser.id),
     Number(id),
   );
   // a set for fast lookups of each commentId for each comment card
@@ -60,7 +64,7 @@ export default async function PostPage({
                   <article key={comment.id}>
                     {i > 0 && <Separator />}
                     <CommentCard
-                      session={session}
+                      sessionUser={sessionUser}
                       comment={{
                         ...comment,
                         isLiked: likedCommentsIds.has(comment.id),

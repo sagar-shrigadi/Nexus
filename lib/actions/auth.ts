@@ -1,7 +1,7 @@
 "use server";
 
-import { signIn, signOut } from "@/auth";
-import { AuthError } from "next-auth";
+import { auth, signIn, signOut } from "@/auth";
+import { AuthError, User } from "next-auth";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { postUser } from "@/app/services/users";
@@ -85,4 +85,29 @@ export async function register(
     };
   }
   redirect("/login");
+}
+export async function requireAuth(): Promise<
+  | {
+      success: false;
+      error: {
+        status: "error";
+        message: string;
+      };
+    }
+  | {
+      success: true;
+      sessionUser: User;
+    }
+> {
+  const session = await auth();
+  if (!session || !session.user) {
+    return {
+      success: false,
+      error: {
+        status: "error",
+        message: "Unauthenticated!",
+      },
+    };
+  }
+  return { success: true, sessionUser: session.user };
 }

@@ -14,7 +14,14 @@ import { updateBio } from "@/lib/actions/users";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
 
-export default function UserBioCard({ userBio }: { userBio: string | null }) {
+export default function UserBioCard({
+  user,
+}: {
+  user: {
+    id: number;
+    bio: string | null;
+  };
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -24,7 +31,7 @@ export default function UserBioCard({ userBio }: { userBio: string | null }) {
     setIsEditing(true);
 
     const formData = new FormData(e.currentTarget);
-    const result = await updateBio(formData);
+    const result = await updateBio({ id: user.id }, formData);
 
     if (result.status === "error") {
       setIsEditing(false);
@@ -55,7 +62,7 @@ export default function UserBioCard({ userBio }: { userBio: string | null }) {
                 name="bio"
                 id="bio"
                 placeholder="Enter Bio"
-                defaultValue={userBio ? userBio : ""}
+                defaultValue={user.bio ? user.bio : ""}
                 required
               />
               {errorMessage && <FieldError>{errorMessage}</FieldError>}
@@ -83,7 +90,7 @@ export default function UserBioCard({ userBio }: { userBio: string | null }) {
         </form>
       ) : (
         <div className="text-lg flex items-center gap-2">
-          {userBio}
+          {user.bio}
           <Button
             type="button"
             size="icon-xs"

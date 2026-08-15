@@ -1,7 +1,6 @@
 "use server";
 
 import { z } from "zod";
-import { auth } from "@/auth";
 import {
   deleteMediaPostByFileNameTransaction,
   deletePostByIdTransaction,
@@ -12,7 +11,8 @@ import {
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { PostAction } from "@/lib/definitations";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
+import { requireAuth } from "@/lib/actions/auth";
 
 const PostSchema = z.object({
   title: z.string().trim().min(1, "Post Title is required."),
@@ -24,7 +24,10 @@ export async function createPost(
   prevState: PostAction | undefined,
   formData: FormData,
 ): Promise<PostAction> {
-  const session = await auth();
+  const authResult = await requireAuth();
+  if (!authResult.success) return authResult.error;
+  const { sessionUser } = authResult;
+
   const validatedPost = PostSchema.safeParse(
     Object.fromEntries(formData.entries()),
   );
@@ -39,10 +42,10 @@ export async function createPost(
   // if file doesnt exist, file size is 0 in that case
   if (!file || file.size === 0) {
     try {
-      await newPost(Number(session?.user?.id), title, content, null);
+      await newPost(Number(sessionUser.id), title, content, null);
       revalidatePath("/");
       revalidatePath("/explore");
-      revalidatePath(`/${session?.user?.email}`);
+      revalidatePath(`/${sessionUser.email}`);
       return {
         status: "success",
         message: "Post successfully created!",
@@ -79,7 +82,7 @@ export async function createPost(
     const field = crypto.randomUUID();
     const filePath = `${field}-${file.name}`;
     // 3. Admin bypass upload into your public storage container
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabaseAdmin.storage
       .from("media")
       .upload(filePath, fileBuffer, {
         contentType: file.type,
@@ -88,17 +91,17 @@ export async function createPost(
 
     if (error) return { status: "error", message: error.message };
     // 4. Synchronously retrieve CDN link string
-    const { data: urlData } = supabase.storage
+    const { data: urlData } = supabaseAdmin.storage
       .from("media")
       .getPublicUrl(data.path);
     try {
-      await newPost(Number(session?.user?.id), title, content, {
+      await newPost(Number(sessionUser.id), title, content, {
         fileName: data.path,
         publicUrl: urlData.publicUrl,
       });
       revalidatePath("/");
       revalidatePath("/explore");
-      revalidatePath(`/${session?.user?.email}`);
+      revalidatePath(`/${sessionUser.email}`);
       return {
         status: "success",
         message: "Post successfully created!",
@@ -117,8 +120,11 @@ export async function updatePost(
   prevState: PostAction | undefined,
   formData: FormData,
 ): Promise<PostAction> {
-  const session = await auth();
-  if (post.userId !== Number(session?.user?.id)) {
+  const authResult = await requireAuth();
+  if (!authResult.success) return authResult.error;
+  const { sessionUser } = authResult;
+
+  if (post.userId !== Number(sessionUser.id)) {
     return {
       status: "error",
       message: "You are not authorized to edit this post!",
@@ -163,9 +169,12 @@ export async function deletePost(
     } | null;
   },
   shouldRedirect: boolean,
-): Promise<PostAction | undefined> {
-  const session = await auth();
-  if (post.userId !== Number(session?.user?.id)) {
+) {
+  const authResult = await requireAuth();
+  if (!authResult.success) return authResult.error;
+  const { sessionUser } = authResult;
+
+  if (post.userId !== Number(sessionUser.id)) {
     return {
       status: "error",
       message: "You are not authorized to delete this post!",
@@ -173,7 +182,7 @@ export async function deletePost(
   }
 
   if (post.media != null) {
-    const { error } = await supabase.storage
+    const { error } = await supabaseAdmin.storage
       .from("media")
       .remove([post.media.fileName]);
 
@@ -211,13 +220,12 @@ export async function deletePost(
     redirect("/", "replace");
   }
 }
-export async function likePost(
-  userId: number,
-  postId: number,
-  pathname: string,
-): Promise<PostAction | undefined> {
+export async function likePost(postId: number, pathname: string) {
+  const authResult = await requireAuth();
+  if (!authResult.success) return authResult.error;
+  const { sessionUser } = authResult;
   try {
-    await likePostTransaction(userId, postId);
+    await likePostTransaction(Number(sessionUser.id), postId);
     revalidatePath(`${pathname}`);
   } catch (error) {
     console.error(error);

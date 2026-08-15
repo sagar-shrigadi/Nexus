@@ -69,7 +69,7 @@ export default function UploadAvatar({
     }
 
     // Dispatch directly to the Server Action
-    const result = await avatarUpload(user, formData);
+    const result = await avatarUpload(formData);
 
     setIsUploading(false);
 

@@ -1,5 +1,4 @@
 "use client";
-import { Session } from "next-auth";
 import { userFollows } from "@/lib/actions/users";
 import { useActionState, useEffect } from "react";
 import { usePathname } from "next/navigation";
@@ -9,12 +8,10 @@ import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 
 export default function FollowUserForm({
-  session,
-  user,
+  userToFollow,
   className,
 }: {
-  session: Session | null;
-  user: {
+  userToFollow: {
     id: number;
     username: string;
     isFollowed: boolean;
@@ -24,10 +21,9 @@ export default function FollowUserForm({
   const pathaname = usePathname();
   const userFollowsWithId = userFollows.bind(
     null,
-    { id: Number(session?.user?.id), username: session!.user!.email! },
     {
-      id: user.id,
-      username: user.username,
+      id: userToFollow.id,
+      username: userToFollow.username,
     },
     pathaname,
   );
@@ -50,11 +46,11 @@ export default function FollowUserForm({
       <Field>
         <Button
           type="submit"
-          variant={user.isFollowed ? "secondary" : "default"}
+          variant={userToFollow.isFollowed ? "secondary" : "default"}
           aria-disabled={isPending}
           disabled={isPending}
         >
-          {user.isFollowed ? "Unfollow" : "Follow"}
+          {userToFollow.isFollowed ? "Unfollow" : "Follow"}
         </Button>
       </Field>
     </form>

@@ -2,7 +2,6 @@
 
 import { Heart } from "lucide-react";
 import { useActionState, useEffect } from "react";
-import { Session } from "next-auth";
 import { usePathname } from "next/navigation";
 import { Field } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
@@ -10,10 +9,8 @@ import { toast } from "@/components/ui/toast";
 import { likeComment } from "@/lib/actions/comments";
 
 export default function CommentLikeForm({
-  session,
   comment,
 }: {
-  session: Session | null;
   comment: {
     id: number;
     postId: number;
@@ -24,7 +21,6 @@ export default function CommentLikeForm({
   const pathname = usePathname();
   const likeCommentWithId = likeComment.bind(
     null,
-    Number(session?.user?.id),
     { id: comment.id, postId: comment.postId },
     pathname,
   );

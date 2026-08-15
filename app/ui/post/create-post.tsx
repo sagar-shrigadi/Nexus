@@ -11,13 +11,13 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Session } from "next-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/components/ui/toast";
 import { Check, ImageIcon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import { User } from "next-auth";
 
-export default function CreatePost({ session }: { session: Session | null }) {
+export default function CreatePost({ sessionUser }: { sessionUser: User }) {
   const [result, formAction, isPending] = useActionState(createPost, undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isFileSelected, setIsFileSelected] = useState<string | null>(null);
@@ -45,11 +45,11 @@ export default function CreatePost({ session }: { session: Session | null }) {
         <div className="flex gap-4">
           <Avatar>
             <AvatarImage
-              src={session?.user?.image ?? "/images/defaultProfile.png"}
-              alt={session?.user?.image ? "User Avatar" : "Default User Avatar"}
+              src={sessionUser.image ?? "/images/defaultProfile.png"}
+              alt={sessionUser.image ? "User Avatar" : "Default User Avatar"}
             />
             <AvatarFallback>
-              {session?.user?.name?.charAt(0).toUpperCase() ?? "U"}
+              {sessionUser.name?.charAt(0).toUpperCase() ?? "U"}
             </AvatarFallback>
           </Avatar>
 

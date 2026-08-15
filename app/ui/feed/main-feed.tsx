@@ -2,24 +2,23 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import CreatePost from "@/app/ui/post/create-post";
 import { Separator } from "@/components/ui/separator";
 import PostCard from "@/app/ui/post/post-card";
-import { auth } from "@/auth";
 import {
   getAllLikedPostsByUser,
   getAllPostsByUserAndUsersFollowedByUser,
 } from "@/app/services/posts";
 import EmptyListTemplate from "@/app/ui/empty-list-template";
+import { User } from "next-auth";
 
-export default async function MainFeed() {
-  const session = await auth();
+export default async function MainFeed({ sessionUser }: { sessionUser: User }) {
   const posts = await getAllPostsByUserAndUsersFollowedByUser(
-    Number(session?.user?.id),
+    Number(sessionUser.id),
   );
-  const likedPosts = await getAllLikedPostsByUser(Number(session?.user?.id));
+  const likedPosts = await getAllLikedPostsByUser(Number(sessionUser.id));
   const likedPostsId = new Set(likedPosts.map((p) => p.postId));
 
   return (
     <article className="grow flex flex-col gap-4 w-full max-w-3xl h-[85svh] sm:h-svh">
-      <CreatePost session={session} />
+      <CreatePost sessionUser={sessionUser} />
       <section className="grow min-h-0">
         <ScrollArea className="h-full border rounded">
           {posts.length > 0 ? (

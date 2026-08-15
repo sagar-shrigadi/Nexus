@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { avatars, comments, posts, userFollows, users } from "@/db/schema";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
 import { and, desc, eq, not, sql } from "drizzle-orm";
 
 export async function getRandomUsersExcludingUser(userId: number) {
@@ -287,7 +287,7 @@ export async function updateAvatarTransaction(
     if (user.avatarId) {
       // user avatar exists then
       // delete the previous avatar file supabase storage
-      const { error } = await supabase.storage
+      const { error } = await supabaseAdmin.storage
         .from("avatars")
         .remove([user.avatar!.fileName]);
 
@@ -328,4 +328,10 @@ export async function deleteUserAvatar(avatarId: number) {
 }
 export async function updateUserBio(userId: number, bio: string) {
   return db.update(users).set({ bio }).where(eq(users.id, userId));
+}
+export async function getUserAvatarIdByUserId(userId: number) {
+  return db.query.users.findFirst({
+    columns: { avatarId: true },
+    where: eq(users.id, userId),
+  });
 }

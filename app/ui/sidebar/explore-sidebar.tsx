@@ -4,16 +4,17 @@ import {
 } from "@/app/services/users";
 import SidebarWrapper from "@/app/ui/sidebar/sidebar-wrapper";
 import FollowUserCard from "@/app/ui/user/follow-user-card";
-import { auth } from "@/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { User } from "next-auth";
 
-export default async function ExploreSidebar() {
-  const session = await auth();
-  const users = await getMostFollowedUsersExcludingUser(
-    Number(session?.user?.id),
-  );
+export default async function ExploreSidebar({
+  sessionUser,
+}: {
+  sessionUser: User;
+}) {
+  const users = await getMostFollowedUsersExcludingUser(Number(sessionUser.id));
   const followedUsers = await allUsersFollowedByUserWithId(
-    Number(session?.user?.id),
+    Number(sessionUser.id),
   );
   const followedUsersId = new Set(followedUsers.map((u) => u.follows));
   return (
