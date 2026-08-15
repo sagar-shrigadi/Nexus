@@ -42,6 +42,7 @@ export default function PostLikeForm({
             variant="ghost"
             aria-disabled={isPending}
             disabled={isPending}
+            aria-label={post.isLiked ? "Unlike post" : "Like post"}
           >
             <Heart
               className={`size-6.5 ${post.isLiked && "fill-pink-500 stroke-pink-500"} transition-colors`}

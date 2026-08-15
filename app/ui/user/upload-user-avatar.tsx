@@ -151,7 +151,11 @@ export default function UploadAvatar({
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogTrigger
           render={
-            <Button variant="secondary" size="icon-sm">
+            <Button
+              aria-label="Update avatar"
+              variant="secondary"
+              size="icon-sm"
+            >
               <Edit />
             </Button>
           }

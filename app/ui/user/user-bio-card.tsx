@@ -92,6 +92,7 @@ export default function UserBioCard({
         <div className="text-lg flex items-center gap-2">
           {user.bio}
           <Button
+            aria-label="Update bio"
             type="button"
             size="icon-xs"
             onClick={() => setIsEditing(true)}

@@ -48,6 +48,7 @@ export default function CommentLikeForm({
             variant="ghost"
             aria-disabled={isPending}
             disabled={isPending}
+            aria-label={comment.isLiked ? "Unlike comment" : "Like comment"}
           >
             <Heart
               className={`size-6.5 ${comment.isLiked && "fill-pink-500 stroke-pink-500"} transition-colors`}

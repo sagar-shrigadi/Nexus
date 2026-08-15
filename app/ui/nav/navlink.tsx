@@ -12,6 +12,7 @@ export default function Navlink({ to, children }: NavlinkProps) {
     <li className="flex items-center justify-center">
       <Link
         href={to}
+        aria-label={to === "/" ? "Home" : "Explore"}
         className={`grow flex items-center gap-4 px-4 py-2 cursor-pointer hover:bg-sidebar-accent rounded transition-colors ${pathname === to ? "bg-sidebar-accent" : ""}`}
       >
         {children}
