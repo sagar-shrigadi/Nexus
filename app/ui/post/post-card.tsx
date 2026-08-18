@@ -1,9 +1,7 @@
 import PostContent from "@/app/ui/post/post-content";
 import PostHeader from "@/app/ui/post/post-header";
 
-export default function PostCard({
-  post,
-}: {
+interface PostCardProps {
   post: {
     id: number;
     title: string;
@@ -27,7 +25,9 @@ export default function PostCard({
       publicUrl: string;
     } | null;
   };
-}) {
+  shouldClamp?: boolean;
+}
+export default function PostCard({ post, shouldClamp = true }: PostCardProps) {
   return (
     <div className="flex flex-col gap-1 py-2.5">
       <PostHeader
@@ -55,6 +55,7 @@ export default function PostCard({
           },
           media: post.media,
         }}
+        shouldClamp={shouldClamp}
       />
     </div>
   );
