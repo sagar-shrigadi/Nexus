@@ -47,7 +47,10 @@ export default async function PostPage({
       </header>
       <ScrollArea className="grow min-h-0 border rounded">
         <section>
-          <PostCard post={{ ...post, isLiked: !!isPostLiked }} />
+          <PostCard
+            post={{ ...post, isLiked: !!isPostLiked }}
+            shouldClamp={false}
+          />
         </section>
         <Separator />
         <section>

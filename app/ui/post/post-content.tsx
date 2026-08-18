@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 
 export default async function PostContent({
   post,
+  shouldClamp,
 }: {
   post: {
     id: number;
@@ -24,6 +25,7 @@ export default async function PostContent({
       publicUrl: string;
     } | null;
   };
+  shouldClamp: boolean;
 }) {
   return (
     <div className="flex flex-col gap-4 px-4 py-1">
@@ -32,7 +34,9 @@ export default async function PostContent({
         className="flex justify-center flex-col gap-1 px-6 py-2 cursor-pointer hover:bg-sidebar-accent rounded transition-colors"
       >
         <h3 className="sm:text-lg font-bold">{post.title}</h3>
-        <p className="line-clamp-4 max-w-[65ch] mb-2">{post.content}</p>
+        <p className={cn(shouldClamp && "line-clamp-4", "max-w-[65ch] mb-2")}>
+          {post.content}
+        </p>
         {post.media && (
           <Image
             src={post.media.publicUrl}
