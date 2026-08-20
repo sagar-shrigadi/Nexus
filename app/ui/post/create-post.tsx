@@ -15,10 +15,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/components/ui/toast";
 import { Check, ImageIcon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
-import { useSession } from "next-auth/react";
+import { User } from "next-auth";
 
-export default function CreatePost() {
-  const { data: session } = useSession();
+export default function CreatePost({ sessionUser }: { sessionUser: User }) {
   const [result, formAction, isPending] = useActionState(createPost, undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isFileSelected, setIsFileSelected] = useState<string | null>(null);
@@ -39,11 +38,11 @@ export default function CreatePost() {
         <div className="flex gap-4">
           <Avatar>
             <AvatarImage
-              src={session?.user?.image ?? "/images/defaultProfile.png"}
-              alt={session?.user?.image ? "User Avatar" : "Default User Avatar"}
+              src={sessionUser.image ?? "/images/defaultProfile.png"}
+              alt={sessionUser.image ? "User Avatar" : "Default User Avatar"}
             />
             <AvatarFallback>
-              {session?.user?.email?.charAt(0).toUpperCase() ?? "U"}
+              {sessionUser.email?.charAt(0).toUpperCase() ?? "U"}
             </AvatarFallback>
           </Avatar>
 
