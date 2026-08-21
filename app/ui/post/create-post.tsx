@@ -16,8 +16,17 @@ import { toast } from "@/components/ui/toast";
 import { Check, ImageIcon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { User } from "next-auth";
+import { useSession } from "next-auth/react";
 
 export default function CreatePost({ sessionUser }: { sessionUser: User }) {
+  const { data: session } = useSession();
+
+  // on initial visit, bcoz the session is fetching async client side it results in it being undefined
+  // which results in falling back to default avatar unless a hard refresh is done
+  // to circumvent that, display the avatar on initial load via server session
+  // and after avatar update by user, the client side session will be populated and all updates will be properly reflected
+  const userAvatar = session?.user?.image ?? sessionUser.image;
+
   const [result, formAction, isPending] = useActionState(createPost, undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isFileSelected, setIsFileSelected] = useState<string | null>(null);
@@ -38,11 +47,11 @@ export default function CreatePost({ sessionUser }: { sessionUser: User }) {
         <div className="flex gap-4">
           <Avatar>
             <AvatarImage
-              src={sessionUser.image ?? "/images/defaultProfile.png"}
-              alt={sessionUser.image ? "User Avatar" : "Default User Avatar"}
+              src={userAvatar ?? "/images/defaultProfile.png"}
+              alt={userAvatar ? "User Avatar" : "Default User Avatar"}
             />
             <AvatarFallback>
-              {sessionUser.name?.charAt(0).toUpperCase() ?? "U"}
+              {sessionUser.email?.charAt(0).toUpperCase() ?? "U"}
             </AvatarFallback>
           </Avatar>
 
