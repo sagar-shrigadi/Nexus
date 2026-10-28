@@ -54,8 +54,8 @@ export default function LoginForm() {
             <FieldDescription>
               Don&apos;t have an account? <Link href="/signup">Sign Up</Link>
             </FieldDescription>
-            {loginError ? <FieldError>{loginError}</FieldError> : ""}
-            {guestLoginError ? <FieldError>{guestLoginError}</FieldError> : ""}
+            {loginError ? <FieldError data-testid='loginError'>{loginError}</FieldError> : ""}
+            {guestLoginError ? <FieldError data-testid='guestLoginError'>{guestLoginError}</FieldError> : ""}
             <Button
               type="submit"
               disabled={loginPending}

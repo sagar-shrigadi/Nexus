@@ -7,7 +7,7 @@ import postgres from "postgres";
 config({ path: ".env.local" }); // or .env
 
 // if using local postgres db, remove the options object,`{prepare: false}` from below,
-const client = postgres(process.env.POSTGRES_URL!, {
+const client = postgres(process.env.LOCAL_DB_URL!, {
   prepare: false,
 });
 export const db = drizzle(client, { schema });
