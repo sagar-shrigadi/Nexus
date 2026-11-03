@@ -55,7 +55,7 @@ export default async function PostContent({
       <div className="flex items-center gap-6 px-6">
         <div className="flex items-center gap-2">
           <MessageSquare className="size-5.5" />
-          <span>{post.commentsCount > 0 ? `${post.commentsCount}` : ""}</span>
+          <span data-testid='postCommentCount'>{post.commentsCount > 0 && post.commentsCount}</span>
         </div>
         <PostLikeForm
           post={{ id: post.id, likes: post.likes, isLiked: post.isLiked }}
