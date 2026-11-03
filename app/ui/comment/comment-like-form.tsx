@@ -56,8 +56,8 @@ export default function CommentLikeForm({
           </Button>
         </Field>
       </form>
-      <span className="transition-all">
-        {comment.likes > 0 && `${comment.likes}`}
+      <span className="transition-all" data-testid='commentLikeCount'>
+        {comment.likes > 0 && comment.likes}
       </span>
     </div>
   );

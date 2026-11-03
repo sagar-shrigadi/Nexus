@@ -31,7 +31,7 @@ export default function CommentOptions({
         nativeButton={true}
         render={
           <button
-            aria-label="Open user actions"
+            aria-label="Open user actions for comments"
             className={cn(
               buttonVariants({
                 variant: "outline",
