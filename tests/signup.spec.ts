@@ -3,7 +3,6 @@ config({ path: ".env.local" });
 import {test, expect} from '@playwright/test';
 import { faker } from "@faker-js/faker";
 
-test.describe.configure({ mode: 'default' });
 test.beforeEach(async ({page}) => {
     await page.goto('');
     await page.getByRole('link', {name: 'Sign Up'}).click();
@@ -16,7 +15,7 @@ test('navigate to login page', async ({page}) => {
 
     await expect(page.getByText('Login to your account', {exact:true})).toBeVisible();
     await expect(page.getByText('Enter your username below to login to your account')).toBeVisible();
-    await expect(page).toHaveURL(/login/)
+    await expect(page).toHaveURL(/login/);
 });
 test('after successfully signing up, redirects to login page', async ({page}) => {
     const firstname = faker.person.firstName();
@@ -28,10 +27,9 @@ test('after successfully signing up, redirects to login page', async ({page}) =>
 
     await page.getByRole('button', {name: 'Sign up'}).click();
 
-
-    // after form submission, redirect to login page
-    await expect(page).toHaveURL(/login/)
-})
+    // after signing up, redirect to login page
+    await expect(page).toHaveURL(/login/);
+});
 test.describe('failed sign up attempts', () => {
     test('errors when a username already exists', async ({page}) => {
         await page.getByLabel('First Name').fill(faker.person.firstName());
@@ -43,8 +41,8 @@ test.describe('failed sign up attempts', () => {
         await page.getByRole('button', {name: 'Sign up'}).click();
 
         // to still be at signup page
-        await expect(page).toHaveURL(/signup/)
-        await expect(page.getByTestId('signUpError')).toHaveText('Database error: Failed to create your account. Please Try again!')
+        await expect(page).toHaveURL(/signup/);
+        await expect(page.getByTestId('signUpError')).toHaveText('Database error: Failed to create your account. Please Try again!');
     })
     test.describe('validation errors', () => {
         test('no firstname and lastname provided', async ({page}) => {
@@ -56,11 +54,12 @@ test.describe('failed sign up attempts', () => {
 
             await page.getByRole('button', {name: 'Sign up'}).click();
 
-            await expect(page).toHaveURL(/signup/)
-            await expect(page.getByTestId('signUpFirstNameError')).toHaveText('First name is required.')
-            await expect(page.getByTestId('signUpLastNameError')).toHaveText('Last name is required.')
-            await expect(page.getByTestId('signUpError')).toHaveText('Missing or invalid fields. Failed to register.')
-        })
+            // still be on signup page
+            await expect(page).toHaveURL(/signup/);
+            await expect(page.getByTestId('signUpFirstNameError')).toHaveText('First name is required.');
+            await expect(page.getByTestId('signUpLastNameError')).toHaveText('Last name is required.');
+            await expect(page.getByTestId('signUpError')).toHaveText('Missing or invalid fields. Failed to register.');
+        });
         test('errors when firstname, lastname, username, password exceeds max lengths', async ({page}) => {
             await page.getByLabel('First Name').fill('f'.repeat(51));
             await page.getByLabel('Last Name').fill('l'.repeat(51));
@@ -69,12 +68,14 @@ test.describe('failed sign up attempts', () => {
 
             await page.getByRole('button', {name: 'Sign up'}).click();
 
-            await expect(page.getByTestId('signUpFirstNameError')).toHaveText('First name is too long.')
-            await expect(page.getByTestId('signUpLastNameError')).toHaveText('Last name is too long.')
-            await expect(page.getByTestId('signUpUsernameError')).toHaveText('Username is too long.')
-            await expect(page.getByTestId('signUpPasswordError')).toHaveText('Password is too long.')
+            // still be on signup page
+            await expect(page).toHaveURL(/signup/);
+            await expect(page.getByTestId('signUpFirstNameError')).toHaveText('First name is too long.');
+            await expect(page.getByTestId('signUpLastNameError')).toHaveText('Last name is too long.');
+            await expect(page.getByTestId('signUpUsernameError')).toHaveText('Username is too long.');
+            await expect(page.getByTestId('signUpPasswordError')).toHaveText('Password is too long.');
 
-            await expect(page.getByTestId('signUpError')).toHaveText('Missing or invalid fields. Failed to register.')
-        })
-    })
-})
+            await expect(page.getByTestId('signUpError')).toHaveText('Missing or invalid fields. Failed to register.');
+        });
+    });
+});
