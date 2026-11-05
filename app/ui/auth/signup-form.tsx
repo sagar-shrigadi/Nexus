@@ -36,7 +36,7 @@ export default function SignupForm() {
               required
             />
             {errorMessage?.errors?.firstname ? (
-              <FieldError>{errorMessage.errors.firstname}</FieldError>
+              <FieldError data-testid='signUpFirstNameError'>{errorMessage.errors.firstname}</FieldError>
             ) : (
               ""
             )}
@@ -51,7 +51,7 @@ export default function SignupForm() {
               required
             />
             {errorMessage?.errors?.lastname ? (
-              <FieldError>{errorMessage.errors.lastname}</FieldError>
+              <FieldError data-testid='signUpLastNameError'>{errorMessage.errors.lastname}</FieldError>
             ) : (
               ""
             )}
@@ -64,9 +64,10 @@ export default function SignupForm() {
               id="username"
               required
               autoComplete="username"
+              minLength={3}
             />
             {errorMessage?.errors?.username ? (
-              <FieldError>{errorMessage.errors.username}</FieldError>
+              <FieldError data-testid='signUpUsernameError'>{errorMessage.errors.username}</FieldError>
             ) : (
               <FieldDescription>
                 Must be at least 3 characters long.
@@ -84,7 +85,7 @@ export default function SignupForm() {
               minLength={8}
             />
             {errorMessage?.errors?.password ? (
-              <FieldError>{errorMessage.errors.password}</FieldError>
+              <FieldError data-testid='signUpPasswordError'>{errorMessage.errors.password}</FieldError>
             ) : (
               <FieldDescription>
                 Must be at least 8 characters long.
@@ -97,7 +98,7 @@ export default function SignupForm() {
               Already have an account? <Link href="/login">Sign in</Link>
             </FieldDescription>
             {errorMessage?.message ? (
-              <FieldError>{errorMessage.message}</FieldError>
+              <FieldError data-testid='signUpError'>{errorMessage.message}</FieldError>
             ) : (
               ""
             )}

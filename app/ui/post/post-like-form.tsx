@@ -50,8 +50,8 @@ export default function PostLikeForm({
           </Button>
         </Field>
       </form>
-      <span className="transition-all">
-        {post.likes > 0 ? `${post.likes}` : ""}
+      <span className="transition-all" data-testid='postLikeCount'>
+        {post.likes > 0 && post.likes}
       </span>
     </div>
   );

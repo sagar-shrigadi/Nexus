@@ -35,7 +35,7 @@ export default function PostOptions({
       <DropdownMenuTrigger
         render={
           <button
-            aria-label="Open user actions"
+            aria-label="Open user actions for post"
             className={cn(
               buttonVariants({
                 variant: "outline",

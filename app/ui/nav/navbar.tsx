@@ -73,6 +73,7 @@ export default async function Navbar({ sessionUser }: { sessionUser: User }) {
               <DropdownMenuTrigger
                 render={
                   <button
+                    data-testid='userOptions'
                     className={cn(
                       buttonVariants({
                         variant: "outline",

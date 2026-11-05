@@ -43,7 +43,7 @@ const SignUpSchema = z.object({
     .string()
     .trim()
     .min(3, "Username must be at least 3 characters long.")
-    .max(30, "Username must not exceed 30 characters."),
+    .max(30, "Username is too long."),
   password: z
     .string()
     .trim()
